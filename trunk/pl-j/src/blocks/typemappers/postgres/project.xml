@@ -2,8 +2,9 @@
 <project>
 
   <pomVersion>3</pomVersion>
-  <id>postgres-typemapper</id>
-  <name>postgres-typemapper</name>
+  <id>pl-j-postgres</id>
+  <name>pl-j-postgres</name>
+  <currentVersion>0.0.1</currentVersion>
   
   <extends>../../project.xml</extends>
 
@@ -28,23 +29,24 @@
 		</dependency>
 
 		<dependency>
-			<id>excalibur-thread</id>
+			<id>log4j</id>
 			<type>jar</type>
-			<artifactId>excalibur-thread</artifactId>
-			<version>1.0</version>
+			<artifactId>log4j</artifactId>
+			<version>1.2.8</version>
+		</dependency>
+
+		<dependency>
+			<id>pl-j</id>
+			<type>jar</type>
+			<artifactId>pl-j-api</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 
 	</dependencies>
 
 	<build>
 		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
-
-		<!-- 
-		err... ehmm... don`t say anithing, I know :( 
-		the src structure is ugly.
-		-->
-		<sourceDirectory>.</sourceDirectory>
-
+		<sourceDirectory>src/java</sourceDirectory>
 	</build>
 
 </project>
