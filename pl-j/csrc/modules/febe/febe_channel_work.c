@@ -36,11 +36,12 @@ febe_receive_integer_4(void)
 		
 	}
 	for (i = 0; i < 4; i++) {
+		elog(DEBUG1, "chr: %d", c[i]);
 		pqGetc(c + i, min_conn);
 	}
 	i = c[3] + (c[2] * 256) + (c[1] * 256 * 256) +
 		(c[0] * 256 * 256 * 256);
-	elog(DEBUG1, "");
+	elog(DEBUG1, "febe_receive_integer_4: %d", i);
 	return i;
 }
 
@@ -57,6 +58,10 @@ febe_receive_string(void)
 	 * pqGetInt(&cnt, 4, min_conn);
 	 */
 	cnt = febe_receive_integer_4();
+
+	if(cnt == 0)
+		return "";
+
 //	elog(DEBUG1,"string len: %d", (unsigned int)cnt);
 	tmp_chr = SPI_palloc(sizeof(char) * (cnt + 2));
 	pqGetnchar(tmp_chr, cnt, min_conn);
@@ -455,11 +460,10 @@ febe_receive_sql_prepare(void)
 //	ret -> types = NULL;
 
 	for (i = 0; i < ret -> ntypes; i++) {
+		elog(DEBUG1, "%d", i);
 		ret -> types[i] = febe_receive_string();
-//		pljelog(DEBUG1, "ret -> types[%d] = %s", i, ret -> types[i]);
 	}
 
-//	pljelog(DEBUG1,"febe_receive_sql_prepare");
 	return ret;
 }
 
@@ -535,6 +539,20 @@ febe_receive_sql_unprepare(){
 	return ret;
 }
 
+sql_msg_cursor_open
+febe_receive_sql_opencursor_sql(){
+	sql_msg_cursor_open	ret;
+
+	ret = SPI_palloc(sizeof(struct str_sql_msg_cursor_open));
+	ret -> msgtype = MT_SQL;
+	ret -> sqltype = SQL_TYPE_CURSOR_OPEN;
+	ret -> length = sizeof(struct str_sql_msg_cursor_open);
+	ret -> cursorname = febe_receive_string();
+	ret -> query = febe_receive_string();
+
+	return ret;
+}
+
 sql_msg
 febe_receive_sql(void)
 {
@@ -555,6 +573,8 @@ febe_receive_sql(void)
 			return (sql_msg)febe_receive_sql_cursorclose();
 		case SQL_TYPE_UNPREPARE:
 			return (sql_msg)febe_receive_sql_unprepare();
+		case SQL_TYPE_CURSOR_OPEN:
+			return (sql_msg)febe_receive_sql_opencursor_sql();
 		default:
 			//pljlogging_error = 1;
 		elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
