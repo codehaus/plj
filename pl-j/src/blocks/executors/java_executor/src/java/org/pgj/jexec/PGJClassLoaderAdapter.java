@@ -4,7 +4,7 @@
 
 package org.pgj.jexec;
 
-import org.pgj.classloaders.pgjClassLoader;
+import org.pgj.tools.classloaders.PLJClassLoader;
 
 
 /**
@@ -19,12 +19,12 @@ public class PGJClassLoaderAdapter extends ClassLoader {
 		return cl.load(name);
 	}
 
-	pgjClassLoader cl = null;
+	PLJClassLoader cl = null;
 
 	/**
 	 * 
 	 */
-	public PGJClassLoaderAdapter(pgjClassLoader cl) {
+	public PGJClassLoaderAdapter(PLJClassLoader cl) {
 		super();
 		this.cl = cl;
 	}
