@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
 
-import org.pgj.Channel;
 import org.pgj.messages.Result;
 import org.pgj.messages.SQLCursorClose;
 import org.pgj.messages.SQLFetch;
