@@ -65,9 +65,13 @@
 		url=" jdbc:postgresql:plj"
 		userid="postgres74"
 		password="postgres">
-    <operation type="INSERT" 
+	    <operation type="INSERT" 
             src="seedFile.xml"/>
-</dbunit>
+		</dbunit>
 	</goal>
+
+	<preGoal name="clean:clean">
+		<attainGoal name="multiproject:clean"/>
+	</preGoal>
 
 </project>

@@ -36,7 +36,7 @@
 		<url>jdbc:default:database</url>
 		<user>default</user>
 		<password>default</password>
-		<select>select jar, classcode from sqlj.plj_classes where fqn = ?</select>
+		<select>select classcode from sqlj.plj_classes where fqn = ?</select>
 		<store>insert into sqlj.plj_classes (classcode, fqn, jar) values (?, ?, ?)</store>
 		<delete>delete from sqlj.plj_classes where fqn = ?</delete>
 		<count>select count(*) from sqlj.plj_classes where fqn = ?</count>
@@ -80,6 +80,10 @@
 					will be applied.
 					-->
 				<canUserOverrideFetchSize>false</canUserOverrideFetchSize>
+				<!--
+					Use the plan pool feature.
+					-->
+				<usePlanPool>false</usePlanPool>
 				<!--
 					===== DatabaseMetadata =====
 					-->

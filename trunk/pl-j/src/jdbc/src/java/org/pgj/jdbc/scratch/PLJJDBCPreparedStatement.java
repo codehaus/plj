@@ -106,10 +106,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	}
 
 	/**
-	 * 
-	 * @param statement
-	 * @param args
-	 * @throws SQLException
+	 * Actualy prepares the statement and sets the plan ID.
+	 * @throws SQLException on mapping problems mostly
 	 */
 	private void doPrepare() throws SQLException {
 
@@ -134,6 +132,15 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			throw new SQLException("mapping exception:" + args[i].getName());
 		}
 
+		if(conn.planPool != null)
+		synchronized (conn.planPool) {
+			int pplan = conn.planPool.getPlan(dbstatement, conn);
+			if (pplan != -1) {
+				this.plan = pplan;
+				return;
+			}
+		}
+
 		SQLPrepare prep = new SQLPrepare();
 		prep.setStatement(dbstatement);
 		prep.setClient(conn.client);
@@ -150,11 +157,14 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		} catch (MappingException e2) {
 			throw new SQLException("Result cannot be mapped to int");
 		}
+		if(conn.planPool != null)
+		synchronized(conn.planPool){
+			conn.planPool.putPlan(dbstatement, plan, conn);
+		}
 	}
 
 	private Field[] doMakeFields() throws MappingException {
 		TypeMapper mapper = conn.client.getTypeMapper();
-		SQLExecute exec = new SQLExecute();
 		Field[] flds = new Field[params.size()];
 		for (int i = 0; i < flds.length; i++) {
 			Object o = params.get(i);
@@ -169,9 +179,12 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	}
 
 	/**
-	 *  
+	 * Construct prepared statements.
+	 * @param conn			Connection to work on
+	 * @param statement		The statement to prepare
+	 * @throws SQLException if the statement is wrong.
 	 */
-	protected PLJJDBCPreparedStatement(PLJJDBCConnection conn, String statement)
+	PLJJDBCPreparedStatement(PLJJDBCConnection conn, String statement)
 			throws SQLException {
 		super();
 		this.conn = conn;
@@ -316,44 +329,44 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			case Types.BIGINT :
 				paramClasses.set(parameterIndex - 1, BigInteger.class);
 				break;
-			case Types.BINARY:
+			case Types.BINARY :
 				paramClasses.set(parameterIndex - 1, byte[].class);
 				break;
-			case Types.BIT:
+			case Types.BIT :
 				paramClasses.set(parameterIndex - 1, Boolean.class);
 				break;
-			case Types.BLOB:
+			case Types.BLOB :
 				paramClasses.set(parameterIndex - 1, byte[].class);
 				break;
-			case Types.BOOLEAN:
+			case Types.BOOLEAN :
 				paramClasses.set(parameterIndex - 1, Boolean.class);
 				break;
-			case Types.CHAR:
+			case Types.CHAR :
 				paramClasses.set(parameterIndex - 1, Character.class);
 				break;
-			case Types.CLOB:
+			case Types.CLOB :
 				paramClasses.set(parameterIndex - 1, byte[].class);
 				break;
-			case Types.DATE:
+			case Types.DATE :
 				paramClasses.set(parameterIndex - 1, Date.class);
 				break;
-			case Types.DECIMAL:
+			case Types.DECIMAL :
 				paramClasses.set(parameterIndex - 1, Number.class);
 				break;
-			case Types.DOUBLE:
+			case Types.DOUBLE :
 				paramClasses.set(parameterIndex - 1, Double.class);
 				break;
-			case Types.FLOAT:
+			case Types.FLOAT :
 				paramClasses.set(parameterIndex - 1, Float.class);
 				break;
-			case Types.INTEGER:
+			case Types.INTEGER :
 				paramClasses.set(parameterIndex - 1, Integer.class);
 				break;
-			case Types.JAVA_OBJECT:
+			case Types.JAVA_OBJECT :
 				paramClasses.set(parameterIndex - 1, byte[].class);
 				break;
-			default:
-				throw new SQLException("Unhandled type:"+sqlType);
+			default :
+				throw new SQLException("Unhandled type:" + sqlType);
 		}
 	}
 

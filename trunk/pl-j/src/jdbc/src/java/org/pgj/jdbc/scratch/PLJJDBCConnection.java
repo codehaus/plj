@@ -34,6 +34,8 @@ import org.pgj.tools.utils.ClientUtils;
  */
 public class PLJJDBCConnection implements Connection {
 
+	PlanPool planPool = null;
+	
 	private final static Category log = Category
 			.getInstance(PLJJDBCConnection.class);
 
@@ -101,13 +103,17 @@ public class PLJJDBCConnection implements Connection {
 	}
 
 	/**
-	 *  
+	 * Driver constructor.
+	 * @throws SQLException if the driver is misconfigured 
 	 */
-	public PLJJDBCConnection() {
+	public PLJJDBCConnection() throws SQLException {
 		super();
 		client = ClientUtils.getClientforThread();
 		communicationChanell = client.getChannel();
 		conf = org.pgj.tools.utils.JDBCUtil.getConfiguration();
+		if(getBooleanFromConf("usePlanPool")){
+			planPool = PlanPool.getPlanPool();
+		}
 	}
 
 	/*
