@@ -253,8 +253,9 @@ public class FEBEChannel
 	 * @avalon.dependency key="socket-manager" type="org.apache.avalon.cornerstone.services.sockets.SocketManager"
 	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 * 
-	 * @dna.dependency key="socket-manager" type="org.apache.avalon.cornerstone.services.sockets.SocketManager"
-	 * @dna.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
+	 * @dna.dependency key="socket-manager" type="org.apache.avalon.cornerstone.services.sockets.SocketManager" optional="false"
+	 * @dna.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper" optional="false"
+	 * 
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		logger.debug("servicing");

@@ -46,6 +46,27 @@
             <type>jar</type>
             <properties/>
         </dependency>
+        <dependency>
+            <groupId>loom</groupId>
+            <artifactId>maven-loom-plugin</artifactId>
+            <version>1.0-rc1</version>
+            <type>plugin</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>dna</groupId>
+            <artifactId>maven-dna-plugin</artifactId>
+            <version>1.1</version>
+            <type>plugin</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>metaclass</groupId>
+            <artifactId>maven-metaclass-plugin</artifactId>
+            <version>1.1</version>
+            <type>plugin</type>
+            <properties/>
+        </dependency>
     </dependencies>
     <build>
         <nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>

@@ -1,16 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
-
-  <pomVersion>3</pomVersion>
-  <id>pl-j</id>
-  <name>pl-j</name>
-
-  <extend>${basedir}/../project.xml</extend>
-
-  <inceptionYear>2004</inceptionYear>
-
-  <description>Source codes for PL-J</description>
-  <shortDescription>
-  </shortDescription>
-
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>pl-j</artifactId>
+    <name>pl-j</name>
+    <groupId>pl-j</groupId>
+    <description>PL-J Tools subprojects contains general classes and blocks such as classloader implementations and JDBC utility classes. These classes are used in most of the block implementation subprojects.</description>
+    <shortDescription>PL-J general classes to build blocks on.</shortDescription>
+    <properties/>
 </project>

@@ -56,32 +56,42 @@
 				<resource
 					id="logkit:logkit" 
 					version="2.0"/>
+				<resource
+					id="bsf:bsf" 
+					version="2.3.0"/>
 
+				<resource
+					id="jython:jython" 
+					version="2.1"/>
+
+				<resource
+					id="groovy:groovy" 
+					version="1.0-beta-7"/>
 
 				<resource 
 					id="pl-j:pl-j-api" 
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-javaexecutor"
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-febe"
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-postgres"
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-glue"
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-tools"
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-jdbc"
-					version="0.0.5"/>
+					version="0.0.6"/>
 				<resource
 					id="pl-j:pl-j-bsfexec"
-					version="0.0.5"/>
+					version="0.0.6"/>
 
 			</repository>
 		</classpath>
@@ -97,6 +107,7 @@
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
 				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
 				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
+				<type db="text" class="org.pgj.typemapping.postgres.PGText"/>
 			</map>
 			<backmap>
 				<type class="java.lang.Integer" type="int4"/>
@@ -217,6 +228,45 @@
 		</categories>
 	</component>
 
+	<!-- 
+		JDBC ScriptRepository implementation. The default configuration requires the
+		sqlj.plj_classes installed. 
+		You can install it from etc/install/sqlj_scripts.sql
+	 -->
+	<component
+		name="scriptloader"
+		class="org.pgj.bsf.JDBCScriptRepository">
+		<dependencies>
+		</dependencies>
+		<configuration>
+			<cached>true</cached>
+			<load>select lang, script, name from sqlj.plj_scripts where name = ?</load>
+			<store>insert into sqlj.plj_scripts (name, lang, script) values (?, ?, ?)</store>
+			<delete>delete from sqlj.plj_scripts where name = ?</delete>
+		</configuration>
+	</component>
+
+	<!-- 
+		The executor based on BSF framework. It is under heavy developement, and still needs
+		a good privileged function framework.
+		To let BSFExecutor run your pet language, you need to add it to the package dependencies 
+		above.
+	 -->
+	<component
+		name="bsf-executor"
+		class="org.pgj.bsf.BSFExecutor">
+		<dependencies>
+			<dependency key="classloader" source="classloader"/>
+			<dependency key="scriptloader" source="scriptloader"/>
+		</dependencies>
+		<configuration>
+			<tempDir>/tmp/</tempDir>
+		</configuration>
+		<categories priority="DEBUG">
+			<category name="/bsf-executor"/>
+		</categories>
+	</component>
+
 	<!--
 		Experimental!
 		JTA integration.
@@ -234,6 +284,9 @@
 		<dependencies>
 			<dependency key="channel" source="channel"/>
 			<dependency key="executor" source="executor"/>
+			<!-- 
+			<dependency key="executor" source="bsf-executor"/>
+			 -->
 			<dependency key="jdbc-configurator" source="jdbc-configurator"/>
 			<dependency key="jta-adapter" source="jta-adapter"/>
 		</dependencies>
@@ -242,6 +295,11 @@
 		</categories>
 	</component>
 
+	<!-- 
+		The JDBCInitializer is from the tools subproject, it configures JDBC connections.
+		The configuration of this component and it`s documentation is under developement,
+		and is closely related to the JDBC functionality.
+	 -->
 	<component
 		name="jdbc-configurator"
 		class="org.pgj.jdbc.core.JDBCInitializer">

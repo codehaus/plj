@@ -29,6 +29,10 @@ import org.pgj.typemapping.MappingException;
  * 
  * @avalon.component name="method-finder"
  * @avalon.service type="org.pgj.tools.methodfinder.MethodFinder"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.tools.methodfinder.MethodFinder"
+ * 
  * @author Laszlo Hornyak
  */
 public class DefaultMethodFinder
@@ -168,8 +172,11 @@ public class DefaultMethodFinder
 	/**
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
 	 * 
-	 * @avalon.dependency key="tuple-mapper"
-	 *                    type="org.pgj.tools.tuplemapper.TupleMapper"
+	 * @avalon.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper"
+	 * 
+	 * 
+	 * @dna.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper"
+	 * 
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		tupleMapper = (TupleMapper) arg0.lookup("tuple-mapper");

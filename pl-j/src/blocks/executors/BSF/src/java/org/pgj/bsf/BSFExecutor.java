@@ -133,15 +133,12 @@ public class BSFExecutor
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
 	 * 
 	 * @avalon.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
-	 * @avalon.dependency key="jdbc-configurator"
-	 *                    type="org.pgj.tools.jdbc.JDBCConfigurator"
+	 * @avalon.dependency key="jdbc-configurator" type="org.pgj.tools.jdbc.JDBCConfigurator"
 	 * @avalon.dependency key="scriptloader" type="org.pgj.bsf.ScriptRepository"
 	 * 
-	 * 
 	 * @dna.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
-	 * @dna.dependency key="jdbc-configurator"
-	 *                    type="org.pgj.tools.jdbc.JDBCConfigurator"
-	 * @dnas.dependency key="scriptloader" type="org.pgj.bsf.ScriptRepository"
+	 * @dna.dependency key="jdbc-configurator" type="org.pgj.tools.jdbc.JDBCConfigurator"
+	 * @dna.dependency key="scriptloader" type="org.pgj.bsf.ScriptRepository"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		loader = (ScriptRepository) arg0.lookup("scriptloader");
