@@ -1,0 +1,55 @@
+package org.pgj.jdbc.postgresql.jdbc2;
+
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
+
+import org.pgj.jdbc.postgresql.PGConnection;
+import org.pgj.jdbc.postgresql.largeobject.LargeObject;
+import org.pgj.jdbc.postgresql.largeobject.LargeObjectManager;
+
+public abstract class AbstractJdbc2Blob
+{
+	private int oid;
+	private LargeObject lo;
+
+	public AbstractJdbc2Blob(PGConnection conn, int oid) throws SQLException
+	{
+		this.oid = oid;
+		LargeObjectManager lom = conn.getLargeObjectAPI();
+		this.lo = lom.open(oid);
+	}
+
+	public long length() throws SQLException
+	{
+		return lo.size();
+	}
+
+	public InputStream getBinaryStream() throws SQLException
+	{
+		return lo.getInputStream();
+	}
+
+	public byte[] getBytes(long pos, int length) throws SQLException
+	{
+		lo.seek((int)pos, LargeObject.SEEK_SET);
+		return lo.read(length);
+	}
+
+	/*
+	 * For now, this is not implemented.
+	 */
+	public long position(byte[] pattern, long start) throws SQLException
+	{
+		throw org.pgj.jdbc.postgresql.Driver.notImplemented();
+	}
+
+	/*
+	 * This should be simply passing the byte value of the pattern Blob
+	 */
+	public long position(Blob pattern, long start) throws SQLException
+	{
+		return position(pattern.getBytes(0, (int)pattern.length()), start);
+	}
+
+}

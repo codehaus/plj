@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/interfaces"/>
+	<classpathentry kind="src" path="src/jdbc/src/java"/>
+	<classpathentry kind="src" path="src/tools/src/java"/>
+	<classpathentry kind="src" path="src/blocks/typemappers/postgres/src/java"/>
+	<classpathentry kind="src" path="src/blocks/glues/default/src/java"/>
+	<classpathentry kind="src" path="src/blocks/executors/java_executor/src/java"/>
+	<classpathentry kind="src" path="src/tests"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src/blocks/chanells/febe/src/java"/>
+	<classpathentry kind="var" path="MAVEN_REPO/ant/jars/ant-1.6.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/log4j/jars/log4j-1.2.8.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/excalibur-pool/jars/excalibur-pool-1.2.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/excalibur/jars/excalibur-threadcontext-1.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/cornerstone-sockets/jars/cornerstone-sockets-api-1.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/excalibur-thread/jars/excalibur-thread-1.1.1.jar"/>
+	<classpathentry kind="lib" path="xdocs/jdbc.xml"/>
+	<classpathentry kind="lib" path="xdocs/triggers.xml"/>
+	<classpathentry kind="var" path="MAVEN_REPO/commons-beanutils/jars/commons-beanutils-1.6.1.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/bsf/jars/bsf-2.3.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/regexp/jars/regexp-1.3.jar"/>
+	<classpathentry kind="src" path="src/unit-tests"/>
+	<classpathentry kind="var" path="MAVEN_REPO/classworlds/jars/classworlds-1.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/avalon-framework/jars/avalon-framework-api-4.2.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/avalon-framework/jars/avalon-framework-impl-4.2.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

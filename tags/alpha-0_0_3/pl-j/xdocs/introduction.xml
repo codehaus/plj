@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Introduction</title>
+		<author email="kocka at forgeahead.hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+		<section name="Introduction">
+			<p>PL-J is a system to run stored procedures and user defined functions (UDF) in
+			a relational database management system (RDBMS).
+			</p>
+			<p>A less exact definition: PL-J is java stored procedures system for PostgreSQL. 
+			Even though it is much more than that, people like to simplify.</p>
+		</section>
+		<section name="Component interfaces">
+			<p>
+			PL-J is built from reusable/replacable components. We have our
+			implementations and the default deployment descriptor, but you
+			can write yours if you want.
+			</p>
+			<subsection name="C - channel">
+				<p>
+				The module that knows how to talk to the stored procedure
+				system.
+				</p>
+			</subsection>
+			<subsection name="C - configuration">
+				<p>
+				There is a need for a configuration api on the C side for
+				channel implementation specific settings (how to communicate
+				or even connect to the java side).
+				</p>
+			</subsection>
+			<subsection name="Java - channel">
+				<p>
+				The java side channel is responsible for sending and receiving messages
+				from the RDBMS.
+				</p>
+			</subsection>
+			<subsection name="Java - type mapper">
+				<p>
+				The typemapper is a component that maps raw data into java objects.
+				You may use it for custom datatypes too, so you don`t have to worry about
+				SQLData in your stored procedures.
+				</p>
+			</subsection>
+			<subsection name="Java - executor">
+				<p>
+				Executor components execute object oriented calls.
+				</p>
+			</subsection>
+		</section>
+		<section name="Components implementations">
+			<p>
+			The following components are implemented:
+			</p>
+			<subsection name="PostgreSQL call handler">
+				<p>
+				The PostgreSQL call handler is the entry point of a stored procedure
+				or function from the PostgreSQL ORDBMS. It contains the main logic of
+				how messages are handled in a PostgreSQL system.
+				</p>
+			</subsection>
+			<subsection name="C - FEBE channel">
+				<p>
+				The FE/BE channel is built from the PostgreSQL groups frontend/backend protocol.
+				It contains a modified version of libpq.
+				</p>
+			</subsection>
+			<subsection name="C - table based configuration implementation">
+				<p>
+				The default (and now the only) implementation of the C side configuration
+				api. It uses a table called 'sqlj.plj_config' to read configuration settings.
+				</p>
+			</subsection>
+			<subsection name="Java - PostgreSQL type mapper">
+				<p>
+				Maps PostgreSQL raw data into usual java ojects.
+				</p>
+			</subsection>
+			<subsection name="Java - Java executor">
+				<p>
+				The executor that executes java stored procedures written in java.
+				It uses a classloader component to load classes, the current implementation
+				is file-system based, which will be replaced with JDBC based as soon as
+				we have a JDBC implementation.
+				</p>
+			</subsection>
+		</section>
+
+	</body>
+</document>
+

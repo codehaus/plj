@@ -1,0 +1,20 @@
+
+module org{
+	module pgj{
+		module corba{
+		
+			struct errorstruct{
+				string sid;
+				string classname;
+				string message;
+				string stacktrace;
+			};
+			
+			exception ex_pgj_error{
+				errorstruct exceptiondata;
+			};
+			
+		};
+	};
+};
+

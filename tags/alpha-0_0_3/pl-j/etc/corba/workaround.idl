@@ -1,0 +1,11 @@
+/**
+ * Workaround for orbit-idl-2
+ */
+
+#include <callserver.idl>
+
+#include <callreq.idl>
+#include <error.idl>
+#include <result.idl>
+#include <sql.idl>
+
