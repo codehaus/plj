@@ -10,8 +10,8 @@ pqPutMsgEnd(PGconn_min *conn);
 int
 pqReadData(PGconn_min *conn);
 
-static int
-pqSendSome(PGconn_min *conn, int len);
+//static int
+//pqSendSome(PGconn_min *conn, int len);
 
 
 int

@@ -7,6 +7,9 @@
  * author:			Laszlo Hornyak
  */
 
+#ifndef LIBPQ_MIN_H
+#define LIBPQ_MIN_H
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -96,3 +99,4 @@ typedef enum
                                                                  * compatibility */
 } PostgresPollingStatusType;
 
+#endif
