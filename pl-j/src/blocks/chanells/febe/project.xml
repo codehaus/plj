@@ -5,7 +5,7 @@
   <groupId>pl-j</groupId>
   <artifactId>pl-j-febe</artifactId>
   <name>pl-j-febe</name>
-  <currentVersion>0.0.1</currentVersion>
+  <currentVersion>0.0.2</currentVersion>
 
   <!-- extend>${basedir}/../../../../project.xml</extend -->
 
@@ -20,14 +20,14 @@
 
 	<dependencies>
 		<dependency>
-		<id>ant</id>
+		<groupId>ant</groupId>
 		<type>jar</type>
 		<artifactId>ant</artifactId>
 		<version>1.6</version>
 		</dependency>
 
 		<dependency>
-		<id>avalon-framework</id>
+		<groupId>avalon-framework</groupId>
 		<type>jar</type>
 		<artifactId>avalon-framework</artifactId>
 		<version>4.1.5</version>
@@ -41,17 +41,17 @@
 		</dependency>
 
 		<dependency>
-		<id>cornerstone-sockets</id>
+		<groupId>cornerstone-sockets</groupId>
 		<type>jar</type>
 		<artifactId>cornerstone-sockets-impl</artifactId>
 		<version>1.0</version>
 		</dependency>
 		
 		<dependency>
-			<id>pl-j</id>
+			<groupId>pl-j</groupId>
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
