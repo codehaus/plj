@@ -1,0 +1,88 @@
+
+mesages and meanings:
+
+callmessage		execute this method			db  -> j
+	The client must wait for the ansver unless it is oneway.
+
+result			the result of the operation is ...	db <-> j
+	Describes the result of the operation. (The operation
+	can be a call, an SQL, prepare)
+
+exception		the operation failed			db <-> j
+	The operation had failed.
+	requires no ansver.
+
+
+
+-----
+sqls:
+-----
+simple sql		execute this sql			db <-  j
+	requires ansver: result or exception
+	
+prepare			prepares sql statement			db <-  j
+	requires ansver: result or exception
+	
+prep sql		execute the prepared statement data	db <-  j
+	requires ansver: result or exception
+	
+	
+	
+open cursor prep	open cursor using prepared stat		db <-  j
+	requires ansver: result or exception
+	
+open cursor sql		open cursor with this sql statement	db <-  j
+	requires ansver: result or exception
+	
+sql fetch		fetch data from cursor			db <-  j
+	requires ansver: result or exception
+	
+
+
+----------------------------------------------------------
+
+Basic behavior with no sql:
++-----------------------+-------------------------------+
+|	DB		|		java		|
++-----------------------+-------------------------------+
+|	callmessage	->				|
+|			<-	result/exception	|
++-----------------------+-------------------------------+
+
+oneway call:
++-----------------------+-------------------------------+
+|	DB		|		java		|
++-----------------------+-------------------------------+
+|	callmessage	->				|
++-----------------------+-------------------------------+
+
+
+Basic behavior with simple sql:
++-----------------------+-------------------------------+
+|	DB		|		java		|
++-----------------------+-------------------------------+
+|	callmessage	->				|
+|			<-	simple sql		|
+|			<-	result/exception	|
++-----------------------+-------------------------------+
+
+cursor:
++-----------------------+-------------------------------+
+|	DB		|		java		|
++-----------------------+-------------------------------+
+|	callmessage	->				|
+|			<-	open sql		|
+|	result		->				|
+|			<-	fetch			|
+|	result		->				|
+|			...				|
+|			<-	close			|
+|	result		->				|
+|			<-	result/exception	|
++-----------------------+-------------------------------+
+
+
+prepared statement:
+
+
+
