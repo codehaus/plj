@@ -29,6 +29,8 @@ public class Result extends Message {
 	}
 
 	public int getColumns() {
+		if(fields.length == 0)
+			return 0;
 		return fields[0].length;
 	}
 }
