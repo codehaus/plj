@@ -11,6 +11,7 @@ int plantable_size = -1;
 int
 store_plantable(void* plan) {
 	int i;
+	void** new_plantable = NULL;
 	if(plantable_size == -1)
 		init_plantable();
 	for(i = 0; i < plantable_size; i++) {
@@ -19,10 +20,15 @@ store_plantable(void* plan) {
 			return i;
 		}
 	}
-	plantable_size++;
-	plantable = SPI_repalloc(plantable, plantable_size);
-	plantable[i-1] = plan;
-	return plantable_size -1;
+
+	new_plantable = SPI_palloc(plantable_size + 1);
+	for(i = 0; i <  plantable_size; i++){
+		new_plantable[i] = plantable[i];
+	}
+	
+	plantable_size += 10;
+	plantable[i] = plan;
+	return i;
 }
 
 void
