@@ -3,6 +3,7 @@
  */
 package org.plj.chanells.febe;
 
+import org.pgj.Channel;
 import org.pgj.Client;
 import org.plj.chanells.febe.core.Encoding;
 import org.plj.chanells.febe.core.PGStream;
@@ -41,6 +42,13 @@ final class FEBEClient implements Client {
 	 */
 	public void setEncoding(Encoding encoding) {
 		this.encoding = encoding;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.Client#getChannel()
+	 */
+	public Channel getChannel() {
+		return null;
 	}
 
 }
