@@ -1,9 +1,9 @@
 <project>
     <pomVersion>3</pomVersion>
-    <groupId>pl-j</groupId>
     <artifactId>pl-j-api</artifactId>
     <name>pl-j</name>
-    <currentVersion>0.0.3</currentVersion>
+    <groupId>pl-j</groupId>
+    <currentVersion>0.0.4</currentVersion>
     <organization>
         <name>The pl-j developer group</name>
         <url>http://plj.codehaus.org</url>
@@ -36,7 +36,6 @@
             <tag>alpha-0_0_2</tag>
         </version>
     </versions>
-    <branches/>
     <mailingLists>
         <mailingList>
             <name>dev@plj.codehaus.org</name>
@@ -56,38 +55,38 @@
     </mailingLists>
     <developers>
         <developer>
-            <id>1</id>
             <name>Dave Cramer</name>
+            <id>1</id>
             <organization>PostgreSQL International</organization>
-            <timezone>GMT -5</timezone>
-            <url>http://www.postgresintl.com</url>
             <roles>
                 <role>admin</role>
                 <role>manager</role>
             </roles>
+            <url>http://www.postgresintl.com</url>
+            <timezone>GMT -5</timezone>
         </developer>
         <developer>
-            <id>2</id>
             <name>Laszlo Hornyak</name>
+            <id>2</id>
             <email>hornyakl@inf.elte.hu</email>
             <organization>ForgeAhead</organization>
-            <timezone>GMT+1</timezone>
-            <url>http://people.inf.elte.hu/hornyakl</url>
             <roles>
                 <role>designer</role>
                 <role>developer</role>
             </roles>
+            <url>http://people.inf.elte.hu/hornyakl</url>
+            <timezone>GMT+1</timezone>
         </developer>
     </developers>
     <contributors>
         <contributor>
             <name>Bjorn Blomqvist</name>
             <organization>ForgeAhead</organization>
-            <timezone>GMT+1</timezone>
             <roles>
                 <role>reviewer</role>
                 <role>security architecture design</role>
             </roles>
+            <timezone>GMT+1</timezone>
         </contributor>
         <contributor>
             <name>Dale Camp</name>
@@ -148,4 +147,5 @@
     <reports>
         <report>maven-multiproject-plugin</report>
     </reports>
+    <properties/>
 </project>
