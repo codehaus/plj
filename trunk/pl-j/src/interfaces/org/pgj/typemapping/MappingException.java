@@ -2,11 +2,15 @@ package org.pgj.typemapping;
 
 /**
  * An exception, which is thrown in case of type mapping errors.
+ * 
+ * @author Laszlo Hornyak
  */
 public class MappingException extends Exception {
+
 	public MappingException() {
 		super();
 	}
+
 	/**
 	 * @param cause
 	 */

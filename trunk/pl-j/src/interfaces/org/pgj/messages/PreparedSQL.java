@@ -1,16 +1,15 @@
 /*
  * Created on Jun 29, 2003
- *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
+
 package org.pgj.messages;
 
 import java.util.ArrayList;
 
 /**
- * @author Laszlo Hornyak
  * Executes a prepared SQL statement with a given data.
+ * 
+ * @author Laszlo Hornyak
  */
 public class PreparedSQL extends SQL {
 
@@ -42,5 +41,4 @@ public class PreparedSQL extends SQL {
 	public int getSize() {
 		return data.size();
 	}
-
 }

@@ -4,13 +4,15 @@ import org.pgj.*;
 
 /**
  * Represents a <i>message</i> from or to the database.
+ * 
+ * @author Laszlo Hornyak
  */
 public abstract class Message {
 
-	String protocol_version = null;
-	String pgj_version = null;
-	String jvm = null;
-	Object sid = null;
+	private String protocol_version = null;
+	private String pgj_version = null;
+	private String jvm = null;
+	private Object sid = null;
 
 	/**
 	 * Client MUST be set.

@@ -3,6 +3,8 @@ package org.pgj.typemapping;
 /**
  * Represensts a data of the RDBMS.
  * A field is responsible for parsing and mapping raw datatype to java types.
+ * 
+ * @author Laszlo Hornyak
  */
 public interface Field {
 

@@ -5,9 +5,10 @@
 package org.pgj;
 
 /**
- * @author Laszlo Hornyak
  * An exception class to throw when error occurs on the communication line between the RDBMS 
  * and the java process.
+ * 
+ * @author Laszlo Hornyak
  */
 public class CommunicationException extends Exception {
 

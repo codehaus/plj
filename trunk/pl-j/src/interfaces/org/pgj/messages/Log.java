@@ -6,6 +6,7 @@ package org.pgj.messages;
 
 /**
  * Log message.
+ * 
  * @author Laszlo Hornyak
  */
 public class Log extends Message {

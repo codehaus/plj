@@ -3,9 +3,10 @@ package org.pgj;
 import org.pgj.messages.*;
 
 /**
+ * A communication channel with the RDBMS.
+ * 
  * @author Laszlo Hornyak
  * @since 0.1
- * A communication channel with the RDBMS.
  */
 public interface Channel {
 	
