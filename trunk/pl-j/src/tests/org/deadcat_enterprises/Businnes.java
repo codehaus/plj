@@ -104,8 +104,8 @@ public class Businnes {
 		public void run() {
 			try {
 				while (!should_stop) {
-					logcat.warn(this.getName() + System.currentTimeMillis());
-					sleep(random.nextInt(100));
+					logcat.warn(this.getName() +" "+ System.currentTimeMillis());
+					sleep(random.nextInt(10));
 				}
 			} catch (InterruptedException e) {
 				logcat.warn("ooops", e);
@@ -121,7 +121,8 @@ public class Businnes {
 		}
 
 		try {
-			Thread.sleep(100);
+			Thread.sleep(10000);
+			logcat.warn("ok, now i kill everybody");
 		} catch (InterruptedException e) {
 			logcat.warn("hoppa", e);
 		}
@@ -130,8 +131,10 @@ public class Businnes {
 			try {
 				logthreads[i].join();
 			} catch (InterruptedException e1) {
+				logcat.error("oops", e1);
 			}
 		}
+		logcat.warn("this should be the last log.");
 
 		return "ok";
 	}
