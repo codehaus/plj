@@ -1,0 +1,9 @@
+
+create function plpgj_call_handler()
+	returns opaque
+	as '@INSTALL_LIBHOME@/plpgj.so', 'plpgj_call_handler'
+	language 'C';
+	
+
+create trusted language 'pl/pgj' handler plpgj_call_handler;
+
