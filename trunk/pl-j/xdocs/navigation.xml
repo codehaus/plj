@@ -5,19 +5,29 @@
   <title>PL-J</title>
 
   <body>
-    <links>
-      <!--
-      <item name=""           href=""/>
-      -->
-    </links>
 
     <menu name="General Information">
       <item name="Introduction"              href="introduction.html"/>
       <item name="Build, and install howto"   href="build-install-howto.html"/>
     </menu>
+
+    <menu name="Subprojects">
+      <item name="pl-j-febe"               href="/multiproject/pl-j-febe"/>
+      <item name="pl-j-postgres"           href="/multiproject/pl-j-postgres"/>
+      <item name="pl-j-javaexecutor"       href="/multiproject/pl-j-javaexecutor"/>
+      <item name="pl-j-glue"               href="/multiproject/pl-j-glue"/>
+      <item name="pl-j-tools"              href="/multiproject/pl-j-tools"/>
+    </menu>
+
     <menu name="Documentation">
       <item name="Changes"               href="/changes-report.html"/>
+      <item name="JDBC"               href="/jdbc.html"/>
+      <item name="Trigger support"               href="/triggers.html"/>
     </menu>
+
+    <links>
+      <item name="PostgreSQL ORDBMS"           href="http://www.postgresql.org/"/>
+    </links>
 
   </body>
 </project>
