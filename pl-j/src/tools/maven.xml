@@ -4,4 +4,5 @@
 	<preGoal name="java:compile">
 		<attainGoal name="avalon:meta"/>
 	</preGoal>
+
 </project>
