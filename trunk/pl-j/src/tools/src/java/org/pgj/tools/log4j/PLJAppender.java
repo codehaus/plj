@@ -7,7 +7,11 @@ package org.pgj.tools.log4j;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
+import org.pgj.Channel;
+import org.pgj.Client;
+import org.pgj.CommunicationException;
 import org.pgj.messages.Log;
+import org.pgj.tools.channelutil.ClientUtils;
 
 
 /**
@@ -24,7 +28,13 @@ public class PLJAppender extends AppenderSkeleton {
 	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
 	 */
 	protected void append(LoggingEvent arg0) {
+		Client clnt = ClientUtils.getClientforThread();
+
+		//TODO: in a good configuration this should never happen, so lets log it.
+		if(clnt == null)
+			return;
 		Log log = new Log();
+		log.setClient(clnt);
 		log.setCategory(arg0.getLoggerName());
 		int level = Log.LEVEL_DEBUG;
 		switch (arg0.getLevel().toInt()) {
@@ -45,6 +55,17 @@ public class PLJAppender extends AppenderSkeleton {
 		log.setLevel(level);
 		log.setMessage(arg0.getMessage() == null ? "(null)" : arg0.getMessage()
 				.toString());
+		try {
+			if(clnt == null)
+				return;
+			Channel channel = clnt.getChannel();
+			if(channel != null){
+				channel.sendToRDBMS(log);
+			}
+		} catch (CommunicationException e) {
+			System.err.println("gebasz!");
+			e.printStackTrace();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -59,5 +80,4 @@ public class PLJAppender extends AppenderSkeleton {
 	public boolean requiresLayout() {
 		return false;
 	}
-
 }
