@@ -2848,56 +2848,19 @@ fi
 # ----
 save_CFLAGS="$CFLAGS"
 save_LIBS="$LIBS"
-CFLAGS="-I${with_pgsourcetree}/src/interfaces/libpq -I${with_pgsourcetree}/src/include $CFLAGS"
-LIBS="-L${with_pgsourcetree}/src/interfaces/libpq -lpq $LIBS"
+# CFLAGS="-I${with_pgsourcetree}/src/interfaces/libpq -I${with_pgsourcetree}/src/include $CFLAGS"
+# LIBS="-L${with_pgsourcetree}/src/interfaces/libpq -lpq $LIBS"
 
 # PQfreemem()
-echo "$as_me:$LINENO: checking for PQfreemem() in libpq" >&5
-echo $ECHO_N "checking for PQfreemem() in libpq... $ECHO_C" >&6
-have_pqfreemem=no
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <libpq-fe.h>
-int
-main ()
-{
-PQfreemem(NULL);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  have_pqfreemem=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-echo "$as_me:$LINENO: result: $have_pqfreemem" >&5
-echo "${ECHO_T}$have_pqfreemem" >&6
-if test $have_pqfreemem = yes ; then
-	cat >>confdefs.h <<\_ACEOF
-#define HAVE_PQFREEMEM 1
-_ACEOF
-
-fi
+#AC_MSG_CHECKING([for PQfreemem() in libpq])
+#have_pqfreemem=no
+#AC_TRY_LINK([#include <libpq-fe.h>],
+#	   [PQfreemem(NULL);],
+#	   [have_pqfreemem=yes])
+#AC_MSG_RESULT($have_pqfreemem)
+#if test $have_pqfreemem = yes ; then
+#	AC_DEFINE(HAVE_PQFREEMEM,1,)
+#fi
 
 # PQputCopyData()
 echo "$as_me:$LINENO: checking for PQputCopyData() in libpq" >&5
