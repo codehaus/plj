@@ -1,0 +1,7 @@
+
+In this directory, you can find the C sides of the communication interfaces.
+The java (or other) parts should be in /src/blocks/channels.
+
+Modules MUST implement the c interface described in plpgj_chanell.h.
+
+

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+	JAVA EXECUTOR build
+-->
+
+<project name="pgj.executors.java" default="warn">
+	
+	<path id="project_classpath_uber">
+		<fileset dir="${project.home}/${phoenix.extlib}">
+			<include name="**.jar"/>
+		</fileset>
+		<fileset dir="${project.home}/lib/"/>
+		<pathelement location="${project.home}/src/blocks/executors/java_executor/interfaces/"/>
+		<pathelement location="${project.home}/src/interfaces/"/>
+	</path>
+	
+	<target name="warn" description="fail - this is by default">
+		<fail message="Do not run ant here!!"/>
+	</target>
+	
+	<target name="compile.impl" depends="compile.if" description="compiles implementation">
+		<javac srcdir="blocks" classpathref="project_classpath_uber">
+			<!--classpath>
+				<pathelement 
+					location="${project.home}/${phoenix.extlib}/avalon-framework-4.1.3.jar"/>
+				<pathelement 
+					location="${project.home}/src/blocks/executors/java_executor/interfaces/"/>
+				<pathelement location="${project.home}/src/interfaces/"/>
+			</classpath-->
+		</javac>
+	</target>
+	
+	<target name="compile.if" description="compiles interfaces">
+		<javac srcdir="interfaces"/>
+	</target>
+	
+	<target name="compile" depends="compile.impl, compile.if" description="does compiling"/>
+	
+	<target name="mkjar" depends="compile" description="creates the jar archive">
+		<jar jarfile="java_executor.jar">
+			<manifest>
+				<attribute name="Built-by" value="jakarta-ant"/>
+				<section name="org/pgj/jexec/JavaExecutor.class">
+					<attribute name="Avalon-Block" value="true"/>
+				</section>
+			</manifest>
+			<fileset dir="blocks/"/>
+			<fileset dir="interfaces/"/>
+		</jar>
+	</target>
+	
+	<target name="clean" description="cleans the source">
+		<delete file="java_executor.jar"/>
+		<delete>
+			<fileset dir="interfaces" includes="**/*.class"/>
+			<fileset dir="blocks" includes="**/*.class"/>
+		</delete>
+	</target>
+	
+</project>
