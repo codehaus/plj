@@ -6,6 +6,7 @@ package org.pgj.tools.tuplemapper;
 
 import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
+import org.pgj.typemapping.TypeMapper;
 
 
 /**
@@ -38,5 +39,5 @@ public interface TupleMapper {
 	 * @return the tuple
 	 * @throws MappingException if the object couldn`t be mapped back to tuple.
 	 */
-	Tuple backMap(Object obj) throws MappingException;
+	Tuple backMap(Object obj, TypeMapper typemapper) throws MappingException;
 }

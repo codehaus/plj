@@ -70,7 +70,7 @@ public class FSClassLoader extends SecureClassLoader
 			byte[] raw = new byte[stream.available()];
 			stream.read(raw);
 			stream.close();
-			cl = this.defineClass(fqn, raw, 0, raw.length, getCodeSource(fqn));
+			cl = this.defineClass(fqn, raw, 0, raw.length/*, getCodeSource(fqn)*/);
 			resolveClass(cl);
 			map.put(fqn, cl);
 			return cl;

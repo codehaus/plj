@@ -310,7 +310,52 @@ message febe_receive_log() {
 
 
 message febe_receive_tupres() {
-	return NULL;
+	trigger_tupleres res;
+	int i;
+	
+	elog(DEBUG1,"1");
+	res = SPI_palloc(sizeof(str_msg_trigger_tupleresult));
+	res -> length = sizeof(str_msg_trigger_tupleresult);
+	res -> msgtype = MT_TUPLRES;
+
+	res -> tablename = febe_receive_string();
+	res -> colcount = febe_receive_integer_4();
+	if(res -> colcount > 0){
+		res -> _tuple = SPI_palloc(sizeof(pparam) * res -> colcount);
+	} else {
+		res -> _tuple = NULL;
+	}
+	elog(DEBUG1,"2");
+	for(i = 0; i< res -> colcount; i++){
+		char* name;
+		char isnull;
+		name = febe_receive_string();
+		res -> _tuple[i] = SPI_palloc(sizeof(struct fnc_param));
+		pqGetc(&isnull, min_conn);
+		if(isnull == 'n'){
+			//NULL
+			res -> _tuple[i] -> type = NULL;
+			res -> _tuple[i] -> data.isnull = true;
+		} else {
+			//not null
+			res -> _tuple[i] -> type = febe_receive_string();
+			res -> _tuple[i] -> data.isnull = false;
+			res -> _tuple[i] -> data.length = febe_receive_integer_4();
+			if(res -> _tuple[i] -> data.length > 0) {
+				res -> _tuple[i] -> data.data = 
+					SPI_palloc(res -> _tuple[i] -> data.length);
+			} else {
+				res -> _tuple[i] -> data.data = NULL;
+			}
+			pqGetnchar(
+				res -> _tuple[i] -> data.data, 
+				res -> _tuple[i] -> data.length, 
+				min_conn);
+		}
+	}
+	elog(DEBUG1,"3");
+	
+	return res;
 }
 message plpgj_channel_receive(void){
 	int header;

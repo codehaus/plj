@@ -238,8 +238,10 @@ trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS){
 	}
 
 	if(TRIGGER_FIRED_FOR_ROW(tdata -> tg_event)){
+		elog(DEBUG1,"PLPGJ_TRIGGER_STARTED_FOR_ROW");
 		ret -> row = PLPGJ_TRIGGER_STARTED_FOR_ROW;
 	} else {
+		elog(DEBUG1,"PLPGJ_TRIGGER_STARTED_FOR_STATEMENT");
 		ret -> row = PLPGJ_TRIGGER_STARTED_FOR_STATEMENT;
 	}
 

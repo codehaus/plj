@@ -14,8 +14,8 @@ extern "C" {
 #define PLPGJ_TRIGGER_ACTIONORDER_BEFORE 1
 #define PLPGJ_TRIGGER_ACTIONORDER_AFTER 2
 
-#define PLPGJ_TRIGGER_STARTED_FOR_ROW 1
-#define PLPGJ_TRIGGER_STARTED_FOR_STATEMENT 2
+#define PLPGJ_TRIGGER_STARTED_FOR_ROW 0
+#define PLPGJ_TRIGGER_STARTED_FOR_STATEMENT 1
 
 typedef struct {
 	base_message_content;
@@ -39,6 +39,7 @@ typedef str_msg_trigger_callreq* trigger_callreq;
 typedef struct {
 	base_message_content;
 	char* tablename;
+	int colcount;
 	pparam* _tuple;
 }str_msg_trigger_tupleresult;
 

@@ -13,6 +13,7 @@ import org.apache.bsf.BSFManager;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
+import org.pgj.typemapping.TypeMapper;
 
 
 /**
@@ -83,7 +84,7 @@ public class ScriptingTupleMapper implements Configurable, TupleMapper, LogEnabl
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.tuplemapper.TupleMapper#backMap(java.lang.Object)
 	 */
-	public Tuple backMap(Object obj) throws MappingException {
+	public Tuple backMap(Object obj, TypeMapper typeMapper) throws MappingException {
 		// TODO Auto-generated method stub
 		return null;
 	}
