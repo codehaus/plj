@@ -228,7 +228,8 @@ plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc)
 
 			ret[i]->data.data = DatumGetPointer(binval);
 			ret[i]->data.isnull = isnull;
-			ret[i]->data.length = datumGetSize(binval, typbyval, typlen);
+			ret[i]->data.length = datumGetSize(binval, false, typlen)
+				+ (typbyval ? 4 : 0);
 			pljelog(DEBUG1, "ret[%d]->data.length = %d", i, ret[i]->data.length);
 
 			ret[i]->type = SPI_gettype(desc, i + 1);
@@ -236,13 +237,6 @@ plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc)
 		}
 		else
 			pljelog(WARNING, "tupl is null");
-		/*
-		 * if(isnull){
-		 * elog(DEBUG1,"null");
-		 * } else {
-		 * elog(DEBUG1,"not null");
-		 * }
-		 */
 
 	}
 	return ret;
