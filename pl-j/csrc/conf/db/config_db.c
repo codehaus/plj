@@ -12,8 +12,7 @@ plj_get_configvalue_string(const char *paramName)
 {
 
 	char	   *sql;
-	int			proc,
-				ret;
+	int	   proc, ret;
 
 	/*
 	 * no SPI_connect, we are already connected.
@@ -33,7 +32,7 @@ plj_get_configvalue_string(const char *paramName)
 		return SPI_getvalue(tuptable->vals[0], tupdesc, 1);
 	}
 
-	pljelog(WARNING, "config value not set: %s", paramName);
+	elog(WARNING, "[config db] config value not set: %s", paramName);
 	return "";
 }
 

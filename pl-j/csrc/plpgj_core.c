@@ -13,24 +13,38 @@
 #include "executor/spi.h"
 #include "pljelog.h"
 
+sigjmp_buf* PG_exception_stack;
+
 PG_FUNCTION_INFO_V1(plpgj_call_handler);
 
 Datum
 plpgj_call_handler(PG_FUNCTION_ARGS)
 {
 	Datum		datumreturn;
+	int ret;
 
-	if (SPI_connect() != SPI_OK_CONNECT)
-		pljelog(FATAL, "SPI connect error");
+	ret = SPI_connect();
+	if (ret != SPI_OK_CONNECT)
+#if (POSTGRES_VERSION == 74)
+		elog(ERROR, "[pl-j core] SPI connect error: %d", ret);
+#else
+		elog(ERROR, "[pl-j core] SPI connect error: %d (%s)", ret, SPI_result_code_string(ret));
+#endif
 
-	pljelog(DEBUG1, "plpgj_call_handler");
+
+	pljelog(DEBUG1, "[pl-j core] plpgj_call_handler");
 
 	datumreturn = plpgj_call_hook(fcinfo);
 
-	pljelog(DEBUG1, "call done, disconnect and return");
+	pljelog(DEBUG1, "[pl-j core] call done, disconnect and return");
 
-	if (SPI_finish() != SPI_OK_FINISH)
-		pljelog(ERROR, "SPI finsh error");
+	ret = SPI_finish();
+	if (ret != SPI_OK_FINISH)
+#if (POSTGRES_VERSION == 74)
+		elog(ERROR, "SPI finsh error: %d", ret);
+#else
+		elog(ERROR, "SPI finis error: %d (%s)", ret, SPI_result_code_string(ret));
+#endif
 
 	return datumreturn;
 }	//plpgj_call_handler
