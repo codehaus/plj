@@ -72,13 +72,41 @@ public class DefaultMethodFinder
 		Method callm = null;
 
 		callm = clazz.getMethod(call.getMethodname(), paramclasses);
+		if(callm.getModifiers() != 9)
+			throw new NoSuchMethodException("A JSProc method must be public static.");
 
 		return callm;
 	}
 
 	protected Method findTriggerMethod(TriggerCallRequest call, Class clazz)
 			throws MappingException, NoSuchMethodException {
-		return null;
+		
+		Class[] paramClasses = null;
+		if (call.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW) {
+			switch (call.getReason()) {
+				case TriggerCallRequest.TRIGGER_REASON_UPDATE :
+					paramClasses = new Class[2];
+					paramClasses[0] = tupleMapper.getMappedClass(call.getNew());
+					paramClasses[1] = tupleMapper.getMappedClass(call.getOld());
+					break;
+				case TriggerCallRequest.TRIGGER_REASON_DELETE :
+					paramClasses = new Class[1];
+					paramClasses[0] = tupleMapper.getMappedClass(call.getOld());
+					break;
+				case TriggerCallRequest.TRIGGER_REASON_INSERT :
+					paramClasses = new Class[1];
+					paramClasses[0] = tupleMapper.getMappedClass(call.getNew());
+					break;
+			}
+		} else {
+			paramClasses = new Class[0];
+		}
+		Method callm = clazz.getMethod(call.getMethodname(), paramClasses);
+		
+		if(callm.getModifiers() != 9)
+			throw new NoSuchMethodException("A JSProc method must be public static.");
+		
+		return callm;
 	}
 
 	/* (non-Javadoc)

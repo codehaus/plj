@@ -73,10 +73,10 @@ typedef struct str_sql_msg_cursor_fetch
 	base_message_content;
 	sql_message_content;
 	char	   *cursorname;
-
+	unsigned int count;
 	/** direction: 0 if forward, 1 backward */
 	unsigned short direction;
 
-} sql_msg_cursor_fetch;
+} *sql_msg_cursor_fetch;
 
 #endif

@@ -82,7 +82,7 @@ public class PLJJDBCStatement implements Statement {
 			}
 
 			// TODO this method needs testing
-			return new PLJJDBCResultSet(channel, cursorName);
+			return new PLJJDBCResultSet(connection, cursorName);
 		}
 	}
 
