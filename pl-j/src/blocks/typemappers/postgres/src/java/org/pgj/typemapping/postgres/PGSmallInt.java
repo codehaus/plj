@@ -1,6 +1,7 @@
 /*
  * Created on Jul 20, 2003
  */
+
 package org.pgj.typemapping.postgres;
 
 import org.apache.log4j.Category;
@@ -15,7 +16,7 @@ public class PGSmallInt extends AbstractPGField {
 
 	private static Category cat = Category.getInstance(PGSmallInt.class);
 
-	private static Class[] classes = { Integer.class };
+	private static Class[] classes = {Integer.class};
 
 	{
 		raw = new byte[4];
@@ -25,25 +26,32 @@ public class PGSmallInt extends AbstractPGField {
 	 * @see org.pgj.typemapping.postgres.AbstractPGField#backMap(java.lang.Object)
 	 */
 	protected void backMap(Object obj) throws MappingException {
-		
-		if(!(obj instanceof Integer)){
+
+		if (!(obj instanceof Integer)) {
 			throw new MappingException("I can map only Integers, sorry");
 		}
-		
-		int value = ((Integer)obj).intValue();
+
+		if (obj == null) {
+			setNull(true);
+			return;
+		}
+
+		int value = ((Integer) obj).intValue();
 		//TODO false!
-		raw[0] = (byte)(value % (256*256*256)); 
-		raw[1] = (byte)(value % (256*256));
-		raw[2] = (byte)(value % (256));
-		raw[3] = (byte)(value % (1));
+		raw[0] = (byte) (value % (256 * 256 * 256));
+		raw[1] = (byte) (value % (256 * 256));
+		raw[2] = (byte) (value % (256));
+		raw[3] = (byte) (value % (1));
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.pgj.typemapping.Field#getJavaClasses()
+	 * 
+	 * @todo return classes or classes.clone()? (speed or security?)
 	 */
 	public Class[] getJavaClasses() {
 		cat.debug("getJavaClasses()");
-		return classes;
+		return (Class[]) classes.clone();
 	}
 
 	/* (non-Javadoc)
@@ -66,15 +74,16 @@ public class PGSmallInt extends AbstractPGField {
 	 * @see org.pgj.typemapping.Field#defaultGet()
 	 */
 	public Object defaultGet() throws MappingException {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO: this is NOT OKAY like this.
+		return new Integer(raw[0] + (raw[1] << 8) + (raw[2] << 16)
+				+ (raw[3] << 32));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.pgj.typemapping.Field#rdbmsType()
 	 */
 	public String rdbmsType() {
-		return "smallint";
+		return "int4";
 	}
 
 }

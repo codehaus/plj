@@ -11,6 +11,7 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.messages.Result;
 import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
+import org.pgj.typemapping.ReturnMappingException;
 import org.pgj.typemapping.TypeMapper;
 
 /**
@@ -18,7 +19,7 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @author Laszlo Hornyak
  * 
- * @avalon.component name="postgre-typemapper" type="org.pgj.typemapping.TypeMapper"
+ * @avalon.component name="postgre-typemapper"
  * @avalon.service type="org.pgj.typemapping.TypeMapper"
  */
 public class PostgresTypeMapper
@@ -65,6 +66,9 @@ public class PostgresTypeMapper
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.avalon.framework.configuration.Configurable#configure(org.apache.avalon.framework.configuration.Configuration)
+	 */
 	public void configure(Configuration conf) throws ConfigurationException {
 
 		Configuration mapConfig = conf.getChild("map");
@@ -174,38 +178,45 @@ public class PostgresTypeMapper
 	 */
 	public Field backMap(Object object) throws MappingException {
 
-		logger.debug("backMap -ing "
-				+ (object == null ? "[null]" : object.getClass().getName()));
-
-		AbstractPGField fld = null;
-		Class ocl = object.getClass();
-		Class fcl = (Class) backMap.get(ocl);
-
-		//this secures that derived classes can be mapped too.
-		while (fcl == null && ocl != Object.class) {
-			logger.debug(ocl.getName()
-					+ " cannot be mapped back, but i try its superclass.");
-			ocl = ocl.getSuperclass();
-			fcl = (Class) backMap.get(ocl);
-		}
-
-		//check if no back mapping possible
-		if (fcl == null) {
-			logger.debug("did not find backmapping.");
-			throw new MappingException(ocl.getName() + " cannot be mapped back");
-		}
 		try {
-			fld = (AbstractPGField) fcl.newInstance();
-		} catch (InstantiationException e) {
-			throw new MappingException("InstantiationException. "
-					+ e.getMessage());
-		} catch (IllegalAccessException e) {
-			throw new MappingException("IllegalAccessException. "
-					+ e.getMessage());
-		}
-		fld.backMap(object);
+			logger
+					.debug("backMap -ing "
+							+ (object == null ? "[null]" : object.getClass()
+									.getName()));
 
-		return fld;
+			AbstractPGField fld = null;
+			Class ocl = object.getClass();
+			Class fcl = (Class) backMap.get(ocl);
+
+			//this secures that derived classes can be mapped too.
+			while (fcl == null && ocl != Object.class) {
+				logger.debug(ocl.getName()
+						+ " cannot be mapped back, but i try its superclass.");
+				ocl = ocl.getSuperclass();
+				fcl = (Class) backMap.get(ocl);
+			}
+
+			//check if no back mapping possible
+			if (fcl == null) {
+				logger.debug("did not find backmapping.");
+				throw new MappingException(ocl.getName()
+						+ " cannot be mapped back");
+			}
+			try {
+				fld = (AbstractPGField) fcl.newInstance();
+			} catch (InstantiationException e) {
+				throw new MappingException("InstantiationException. "
+						+ e.getMessage());
+			} catch (IllegalAccessException e) {
+				throw new MappingException("IllegalAccessException. "
+						+ e.getMessage());
+			}
+			fld.backMap(object);
+
+			return fld;
+		} catch (MappingException e) {
+			throw new ReturnMappingException(e);
+		}
 
 	}
 
