@@ -80,4 +80,12 @@ public class ScriptingTupleMapper implements Configurable, TupleMapper, LogEnabl
 		logger = arg0;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.pgj.tools.tuplemapper.TupleMapper#backMap(java.lang.Object)
+	 */
+	public Tuple backMap(Object obj) throws MappingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
