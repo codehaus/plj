@@ -13,9 +13,6 @@
 
 	<xsl:template match="component">
 		<xsl:element name="{@name}">
-			<xsl:attribute name="@name">
-				aaa
-			</xsl:attribute>
 			<xsl:copy-of select="configuration/*"/>
 		</xsl:element>
 	</xsl:template>	
