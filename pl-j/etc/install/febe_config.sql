@@ -13,7 +13,8 @@ CREATE TABLE sqlj.plj_config (
     config_key character varying NOT NULL PRIMARY KEY,
     config_value character varying
 );
- 
+
+SET search_path = 'sqlj';
  
 INSERT INTO plj_config VALUES ('febe-mini.host', 'localhost');
 INSERT INTO plj_config VALUES ('febe-mini.port', '1984');
