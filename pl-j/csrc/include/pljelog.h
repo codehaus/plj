@@ -32,6 +32,20 @@ extern sigjmp_buf* PG_exception_stack;
  * copy-paste from pg 8.0 (some kind of backport...)
  */
 
+#if (POSTGRES_VERSION == 74)
+
+// 
+// ultra minimal exception handling imitation for version 7.4
+// Errors wont be recovered, stored procedure execution will fail.
+// 
+
+#define PG_TRY() 	
+#define PG_CATCH() 	if(false) {
+#define PG_END_TRY()	}
+
+#endif
+
+/*
 #define PG_TRY()  \
         do { \
                 sigjmp_buf *save_exception_stack = PG_exception_stack; \
@@ -40,6 +54,7 @@ extern sigjmp_buf* PG_exception_stack;
                 if (sigsetjmp(local_sigjmp_buf, 0) == 0) \
                 { \
                         PG_exception_stack = &local_sigjmp_buf
+
 
 #define PG_CATCH()      \
                 } \
@@ -57,9 +72,23 @@ extern sigjmp_buf* PG_exception_stack;
 #define PG_RE_THROW()  \
         siglongjmp(*PG_exception_stack, 1)
 
+*/
+
+
 
 
 
 #define pljelog		if(pljloging) elog
+
+#if (POSTGRES_VERSION == 80)
+
+//char* plj_exceptionreason(void);
+#define plj_exceptionreason()		"RDBMS exception"
+
+#else
+
+#define plj_exceptionreason()		"RDBMS exception"
+
+#endif
 
 #endif
