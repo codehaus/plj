@@ -45,12 +45,13 @@ char* febe_receive_string(void){
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	elog(DEBUG1, "febe_receive_string: 2");
 	tmp_chr[cnt] = 0;
+	return tmp_chr;
 }
 
 
 
 int febe_send_call(callreq call){
-	
+	int i;
 	elog(DEBUG1, "sending call req. (test phase)");
 	pqPutMsgStart(0,0,min_conn);
 	elog(DEBUG1, "pqPutMsgStart");
@@ -63,7 +64,27 @@ int febe_send_call(callreq call){
 	pqPuts(call -> expect, min_conn);
 	elog(DEBUG1, "puts 3");
 	//TODO: hmm?
-	pqPutInt(0,  4, min_conn);
+	pqPutInt(call -> nrOfParams,  4, min_conn);
+	elog(DEBUG1, "number of params: %d", call -> nrOfParams);
+	for(i = 0; i < call -> nrOfParams; i++){
+		elog(DEBUG1, "sending param %d", i);
+		pqPuts(call -> parameters[i].type, min_conn);
+		elog(DEBUG1, "tp 1");
+		if(call -> parameters[i].data.isnull){
+			pqPutc('N', min_conn);
+			elog(DEBUG1, "tp 2");
+		} else {
+			pqPutc('D', min_conn);
+			elog(DEBUG1, "tp 3");
+			pqPutInt(call -> parameters[i].data.length, 4, min_conn);
+			elog(DEBUG1, "tp 4");
+			pqPutnchar(call -> parameters[i].data.data, call -> parameters[i].data.length, min_conn);
+			elog(DEBUG1, "tp 5");
+		}
+		elog(DEBUG1, "sending param %d done", i);
+
+		
+	}
 	elog(DEBUG1, "putint 1");
 	pqPutMsgEnd(min_conn);
 	elog(DEBUG1, "message end");
@@ -134,8 +155,54 @@ void* febe_receive_exception(){
 	return ret;
 }
 
-void* febe_receive_result(){
-	return NULL;
+void* febe_receive_result() {
+	plpgj_result ret;
+	int i,j;		//iterators
+
+	ret = SPI_palloc(sizeof(str_plpgj_result));
+	ret -> msgtype = MT_RESULT;
+	ret -> length = sizeof(str_plpgj_result);
+
+	ret -> rows = febe_receive_integer_4();
+	ret -> cols = febe_receive_integer_4();
+
+	ret -> data = SPI_palloc( (ret -> rows) * sizeof(raw) );
+
+	for(i = 0; i < ret -> rows; i++) {
+		ret -> data[i] = SPI_palloc( (ret -> cols) * sizeof(raw) );
+		for(j = 0; j < ret -> cols; j++) {
+			char isn;
+			pqGetc(&isn, min_conn);
+			if(isn == 'N'){
+				ret -> data[i][j].data = NULL;
+				ret -> data[i][j].length;
+				ret -> data[i][j].isnull = 1;
+			} else {
+				int len;
+				len = febe_receive_integer_4();
+				ret -> data[i][j].length = len;
+				ret -> data[i][j].data = 
+					SPI_palloc(len);
+				pqGetnchar(ret -> data[i][j].data, len, min_conn);
+			}
+		}
+	}
+
+	return ret;
+}
+
+message febe_receive_log() {
+	log_message ret;
+
+	ret = SPI_palloc(sizeof(str_log_message));
+	ret -> msgtype = MT_LOG;
+	ret -> length = sizeof(str_log_message);
+
+	ret -> level = febe_receive_integer_4();
+	ret -> category = febe_receive_string();
+	ret -> message = febe_receive_string();
+
+	return ret;
 }
 
 message plpgj_channel_receive(void){
@@ -148,7 +215,7 @@ message plpgj_channel_receive(void){
 	//elog(DEBUG1, "header: %d", header);
 
 	ret = pqReadData(min_conn);
-	switch(ret){
+	switch(ret) {
 		case 1: elog(DEBUG1, "got data from the server"); 
 		break;
 		case 0: elog(DEBUG1, "no data, but still okay (who knows?)"); 
@@ -169,7 +236,9 @@ message plpgj_channel_receive(void){
 			return (message) febe_receive_result();
 		case 'E':
 			return (message) febe_receive_exception();
-		default:
+		case 'L':
+			return (message) febe_receive_log();
+	default:
 			elog(ERROR, "message type unknown :%d", type);
 			return NULL;
 	}
