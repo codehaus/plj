@@ -11,7 +11,7 @@ import org.pgj.Executor;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
-import org.pgj.tools.channelutil.ChannelUtils;
+import org.pgj.tools.channelutil.ClientUtils;
 
 /**
  * Glue worker thread.
@@ -54,7 +54,7 @@ public class GlueWorker
 	 * @see Executable#execute()
 	 */
 	public void execute() {
-		ChannelUtils.setChannelforThread(chanell);
+		ClientUtils.setClientforThread(client);
 		try {
 			while (true) {
 				Message msg = chanell.receiveFromRDBMS(client);
@@ -83,7 +83,7 @@ public class GlueWorker
 			executor = null;
 			chanell = null;
 			//no funny tricks ;)
-			ChannelUtils.setChannelforThread(null);
+			ClientUtils.setClientforThread(null);
 		}
 	}
 
