@@ -162,6 +162,6 @@ void plpgj_sql_do(sql_msg msg){
 
 void plpgj_exception_do(error_message msg){
 	
-	elog(ERROR,"Java side exception occured: \n %s : %s \n %s \n", msg->classname, msg->message, msg->stacktrace);
+	elog(ERROR,"Java side exception occured: \n %s : %s \n ", msg->classname, msg->message );
 }
 
