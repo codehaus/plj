@@ -8,17 +8,27 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Map;
 
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.log4j.Category;
 import org.pgj.Channel;
 import org.pgj.Client;
-import org.pgj.tools.channelutil.ClientUtils;
-import org.pgj.tools.jdbc.JDBCUtil;
+import org.pgj.CommunicationException;
+import org.pgj.ExecutionCancelException;
+import org.pgj.jdbc.core.JDBCInitializer;
+import org.pgj.messages.Error;
+import org.pgj.tools.utils.ClientUtils;
+import org.pgj.tools.utils.JDBCUtil;
+
+import com.sun.corba.se.internal.iiop.messages.Message;
 
 /**
  * PGJ JDBC Connection.
@@ -42,16 +52,70 @@ public class PLJJDBCConnection implements Connection {
 	/** helps keeping cursors unique */
 	private volatile long cursorId = 0;
 
+	private Configuration conf = null;
+
+	protected int getIntFromConf(String name) throws SQLException {
+		try {
+			return conf.getChild(name).getValueAsInteger();
+		} catch (ConfigurationException e) {
+			throw new SQLException("JDBC driver configuration not set for "
+					.concat(name));
+		}
+	}
+
+	protected boolean getBooleanFromConf(String name) throws SQLException {
+		try {
+			return conf.getChild(name).getValueAsBoolean();
+		} catch (ConfigurationException e) {
+			throw new SQLException(
+					"JDBC driver configuration not set properly for "
+							.concat(name));
+		}
+	}
+
+	protected String getStringFromConf(String name) throws SQLException {
+		try {
+			return conf.getChild(name).getValue();
+		} catch (ConfigurationException e) {
+			throw new SQLException(
+					"JDBC driver configuration not set properly for "
+							.concat(name));
+		}
+	}
+
+	protected ResultSet getResultSetFromConf(String name, Object[] params)
+			throws SQLException {
+		//TODO make me tricky implementation!
+		PreparedStatement sta = prepareStatement(getStringFromConf(name));
+		for (int i = 0; i < params.length; i++) {
+			if (params[i] != null) {
+				sta.setNull(i, Types.BINARY); //whatever...
+			} else if (params[i] instanceof Integer) {
+				sta.setInt(i, ((Integer) params[i]).intValue());
+			} else if (params[i] instanceof String) {
+				sta.setString(i, (String) params[i]);
+			} else if (params[i] instanceof Short) {
+				sta.setShort(i, ((Short) params[i]).shortValue());
+			} else if (params[i] instanceof Float) {
+				sta.setFloat(i, ((Float) params[i]).floatValue());
+			}
+		}
+		return sta.executeQuery();
+	}
+
 	/**
-	 * 
+	 *  
 	 */
 	public PLJJDBCConnection() {
 		super();
 		client = ClientUtils.getClientforThread();
 		communicationChanell = client.getChannel();
+		conf = org.pgj.tools.utils.JDBCUtil.getConfiguration();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#createStatement()
 	 */
 	public Statement createStatement() throws SQLException {
@@ -59,7 +123,9 @@ public class PLJJDBCConnection implements Connection {
 		return new PLJJDBCStatement(client, this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareStatement(java.lang.String)
 	 */
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -68,7 +134,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareCall(java.lang.String)
 	 */
 	public CallableStatement prepareCall(String sql) throws SQLException {
@@ -77,7 +145,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#nativeSQL(java.lang.String)
 	 */
 	public String nativeSQL(String sql) throws SQLException {
@@ -87,7 +157,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setAutoCommit(boolean)
 	 */
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
@@ -95,7 +167,9 @@ public class PLJJDBCConnection implements Connection {
 		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getAutoCommit()
 	 */
 	public boolean getAutoCommit() throws SQLException {
@@ -103,7 +177,9 @@ public class PLJJDBCConnection implements Connection {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#commit()
 	 */
 	public void commit() throws SQLException {
@@ -111,7 +187,9 @@ public class PLJJDBCConnection implements Connection {
 		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#rollback()
 	 */
 	public void rollback() throws SQLException {
@@ -119,7 +197,9 @@ public class PLJJDBCConnection implements Connection {
 		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#close()
 	 */
 	public void close() throws SQLException {
@@ -127,22 +207,28 @@ public class PLJJDBCConnection implements Connection {
 		closed = true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#isClosed()
 	 */
 	public boolean isClosed() throws SQLException {
 		return closed;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getMetaData()
 	 */
 	public DatabaseMetaData getMetaData() throws SQLException {
 		checkClosed();
-		return new PLJJDBCMetaData(JDBCUtil.getConfiguration(), this);
+		return new PLJJDBCMetaData(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setReadOnly(boolean)
 	 */
 	public void setReadOnly(boolean readOnly) throws SQLException {
@@ -151,7 +237,9 @@ public class PLJJDBCConnection implements Connection {
 		checkClosed();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#isReadOnly()
 	 */
 	public boolean isReadOnly() throws SQLException {
@@ -161,7 +249,9 @@ public class PLJJDBCConnection implements Connection {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setCatalog(java.lang.String)
 	 */
 	public void setCatalog(String catalog) throws SQLException {
@@ -170,7 +260,9 @@ public class PLJJDBCConnection implements Connection {
 		checkClosed();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getCatalog()
 	 */
 	public String getCatalog() throws SQLException {
@@ -180,7 +272,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setTransactionIsolation(int)
 	 */
 	public void setTransactionIsolation(int level) throws SQLException {
@@ -188,7 +282,9 @@ public class PLJJDBCConnection implements Connection {
 		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getTransactionIsolation()
 	 */
 	public int getTransactionIsolation() throws SQLException {
@@ -198,7 +294,9 @@ public class PLJJDBCConnection implements Connection {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getWarnings()
 	 */
 	public SQLWarning getWarnings() throws SQLException {
@@ -207,7 +305,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#clearWarnings()
 	 */
 	public void clearWarnings() throws SQLException {
@@ -216,7 +316,9 @@ public class PLJJDBCConnection implements Connection {
 		checkClosed();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#createStatement(int, int)
 	 */
 	public Statement createStatement(int resultSetType, int resultSetConcurrency)
@@ -227,7 +329,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareStatement(java.lang.String, int, int)
 	 */
 	public PreparedStatement prepareStatement(String sql, int resultSetType,
@@ -238,7 +342,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareCall(java.lang.String, int, int)
 	 */
 	public CallableStatement prepareCall(String sql, int resultSetType,
@@ -249,7 +355,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getTypeMap()
 	 */
 	public Map getTypeMap() throws SQLException {
@@ -259,7 +367,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setTypeMap(java.util.Map)
 	 */
 	public void setTypeMap(Map map) throws SQLException {
@@ -268,7 +378,9 @@ public class PLJJDBCConnection implements Connection {
 		log.error("not implemented");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setHoldability(int)
 	 */
 	public void setHoldability(int holdability) throws SQLException {
@@ -277,7 +389,9 @@ public class PLJJDBCConnection implements Connection {
 		log.error("not implemented");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#getHoldability()
 	 */
 	public int getHoldability() throws SQLException {
@@ -287,7 +401,9 @@ public class PLJJDBCConnection implements Connection {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setSavepoint()
 	 */
 	public Savepoint setSavepoint() throws SQLException {
@@ -297,7 +413,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#setSavepoint(java.lang.String)
 	 */
 	public Savepoint setSavepoint(String name) throws SQLException {
@@ -307,7 +425,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#rollback(java.sql.Savepoint)
 	 */
 	public void rollback(Savepoint savepoint) throws SQLException {
@@ -316,7 +436,9 @@ public class PLJJDBCConnection implements Connection {
 		checkClosed();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#releaseSavepoint(java.sql.Savepoint)
 	 */
 	public void releaseSavepoint(Savepoint savepoint) throws SQLException {
@@ -325,7 +447,9 @@ public class PLJJDBCConnection implements Connection {
 		checkClosed();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#createStatement(int, int, int)
 	 */
 	public Statement createStatement(int resultSetType,
@@ -337,8 +461,11 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.Connection#prepareStatement(java.lang.String, int, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.Connection#prepareStatement(java.lang.String, int, int,
+	 *      int)
 	 */
 	public PreparedStatement prepareStatement(String sql, int resultSetType,
 			int resultSetConcurrency, int resultSetHoldability)
@@ -349,7 +476,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareCall(java.lang.String, int, int, int)
 	 */
 	public CallableStatement prepareCall(String sql, int resultSetType,
@@ -361,7 +490,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareStatement(java.lang.String, int)
 	 */
 	public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
@@ -372,7 +503,9 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Connection#prepareStatement(java.lang.String, int[])
 	 */
 	public PreparedStatement prepareStatement(String sql, int[] columnIndexes)
@@ -383,8 +516,11 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.Connection#prepareStatement(java.lang.String, java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.Connection#prepareStatement(java.lang.String,
+	 *      java.lang.String[])
 	 */
 	public PreparedStatement prepareStatement(String sql, String[] columnNames)
 			throws SQLException {
@@ -402,6 +538,17 @@ public class PLJJDBCConnection implements Connection {
 	synchronized void checkClosed() throws SQLException {
 		if (closed)
 			throw new PLJJDBCSQLException("Connection closed");
+	}
+
+	protected org.pgj.messages.Message doReceiveMessage()
+			throws CommunicationException, SQLException,
+			ExecutionCancelException {
+		org.pgj.messages.Message msg = communicationChanell
+				.receiveFromRDBMS(client);
+		if (msg instanceof Error
+				&& getBooleanFromConf("isStatementErrorIrrecoverable"))
+			throw new ExecutionCancelException();
+		return msg;
 	}
 
 }

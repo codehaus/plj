@@ -33,6 +33,9 @@ import org.pgj.typemapping.MappingException;
  */
 public class PLJJDBCResultSet implements ResultSet {
 
+	/**  */
+	private PLJJDBCConnection conn = null;
+	
 	/** We can communicate with the RDBMS across this chanell. */
 	private Channel chanell = null;
 	/** fetch size */

@@ -75,7 +75,7 @@ public class PLJJDBCStatement implements Statement {
 
 			try {
 				channel.sendToRDBMS(msg);
-				channel.receiveFromRDBMS(client);
+				connection.doReceiveMessage();
 			} catch (CommunicationException e) {
 				throw new SQLException("Comminication exception. root reason:"
 						+ e.getMessage());
@@ -278,7 +278,7 @@ public class PLJJDBCStatement implements Statement {
 			try {
 				synchronized (channel) {
 					channel.sendToRDBMS(ssql);
-					channel.receiveFromRDBMS(client);
+					connection.doReceiveMessage();
 				}
 			} catch (CommunicationException e) {
 				//TODO here it should be fired a runtime exception?
