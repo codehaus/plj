@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Trigger support in PL-J</title>
+		<author email="kocka at forgeahead dot hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+		<section name="Triggers">
+			<p>Yes, PL-J will soon have support for triggers written entirely 
+			in java (or other procedural languages, of course).
+			</p>
+		</section>
+	</body>
+</document>
+
