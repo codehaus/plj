@@ -1,25 +1,30 @@
 <project>
     <pomVersion>3</pomVersion>
     <groupId>pl-j</groupId>
-    <artifactId>pl-j-api</artifactId>
+    <artifactId>pl-j</artifactId>
     <id>pl-j-api</id>
     <name>pl-j</name>
     <currentVersion>0.0.1</currentVersion>
     <organization>
-        <name>The pl-j developer group</name>
-        <url>http://forgeahead.hu/maven/plj/</url>
-        <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
+      <name>The pl-j developer group</name>
+      <url>http://plj.codehaus.org</url>
     </organization>
+    <siteAddress>http://plj.codehaus.org</siteAddress>
+    <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10430</issueTrackingUrl>
+    <repository>
+       <connection>scm:cvs:pserver:anonymous@cvs.plj.codehaus.org:/home/projects/plj/scm:pl-j</connection>
+       <url>http://cvs.plj.codehaus.org</url>
+    </repository>    
+    <logo>http://plj.codehaus.org/images/plpgj-logo.png</logo>
     <inceptionYear>2003</inceptionYear>
     <package>org.pgj</package>
     <description>
-    Pl-j is a stored procudure platform. It`s primary target is PostgreSQL and Java. 
+    Pl-j is a stored procedure platform. It`s primary target is PostgreSQL and Java. 
 	It is possible to adopt other object oriented languages and database platforms.
 	
 	The implementation is built from jakarta-avalon blocks.
 	</description>
-    <shortDescription>Java stored procedures</shortDescription>
-    <siteAddress>http://www.forgeahead.hu/pl-j</siteAddress>
+    <shortDescription>Java stored procedures for SQL database</shortDescription>
     <versions/>
     <branches/>
     <mailingLists/>
@@ -27,9 +32,9 @@
         <developer>
             <id>1</id>
             <name>Dave Cramer</name>
-            <organization>Fastcrypt</organization>
-            <timezone>GMT -6</timezone>
-            <url>http://www.fastcrypt.com</url>
+            <organization>PostgreSQL International</organization>
+            <timezone>GMT -5</timezone>
+            <url>http://www.postgresintl.com</url>
             <roles>
                 <role>admin</role>
                 <role>manager</role>
@@ -87,7 +92,5 @@
         <report>maven-changes-plugin</report>
         <report>maven-javadoc-plugin</report>
         <report>maven-multiproject-plugin</report>
-        <report>maven-file-activity-plugin</report>
-        <report>maven-statcvs-plugin</report>
     </reports>
 </project>
