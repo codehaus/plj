@@ -24,14 +24,14 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
             <type>jar</type>
             <properties/>
         </dependency>
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-tools</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
             <type>jar</type>
             <properties/>
         </dependency>
@@ -54,6 +54,12 @@
 			<type>jar</type>
 			<artifactId>avalon-framework</artifactId>
 			<version>4.1.5</version>
+		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<type>jar</type>
+			<artifactId>postgresql</artifactId>
+			<version>8.0-4plj</version>
 		</dependency>
     </dependencies>
 

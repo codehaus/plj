@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
   <id>pl-j-glue</id>
   <name>pl-j-glue</name>
-  <currentVersion>0.0.2</currentVersion>
+  <currentVersion>0.0.3</currentVersion>
   
   <extends>../../project.xml</extends>
 
@@ -53,14 +53,14 @@
 			<id>pl-j</id>
 			<artifactId>pl-j-api</artifactId>
 			<type>jar</type>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 		<dependency>
 			<id>pl-j</id>
 			<artifactId>pl-j-tools</artifactId>
 			<type>jar</type>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
         <dependency>
