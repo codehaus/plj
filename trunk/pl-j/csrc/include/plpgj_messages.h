@@ -6,4 +6,3 @@
 #include "plpgj_message_fns.h"
 #include "plpgj_message_log.h"
 #include "plpgj_message_trigger.h"
-
