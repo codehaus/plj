@@ -1,17 +1,24 @@
 <project>
     <pomVersion>3</pomVersion>
+    <groupId>pl-j</groupId>
+    <artifactId>pl-j</artifactId>
+    <id>pl-j-api</id>
     <name>pl-j</name>
     <currentVersion>0.0.1</currentVersion>
     <organization>
         <name>The pl-j developer group</name>
-        <url>http://ghoul.fastcrypt.com//hornyakl</url>
-        <logo>/images/logo.png</logo>
+        <url>http://forgeahead.hu/maven/plj/</url>
+        <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
     </organization>
     <inceptionYear>2003</inceptionYear>
     <package>org.pgj</package>
-    <description>Pl-j is a stored procudure platform. It`s priimary target is PostgreSQL and Java. 
-It is possible to adopt other object oriented languages and database platforms.</description>
-    <shortDescription>Java procedureal language</shortDescription>
+    <description>
+    Pl-j is a stored procudure platform. It`s primary target is PostgreSQL and Java. 
+	It is possible to adopt other object oriented languages and database platforms.
+	
+	The implementation is built from jakarta-avalon blocks.
+	</description>
+    <shortDescription>Java stored procedures</shortDescription>
     <siteAddress>http://www.forgeahead.hu/pl-j</siteAddress>
     <versions/>
     <branches/>
