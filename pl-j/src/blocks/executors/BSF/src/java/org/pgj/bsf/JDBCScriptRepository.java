@@ -26,6 +26,10 @@ import org.apache.avalon.framework.logger.Logger;
  * 
  * @avalon.component name="scriptloader" lifestyle="singleton"
  * @avalon.service type="org.pgj.bsf.ScriptRepository"
+ * 
+ * @dna.component name="scriptloader" lifestyle="singleton"
+ * @dna.service type="org.pgj.bsf.ScriptRepository"
+ * 
  */
 public class JDBCScriptRepository
 		implements
