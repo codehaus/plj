@@ -64,7 +64,7 @@ ACX_PTHREAD()
 # Locate the PostgreSQL source tree
 
 AC_ARG_WITH(pgsourcetree, [  --with-pgsourcetree=<dir> Location of PostgreSQL source tree], AC_SUBST(PGSOURCETREE, $with_pgsourcetree))
-AC_ARG_WITH(pgversion, [  --with-pgversion=<dir> Location of PostgreSQL source tree], AC_SUBST(POSTGRES_VERSION, $with_pgversion))
+AC_ARG_WITH(pgversion, [  --with-pgversion=<version> Version number of the PG source (74 or 80)], AC_SUBST(POSTGRES_VERSION, $with_pgversion))
 
 AC_ARG_WITH(confmod, [  --with-confmod=<module> configuration module], AC_SUBST(CONFMOD, $with_confmod))
 AC_ARG_WITH(channel, [  --with-channel=<module> channel module], AC_SUBST(CHANMOD, $with_channel))
