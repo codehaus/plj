@@ -1,3 +1,4 @@
+
 package org.pgj.jexec;
 
 import java.io.File;
@@ -14,35 +15,44 @@ import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.pgj.Executor;
+import org.pgj.TriggerExecutor;
 import org.pgj.classloaders.pgjClassLoader;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
+import org.pgj.messages.TriggerCallRequest;
+import org.pgj.tools.tuplemapper.TupleMapper;
+import org.pgj.typemapping.Tuple;
 import org.pgj.typemapping.TypeMapper;
 
+
 /**
+ * Executes java code as UDF or trigger.
+ *  
  * @author Laszlo Hornyak
- * 
- * Executes java code. 
  * 
  * @avalon.component name="java-executor"
  * @avalon.service type="org.pgj.Executor"
+ * @avalon.service type="org.pgj.TriggerExecutor"
  */
 public class JavaExecutor extends ClassLoader
 		implements
 			Executor,
+			TriggerExecutor,
 			Configurable,
 			Serviceable,
 			LogEnabled {
 
 	/** avalon logger object */
-	Logger logger = null;
+	private Logger logger = null;
 
 	/** class loader block */
-	pgjClassLoader classloader = null;
+	private pgjClassLoader classloader = null;
 
 	/** reference to the type mapper block */
-	TypeMapper typemapper = null;
+	private TypeMapper typemapper = null;
+
+	private TupleMapper tupleMapper = null;
 
 	public static final String FN_UTILITIES_CLASS = "org.pgj.jexec.Utils";
 
@@ -158,10 +168,17 @@ public class JavaExecutor extends ClassLoader
 	 * @see Serviceable#service(ServiceManager)
 	 * @avalon.dependency key="classloader" type="org.pgj.classloaders.pgjClassLoader"
 	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
+	 * @avalon.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper" optional="true"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classloader = (pgjClassLoader) arg0.lookup("classloader");
 		typemapper = (TypeMapper) arg0.lookup("type-mapper");
+		try {
+			tupleMapper = (TupleMapper) arg0.lookup("tuple-mapper");
+		} catch (ServiceException e) {
+			logger
+					.warn("I got no tuplemapper, i won`t be able to run triggers.");
+		}
 	}
 
 	private String compile(String text) {
@@ -179,6 +196,65 @@ public class JavaExecutor extends ClassLoader
 
 	private void store(String name, byte[] classdata) {
 		classloader.store(name, classdata);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.TriggerExecutor#executeTrigger(org.pgj.messages.TriggerCallRequest)
+	 */
+	public Message executeTrigger(TriggerCallRequest trigger) {
+		try {
+			logger.debug("executing trigger");
+
+			Tuple tpl = trigger.getReason() == TriggerCallRequest.TRIGGER_REASON_DELETE
+					? trigger.getOld()
+					: trigger.getNew();
+			Class pcl = tupleMapper.getMappedClass(tpl);
+			Class[] paramClasses = null;
+
+			switch (trigger.getReason()) {
+				case TriggerCallRequest.TRIGGER_REASON_UPDATE :
+					paramClasses = new Class[2];
+					paramClasses[0] = pcl;
+					paramClasses[1] = pcl;
+					break;
+				case TriggerCallRequest.TRIGGER_REASON_DELETE :
+				case TriggerCallRequest.TRIGGER_REASON_INSERT :
+					paramClasses = new Class[1];
+					paramClasses[0] = pcl;
+					break;
+			}
+
+			Class triggerClass = classloader.load(trigger.getClassname());
+			Method triggerMethod = triggerClass.getDeclaredMethod(trigger
+					.getMethodname(), paramClasses);
+			Object triggerObj = triggerClass.newInstance();
+			Object[] paramObjects = null;
+
+			switch (trigger.getReason()) {
+				case TriggerCallRequest.TRIGGER_REASON_UPDATE :
+					paramObjects = new Object[2];
+					paramObjects[0] = tupleMapper.mapTuple(trigger.getNew());
+					paramObjects[1] = tupleMapper.mapTuple(trigger.getOld());
+					break;
+				case TriggerCallRequest.TRIGGER_REASON_DELETE :
+					paramObjects = new Object[1];
+					paramObjects[0] = tupleMapper.mapTuple(trigger.getOld());
+					break;
+				case TriggerCallRequest.TRIGGER_REASON_INSERT :
+					paramObjects = new Object[1];
+					paramObjects[0] = tupleMapper.mapTuple(trigger.getNew());
+					break;
+			}
+
+			Object retObj = triggerMethod.invoke(triggerObj, paramObjects);
+			Result res = typemapper.createResult(retObj);
+			return res;
+		} catch (InvocationTargetException e) {
+			return createException(e);
+		} catch (Throwable t) {
+			//TODO it is very dangerous to catch all throwables here...
+			return createException(t);
+		}
 	}
 
 }
