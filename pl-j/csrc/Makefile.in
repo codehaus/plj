@@ -7,5 +7,5 @@ BUILD_NUMBER=${build.number}
 BUILD_SOFTWARE=pl-pgj
 POSTGRES_INST_HOME=/home/postgres/
 
-COMM_MODULE=omni
+COMM_MODULE=febe
 

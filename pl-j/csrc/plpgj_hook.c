@@ -129,17 +129,15 @@ void plpgj_sql_do(sql_msg msg){
 				//TODO throw back an exception!
 			}
 			
-			PortalDrop(portal);
-			
-			
+			PortalDrop(portal, 0);
 			
 		}
 		break;
 		case SQL_TYPE_CURSOR_OPEN:{
 			Portal portal;
 			sql_msg_cursor_open sql_c_o = (sql_msg_cursor_open)msg;
-			
-			portal = CreatePortal(sql_c_o->cursorname);
+			//TODO: creates constantly bidirectional cursors :(
+			portal = CreatePortal(sql_c_o->cursorname, 1, 1);
 			
 			
 		}
