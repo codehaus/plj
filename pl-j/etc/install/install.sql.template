@@ -5,5 +5,5 @@ create function plpgj_call_handler()
 	language 'C';
 	
 
-create trusted language 'pl/pgj' handler plpgj_call_handler;
+create trusted language 'plj' handler plpgj_call_handler;
 
