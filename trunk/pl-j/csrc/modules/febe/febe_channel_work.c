@@ -242,16 +242,16 @@ message plpgj_channel_receive(void){
 	if(min_conn -> inCursor == min_conn -> inEnd){
 		elog(DEBUG1,"fetching data...");
 		ret = pqReadData(min_conn);
-	}
-	/*switch(ret) {
+	switch(ret) {
 		case 1: elog(DEBUG1, "got data from the server"); 
 		break;
 		case 0: elog(DEBUG1, "no data, but still okay (who knows?)"); 
 		break;
-		case -1: elog(DEBUG1, "got data from the server"); 
+		case -1: elog(WARNING, "ERROR"); 
 		break;
 		default: elog(ERROR, "something is realy _very_ wrong");
-	}*/
+	}
+	}
 
 	ret = pqGetc(&type, min_conn);
 
