@@ -87,6 +87,8 @@
 #include "pljelog.h"
 #include "libpq-mini.h"
 
+#include "libpq-mini-secure.h"
+
 /*	*/
 
 /*	this is a fragment from libpq-int.h */
@@ -110,6 +112,10 @@ static int	pqSocketCheck(PGconn_min * conn, int forRead, int forWrite,
 						  time_t end_time);
 static int	pqSocketPoll(int sock, int forRead, int forWrite,
 						 time_t end_time);
+int		pqReadReady(PGconn_min * conn);
+int		pqWait(int forRead, int forWrite, PGconn_min * conn);
+int		pqWaitTimed(int forRead, int forWrite, PGconn_min * conn,
+			                        time_t finish_time);
 
 
 /*
@@ -869,7 +875,6 @@ pqSendSome(PGconn_min * conn, int len)
 	while (len > 0)
 	{
 		int			sent;
-		char		sebuf[256];
 
 		sent = pqsecure_write(conn, ptr, len);
 
