@@ -7,6 +7,7 @@ package org.pgj.jexec;
 import java.io.IOException;
 
 import org.pgj.messages.CallRequest;
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.typemapping.Field;
 
@@ -43,7 +44,7 @@ public class ReplaceJar extends BasicPrivilegedJSProc {
 	}
 
 	static Object doReplaceJar(PLJClassLoader classLoader, String jarName,
-			String jarFile) throws IOException {
+			String jarFile) throws IOException, ClassStoreException {
 		RemoveJar.doRemoveJar(classLoader, jarName);
 		InstallJar.doInstallJar(classLoader, jarName, jarFile);
 		return null;

@@ -11,14 +11,14 @@ public interface PLJClassLoader {
 	 * @param fqn		the fully qualified class name
 	 * @return true of so, false otherwise
 	 */
-	boolean hasClass(String fqn);
+	boolean hasClass(String fqn) throws ClassStoreException;
 
 	/**
 	 * Load class from repository.
 	 * @param fqn		fully qualified name of the class.
 	 * @return the loaded class.
 	 */
-	Class load(String fqn) throws ClassNotFoundException;
+	Class load(String fqn) throws ClassNotFoundException, ClassStoreException;
 
 	/**
 	 * Store compiled class.
@@ -26,18 +26,18 @@ public interface PLJClassLoader {
 	 * @param raw		the raw data
 	 * @param jar		the name of the jar to store in (has importance only from the point of view of deletion.)
 	 */
-	void store(String name, byte[] raw, String jar);
+	void store(String name, byte[] raw, String jar) throws ClassStoreException;
 
 	/**
 	 * 
 	 * @param name
 	 * @throws ClassNotFoundException
 	 */
-	void removeClass(String name) throws ClassNotFoundException;
+	void removeClass(String name) throws ClassNotFoundException, ClassStoreException;
 
 	/**
 	 * Remove a jar file.
 	 * @param name	the name of the jar file
 	 */
-	void removeJar(String name);
+	void removeJar(String name) throws ClassStoreException;
 }

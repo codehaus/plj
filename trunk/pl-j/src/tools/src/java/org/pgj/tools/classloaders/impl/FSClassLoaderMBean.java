@@ -6,6 +6,8 @@
  */
 package org.pgj.tools.classloaders.impl;
 
+import org.pgj.tools.classloaders.ClassStoreException;
+
 /**
  * @author Laszlo Hornyak
  * 
@@ -14,6 +16,6 @@ package org.pgj.tools.classloaders.impl;
  */
 public interface FSClassLoaderMBean {
 	
-	void reloadClass(String fqn) throws ClassNotFoundException;
+	void reloadClass(String fqn) throws ClassNotFoundException, ClassStoreException;
 	public void flushCache();
 }
