@@ -47,6 +47,12 @@
 				<resource
 					id="commons-beanutils:commons-beanutils" 
 					version="1.6.1"/>
+				<resource
+					id="commons-collections:commons-collections" 
+					version="3.0"/>
+				<resource
+					id="commons-logging:commons-logging" 
+					version="1.0.3"/>
 
 
 				<resource 
