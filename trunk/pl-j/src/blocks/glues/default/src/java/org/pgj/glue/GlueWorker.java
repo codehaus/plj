@@ -25,7 +25,6 @@ public class GlueWorker
 			LogEnabled,
 			Startable {
 
-	public static final String CHANELL_KEY = "CHANELL_KEY";
 	/** the chanell we are dealing with */
 	private Channel chanell;
 	/** The executor object */
@@ -54,7 +53,15 @@ public class GlueWorker
 	 * @see Executable#execute()
 	 */
 	public void execute() {
-		ClientUtils.setClientforThread(client);
+		
+		/* if the client is not set, so this is a new call from a client
+		 * we must set the Client object for this thread, and unset it
+		 * after the call is done. (see finally block)
+		 */
+		boolean setClient = ClientUtils.getClientforThread() == null;
+		if(setClient)
+			ClientUtils.setClientforThread(client);
+
 		try {
 			while (true) {
 				Message msg = chanell.receiveFromRDBMS(client);
@@ -82,8 +89,10 @@ public class GlueWorker
 			client = null;
 			executor = null;
 			chanell = null;
+
 			//no funny tricks ;)
-			ClientUtils.setClientforThread(null);
+			if(setClient)
+				ClientUtils.setClientforThread(null);
 		}
 	}
 
