@@ -15,7 +15,7 @@ public class MapTriggers {
 
 	static Category cat = Category.getInstance(MapTriggers.class);
 
-	public void testTableDeleteTrigger(Map _old){
+	public static void testTableDeleteTrigger(Map _old){
 		cat.warn("this record is deleted:"+_old.get("name"));
 	}
 

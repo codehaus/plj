@@ -11,15 +11,15 @@ package org.deadcat.typetests;
  */
 public class SmallIntTests {
 
-	public Integer add(Integer a, Integer b){
+	public static Integer add(Integer a, Integer b){
 		return new Integer(a.intValue() + b.intValue());
 	}
 
-	public Integer sub(Integer a, Integer b){
+	public static Integer sub(Integer a, Integer b){
 		return new Integer(a.intValue() - b.intValue());
 	}
 
-	public Integer mul(Integer a, Integer b){
+	public static Integer mul(Integer a, Integer b){
 		return new Integer(a.intValue() * b.intValue());
 	}
 

@@ -1,3 +1,4 @@
+
 package org.deadcat_enterprises;
 
 import java.sql.Connection;
@@ -8,6 +9,7 @@ import java.sql.Statement;
 import java.util.Random;
 
 import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A little collection of very stupid methods that can be java UDFs.
@@ -17,17 +19,13 @@ import org.apache.log4j.Category;
  */
 public class Businnes {
 
-	public Businnes() {
-
-	}
-
-	public String test(Integer i) {
+	public static String test(Integer i) {
 		System.out.println("Wow, i got a number:" + i);
 
 		return "Halleluja, vazzeg!";
 	}
 
-	public String test() {
+	public static String test() {
 		System.out
 				.println("\nIf you see this, it means your stored procedure is running.\n");
 
@@ -37,7 +35,7 @@ public class Businnes {
 		return "Haleluja, vazzeg!";
 	}
 
-	public String jdbcTest() throws SQLException {
+	public static String jdbcTest() throws SQLException {
 		System.out.println("JDBC test started");
 
 		Connection conn = DriverManager.getConnection("jdbc:default:database");
@@ -66,59 +64,61 @@ public class Businnes {
 		return "Haleluja, vazzeg!";
 	}
 
-	public int testInt0() {
+	public static int testInt0() {
 		System.out.println("testInt0() was called. its return value is 1984");
 		return 1984;
 	}
 
-	public int testInt1(Integer i1, Integer i2) {
-		System.out.println("i1: "+i1);
-		System.out.println("i2: "+i2);
+	public static int testInt1(Integer i1, Integer i2) {
+		System.out.println("i1: " + i1);
+		System.out.println("i2: " + i2);
 		return i1.intValue() + i2.intValue();
 	}
 
-	public int testInt2(Integer i1) {
+	public static int testInt2(Integer i1) {
 		return i1.intValue();
 	}
 
-	public String testString0(String str) {
+	public static String testString0(String str) {
 		return str.toLowerCase();
 	}
 
-	public String logTest(String logThis) {
+	public static String logTest(String logThis) {
 		Category category = Category.getInstance(Businnes.class);
 		category.error(logThis);
 		return "logged: ".concat(logThis);
 	}
 
+	private static Logger logcat = Logger.getLogger(Businnes.class);
 
-	static Category logcat = Category.getInstance(Businnes.LogThread.class);
+	public static String threadedLogTest() {
+		class LogThread extends Thread{
+			
+			boolean should_stop = false;
+			Category logcat = Category.getInstance(Thread.class);
 
-	private class LogThread extends Thread {
+			Random random = new Random();
 
-		boolean should_stop = false;
-		Random random = new Random();
-
-		private synchronized void pleaseStop() {
-			should_stop = true;
-		}
-
-		public void run() {
-			try {
-				while (!should_stop) {
-					logcat.warn(this.getName() +" "+ System.currentTimeMillis());
-					sleep(random.nextInt(10));
-				}
-			} catch (InterruptedException e) {
-				logcat.warn("ooops", e);
+			private synchronized void pleaseStop() {
+				should_stop = true;
 			}
-		}
-	}
 
-	public String threadedLogTest() {
+			public void run() {
+				try {
+					while (!should_stop) {
+						logcat.warn(this.getName() + " "
+								+ System.currentTimeMillis());
+						sleep(random.nextInt(10));
+					}
+				} catch (InterruptedException e) {
+					logcat.warn("ooops", e);
+				}
+			}
+		};
 		LogThread[] logthreads = new LogThread[100];
 		for (int i = 0; i < 100; i++) {
 			logthreads[i] = new LogThread();
+				
 			logthreads[i].start();
 		}
 
