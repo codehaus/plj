@@ -8,7 +8,7 @@ package org.pgj.glue;
  * Configuration object for Glue;
  * @author Laszlo Hornyak
  */
-public class GlueConfiguration {
+class GlueConfiguration {
 
 	boolean errorRecoverable;
 
