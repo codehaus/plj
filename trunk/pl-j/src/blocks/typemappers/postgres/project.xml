@@ -3,7 +3,7 @@
     <artifactId>pl-j-postgres</artifactId>
     <name>pl-j-postgres</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.5</currentVersion>
+    <currentVersion>0.0.6</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <description>Maps PostgreSQL types into java types.</description>
     <shortDescription>PostgreSQL typemapper.</shortDescription>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
             <type>jar</type>
             <properties/>
         </dependency>
