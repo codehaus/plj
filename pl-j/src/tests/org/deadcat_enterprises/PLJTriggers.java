@@ -21,4 +21,10 @@ public class PLJTriggers {
 		cat.warn("the entry: " + _old.getName() + " is modified to " + _new.getName());
 	}
 
+	public TestTableRecord testTable2InsertTrigger(TestTableRecord _new){
+		cat.warn("adding to testtable: " + _new.getName());
+		_new.getName().replaceAll("kocka", "K0CK@");
+		return _new;
+	}
+
 }

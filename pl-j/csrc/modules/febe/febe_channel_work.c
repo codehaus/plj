@@ -308,6 +308,10 @@ message febe_receive_log() {
 	return ret;
 }
 
+
+message febe_receive_tupres() {
+	return NULL;
+}
 message plpgj_channel_receive(void){
 	int header;
 	char type;
@@ -344,6 +348,8 @@ message plpgj_channel_receive(void){
 			return (message) febe_receive_exception();
 		case 'L':
 			return (message) febe_receive_log();
+		case 'U':
+			return (message) febe_receive_tupres();
 	default:
 			elog(ERROR, "message type unknown :%d", type);
 			return NULL;
