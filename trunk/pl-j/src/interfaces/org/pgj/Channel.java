@@ -1,6 +1,7 @@
 package org.pgj;
 
 import org.pgj.messages.Message;
+import org.pgj.typemapping.MappingException;
 
 /**
  * A communication channel with the RDBMS.
@@ -28,16 +29,16 @@ public interface Channel {
 	 * Receive a message from the RDMBS.
 	 * @param client		the client to get a message from.
 	 * @return				Message from the client.
-	 * @throws CommunicationException	if the communication failed (e.g. client is gone, cables are cut, etc...)
+	 * @throws org.pgj.CommunicationException	if the communication failed (e.g. client is gone, cables are cut, etc...)
 	 * @since 0.1
 	 */
-	public Message receiveFromRDBMS(Client client) throws CommunicationException;
+	public Message receiveFromRDBMS(Client client) throws CommunicationException, MappingException;
 
 	/**
 	 * Send a message to the RDBMS.
 	 * @param msg 			A message to the RDBMS. The client is stored in the param.
-	 * @throws CommunicationException	if the communication failed (e.g. client is gone, cables are cut, etc...)
+	 * @throws org.pgj.CommunicationException	if the communication failed (e.g. client is gone, cables are cut, etc...)
 	 * @since 0.1
 	 */
-	public void sendToRDBMS(Message msg) throws CommunicationException;
+	public void sendToRDBMS(Message msg) throws CommunicationException, MappingException;
 }

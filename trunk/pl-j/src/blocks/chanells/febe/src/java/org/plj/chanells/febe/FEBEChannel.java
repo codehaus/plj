@@ -106,7 +106,7 @@ public class FEBEChannel
 	 * @see org.pgj.Channel#receiveFromRDBMS(org.pgj.Client)
 	 */
 	public Message receiveFromRDBMS(Client client)
-			throws CommunicationException {
+			throws CommunicationException, MappingException {
 		try {
 			synchronized (client) {
 				PGStream stream = ((FEBEClient) client).getStream();
@@ -146,11 +146,6 @@ public class FEBEChannel
 		} catch (IOException e) {
 			logger.error("I/O exception on receiveing from RDBMS", e);
 			throw new CommunicationException("Error at receiveFromRDBMS", e);
-		} catch (MappingException me) {
-			//TODO: is it right to throw a CommunicationException instead of a
-			// MappingException?
-			logger.error("mapping exception, rethrowing", me);
-			throw new CommunicationException("error at receiveing message.", me);
 		}
 	}
 
@@ -159,7 +154,7 @@ public class FEBEChannel
 	 * 
 	 * @see org.pgj.Channel#sendToRDBMS(org.pgj.messages.Message)
 	 */
-	public void sendToRDBMS(Message msg) throws CommunicationException {
+	public void sendToRDBMS(Message msg) throws CommunicationException, MappingException {
 		FEBEClient client = (FEBEClient) msg.getClient();
 		synchronized (client) {
 			PGStream stream = client.getStream();
@@ -190,9 +185,6 @@ public class FEBEChannel
 			} catch (IOException e) {
 				throw new CommunicationException(
 						"could not send message to DB", e);
-			} catch (MappingException e) {
-				logger.error("mapping exception, rethrowing", e);
-				throw new CommunicationException("mapping excption occured", e);
 			}
 		}
 	}
