@@ -8,6 +8,7 @@
 #define SQL_TYPE_CURSOR_CLOSE			2
 #define SQL_TYPE_FETCH					3
 #define SQL_TYPE_CURSOR_OPEN			4
+#define SQL_TYPE_PREPARE			5
 
 typedef struct str_sql_msg
 {
@@ -20,6 +21,15 @@ typedef struct str_sql_statement
 	sql_message_content;
 	char	   *statement;
 }	*sql_msg_statement;
+
+typedef struct str_sql_prepare
+{
+	base_message_content;
+	sql_message_content;
+	char	*statement;
+	int	ntypes;
+	char	**types;
+}	*sql_msg_prepapre;
 
 /**
  * For opening and closing cursors.

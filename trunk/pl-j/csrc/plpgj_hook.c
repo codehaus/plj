@@ -11,6 +11,7 @@
 #include "plpgj_channel.h"
 #include "plpgj_message_fns.h"
 #include "plpgj_core.h"
+#include "planstore.h"
 
 #include "utils/portal.h"
 #include "lib/stringinfo.h"
@@ -23,6 +24,7 @@
 #include "utils/memutils.h"
 #include "access/xact.h"
 #include "pljelog.h"
+
 
 /*	*/
 
@@ -383,6 +385,50 @@ plpgj_sql_do(sql_msg msg)
 			pljlogging_error = 0;
 			elog(DEBUG1, "leaving nolog area");
 			break;
+		case SQL_TYPE_PREPARE:
+			elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
+			pljlogging_error = 1;
+			//do trixx
+			{
+				Oid *argtypes;
+				sql_msg_prepapre prep;
+				int i;
+				TypeName *typnam;
+				void *plan;
+				int planid;
+				plpgj_result res;
+
+				argtypes = prep -> ntypes == 0 ? NULL : SPI_palloc(prep -> ntypes * sizeof(Oid) );
+				prep = (sql_msg_prepapre) msg;
+				for(i = 0; i < prep -> ntypes; i++) {
+					typnam = makeTypeName( prep -> types[i] );
+					argtypes[i] = LookupTypeName(typnam);
+				}
+
+				plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
+				planid = store_plantable(plan);
+
+				//create result
+				res = SPI_palloc(sizeof(str_plpgj_result));
+				res -> msgtype = MT_RESULT;
+				res -> length = sizeof(str_plpgj_result);
+				res -> rows = 1;
+				res -> cols = 1;
+				res -> types = SPI_palloc(sizeof(char*));
+				res -> types[0] = "int4";
+				res -> data = SPI_palloc(sizeof(raw));
+				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
+				res -> data[0] -> length = 8;
+				res -> data[0] -> isnull = 0;
+				res -> data[0] -> data = SPI_palloc(sizeof(12));
+			//	res -> data[0] -> date[0] = 8;
+			//	res -> data[0] -> date[1] = 0;
+			//	res -> data[0] -> date[2] = 0;
+			//	res -> data[0] -> date[3] = 0;
+				
+			}
+			pljlogging_error = 0;
+			elog(DEBUG1, "SQL_TYPE_PREPARE done, leaving nolog area");
 		case SQL_TYPE_CURSOR_CLOSE:
 			{
 				Portal		portal;

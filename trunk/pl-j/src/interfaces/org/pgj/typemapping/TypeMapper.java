@@ -55,4 +55,12 @@ public interface TypeMapper {
 	 * @throws MappingException if the object type cannot be mapped to an RDBMS type.
 	 */
 	Result createResult(Object obj) throws MappingException;
+	
+	/**
+	 * Returns the rdbms type of the given class.
+	 * @param cl	the class
+	 * @return	the name of the rdbms type
+	 * @throws MappingException	if the class is not mappable
+	 */
+	String getRDBMSTypeFor(Class cl) throws MappingException;
 }

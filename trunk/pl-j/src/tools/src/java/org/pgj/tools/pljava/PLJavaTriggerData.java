@@ -6,6 +6,7 @@ package org.pgj.tools.pljava;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.pgj.typemapping.Tuple;
 import org.postgresql.pljava.TriggerData;
 
 /**
@@ -15,35 +16,40 @@ import org.postgresql.pljava.TriggerData;
  */
 public class PLJavaTriggerData implements TriggerData{
 
+	private Tuple old = null;
+	private PLJavaTupleResultSet oldRs = null;
+	private Tuple _new = null;
+	private PLJavaTupleResultSet newRs = null;
+	
 	/**
 	 * 
 	 */
-	public PLJavaTriggerData() {
+	public PLJavaTriggerData(Tuple old, Tuple _new) {
 		super();
-		// TODO Auto-generated constructor stub
+		this.old = old;
+		oldRs = new PLJavaTupleResultSet(old);
+		this._new = _new;
+		newRs = new PLJavaTupleResultSet(_new);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#getNew()
 	 */
 	public ResultSet getNew() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return newRs;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#getOld()
 	 */
 	public ResultSet getOld() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return oldRs;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#getArguments()
 	 */
 	public String[] getArguments() throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -51,7 +57,10 @@ public class PLJavaTriggerData implements TriggerData{
 	 * @see org.postgresql.pljava.TriggerData#getName()
 	 */
 	public String getName() throws SQLException {
-		// TODO Auto-generated method stub
+		if(_new != null)
+			return _new.getRelationName();
+		if(old != null)
+			return old.getRelationName();
 		return null;
 	}
 
@@ -59,7 +68,10 @@ public class PLJavaTriggerData implements TriggerData{
 	 * @see org.postgresql.pljava.TriggerData#getTableName()
 	 */
 	public String getTableName() throws SQLException {
-		// TODO Auto-generated method stub
+		if(_new != null)
+			return _new.getRelationName();
+		if(old != null)
+			return old.getRelationName();
 		return null;
 	}
 
