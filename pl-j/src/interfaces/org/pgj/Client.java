@@ -14,11 +14,11 @@ public interface Client{
 	 * Returns the channel the code can use to communicate to the client.
 	 * @return the channel.
 	 */
-	Channel getChannel();
+	org.pgj.Channel getChannel();
 	
 	/**
 	 * Returns the typemapper used for typemapping by the client's session.
-	 * @return
+	 * @return the typemapper of the client
 	 */
 	TypeMapper getTypeMapper();
 }
