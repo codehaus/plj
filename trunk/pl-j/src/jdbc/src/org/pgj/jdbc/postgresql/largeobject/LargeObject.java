@@ -6,7 +6,7 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/largeobject/LargeObject.java,v 1.1 2004-06-12 17:33:11 kocka Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/largeobject/LargeObject.java,v 1.2 2004-07-06 18:22:22 kocka Exp $
  *
  *-------------------------------------------------------------------------
  */
@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
-
-import org.pgj.jdbc.postgresql.fastpath.Fastpath;
-import org.pgj.jdbc.postgresql.fastpath.FastpathArg;
 
 /*
  * This class provides the basic methods required to run the interface, plus
@@ -62,7 +59,7 @@ public class LargeObject
 	 */
 	public static final int SEEK_END = 2;
 
-	private Fastpath	fp; // Fastpath API to use
+//	private Fastpath	fp; // Fastpath API to use
 	private int oid;	// OID of this object
 	private int fd; // the descriptor of the open large object
 
@@ -82,16 +79,16 @@ public class LargeObject
 	 * @exception SQLException if a database-access error occurs.
 	 * @see org.pgj.jdbc.postgresql.largeobject.LargeObjectManager
 	 */
-	protected LargeObject(Fastpath fp, int oid, int mode) throws SQLException
-	{
-		this.fp = fp;
-		this.oid = oid;
-
-		FastpathArg args[] = new FastpathArg[2];
-		args[0] = new FastpathArg(oid);
-		args[1] = new FastpathArg(mode);
-		this.fd = fp.getInteger("lo_open", args);
-	}
+//	protected LargeObject(Fastpath fp, int oid, int mode) throws SQLException
+//	{
+//		this.fp = fp;
+//		this.oid = oid;
+//
+//		FastpathArg args[] = new FastpathArg[2];
+//		args[0] = new FastpathArg(oid);
+//		args[1] = new FastpathArg(mode);
+//		this.fd = fp.getInteger("lo_open", args);
+//	}
 
 	/* Release large object resources during garbage cleanup */
 	protected void finalize() throws SQLException
@@ -119,32 +116,32 @@ public class LargeObject
 	 */
 	public void close() throws SQLException
 	{
-		if (!closed)
-		{
-			// flush any open output streams
-			if (os != null)
-			{
-				try
-				{
-					// we can't call os.close() otherwise we go into an infinite loop!
-					os.flush();
-				}
-				catch (IOException ioe)
-				{
-					throw new SQLException(ioe.getMessage());
-				}
-				finally
-				{
-					os = null;
-				}
-			}
-
-			// finally close
-			FastpathArg args[] = new FastpathArg[1];
-			args[0] = new FastpathArg(fd);
-			fp.fastpath("lo_close", false, args); // true here as we dont care!!
-			closed = true;
-		}
+//		if (!closed)
+//		{
+//			// flush any open output streams
+//			if (os != null)
+//			{
+//				try
+//				{
+//					// we can't call os.close() otherwise we go into an infinite loop!
+//					os.flush();
+//				}
+//				catch (IOException ioe)
+//				{
+//					throw new SQLException(ioe.getMessage());
+//				}
+//				finally
+//				{
+//					os = null;
+//				}
+//			}
+//
+//			// finally close
+//			FastpathArg args[] = new FastpathArg[1];
+//			args[0] = new FastpathArg(fd);
+//			fp.fastpath("lo_close", false, args); // true here as we dont care!!
+//			closed = true;
+//		}
 	}
 
 	/*
@@ -158,11 +155,13 @@ public class LargeObject
 	{
 		// This is the original method, where the entire block (len bytes)
 		// is retrieved in one go.
-		FastpathArg args[] = new FastpathArg[2];
-		args[0] = new FastpathArg(fd);
-		args[1] = new FastpathArg(len);
-		return fp.getData("loread", args);
+//		FastpathArg args[] = new FastpathArg[2];
+//		args[0] = new FastpathArg(fd);
+//		args[1] = new FastpathArg(len);
+//		return fp.getData("loread", args);
 
+		return null;
+		
 		// This version allows us to break this down into 4k blocks
 		//if (len<=4048) {
 		//// handle as before, return the whole block in one go
@@ -214,10 +213,10 @@ public class LargeObject
 	 */
 	public void write(byte buf[]) throws SQLException
 	{
-		FastpathArg args[] = new FastpathArg[2];
-		args[0] = new FastpathArg(fd);
-		args[1] = new FastpathArg(buf);
-		fp.fastpath("lowrite", false, args);
+//		FastpathArg args[] = new FastpathArg[2];
+//		args[0] = new FastpathArg(fd);
+//		args[1] = new FastpathArg(buf);
+//		fp.fastpath("lowrite", false, args);
 	}
 
 	/*
@@ -247,11 +246,11 @@ public class LargeObject
 	 */
 	public void seek(int pos, int ref) throws SQLException
 	{
-		FastpathArg args[] = new FastpathArg[3];
-		args[0] = new FastpathArg(fd);
-		args[1] = new FastpathArg(pos);
-		args[2] = new FastpathArg(ref);
-		fp.fastpath("lo_lseek", false, args);
+//		FastpathArg args[] = new FastpathArg[3];
+//		args[0] = new FastpathArg(fd);
+//		args[1] = new FastpathArg(pos);
+//		args[2] = new FastpathArg(ref);
+//		fp.fastpath("lo_lseek", false, args);
 	}
 
 	/*
@@ -274,9 +273,10 @@ public class LargeObject
 	 */
 	public int tell() throws SQLException
 	{
-		FastpathArg args[] = new FastpathArg[1];
-		args[0] = new FastpathArg(fd);
-		return fp.getInteger("lo_tell", args);
+//		FastpathArg args[] = new FastpathArg[1];
+//		args[0] = new FastpathArg(fd);
+//		return fp.getInteger("lo_tell", args);
+		return 0;
 	}
 
 	/*

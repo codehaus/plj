@@ -6,7 +6,7 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/core/BaseConnection.java,v 1.1 2004-06-20 20:51:42 kocka Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/core/BaseConnection.java,v 1.2 2004-07-06 18:22:22 kocka Exp $
  *
  *-------------------------------------------------------------------------
  */
@@ -33,13 +33,12 @@ public interface BaseConnection extends PGConnection
 	public Object getObject(String type, String value) throws SQLException;
 	public int getPGProtocolVersionMajor();
 	public int getPGProtocolVersionMinor();
-	public PGStream getPGStream();
 	public String getPGType(int oid) throws SQLException;
 	public int getPGType(String pgTypeName) throws SQLException;
 	public int getSQLType(int oid) throws SQLException;
 	public int getSQLType(String pgTypeName) throws SQLException;
-	public boolean haveMinimumCompatibleVersion(String ver) throws SQLException;
-	public boolean haveMinimumServerVersion(String ver) throws SQLException;
+//	public boolean haveMinimumCompatibleVersion(String ver) throws SQLException;
+//	public boolean haveMinimumServerVersion(String ver) throws SQLException;
 	public void setAutoCommit(boolean autoCommit) throws SQLException;
 	public void setCursorName(String cursor) throws SQLException;
 

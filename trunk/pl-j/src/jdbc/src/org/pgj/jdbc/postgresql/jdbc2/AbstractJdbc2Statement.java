@@ -23,7 +23,7 @@ import org.pgj.jdbc.postgresql.largeobject.LargeObjectManager;
 import org.pgj.jdbc.postgresql.util.PSQLException;
 import org.pgj.jdbc.postgresql.util.PSQLState;
 
-/* $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/jdbc2/AbstractJdbc2Statement.java,v 1.1 2004-06-12 17:33:11 kocka Exp $
+/* $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/jdbc2/AbstractJdbc2Statement.java,v 1.2 2004-07-06 18:22:22 kocka Exp $
  * This class defines methods of the jdbc2 specification.  This class extends
  * org.pgj.jdbc.postgresql.jdbc1.AbstractJdbc1Statement which provides the jdbc1
  * methods.  The real Statement class (for jdbc2) is org.pgj.jdbc.postgresql.jdbc2.Jdbc2Statement
@@ -256,57 +256,57 @@ public abstract class AbstractJdbc2Statement extends org.pgj.jdbc.postgresql.jdb
 
 	public void setCharacterStream(int i, java.io.Reader x, int length) throws SQLException
 	{
-		if (connection.haveMinimumCompatibleVersion("7.2"))
-		{
-			//Version 7.2 supports CharacterStream for for the PG text types
-			//As the spec/javadoc for this method indicate this is to be used for
-			//large text values (i.e. LONGVARCHAR)	PG doesn't have a separate
-			//long varchar datatype, but with toast all the text datatypes are capable of
-			//handling very large values.  Thus the implementation ends up calling
-			//setString() since there is no current way to stream the value to the server
-			char[] l_chars = new char[length];
-			int l_charsRead;
-			try
-			{
-				l_charsRead = x.read(l_chars, 0, length);
-			}
-			catch (IOException l_ioe)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_ioe);
-			}
-			setString(i, new String(l_chars, 0, l_charsRead));
-		}
-		else
-		{
-			//Version 7.1 only supported streams for LargeObjects
-			//but the jdbc spec indicates that streams should be
-			//available for LONGVARCHAR instead
-			LargeObjectManager lom = connection.getLargeObjectAPI();
-			int oid = lom.create();
-			LargeObject lob = lom.open(oid);
-			OutputStream los = lob.getOutputStream();
-			try
-			{
-				// could be buffered, but then the OutputStream returned by LargeObject
-				// is buffered internally anyhow, so there would be no performance
-				// boost gained, if anything it would be worse!
-				int c = x.read();
-				int p = 0;
-				while (c > -1 && p < length)
-				{
-					los.write(c);
-					c = x.read();
-					p++;
-				}
-				los.close();
-			}
-			catch (IOException se)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, se);
-			}
-			// lob is closed by the stream so don't call lob.close()
-			setInt(i, oid);
-		}
+//		if (connection.haveMinimumCompatibleVersion("7.2"))
+//		{
+//			//Version 7.2 supports CharacterStream for for the PG text types
+//			//As the spec/javadoc for this method indicate this is to be used for
+//			//large text values (i.e. LONGVARCHAR)	PG doesn't have a separate
+//			//long varchar datatype, but with toast all the text datatypes are capable of
+//			//handling very large values.  Thus the implementation ends up calling
+//			//setString() since there is no current way to stream the value to the server
+//			char[] l_chars = new char[length];
+//			int l_charsRead;
+//			try
+//			{
+//				l_charsRead = x.read(l_chars, 0, length);
+//			}
+//			catch (IOException l_ioe)
+//			{
+//				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_ioe);
+//			}
+//			setString(i, new String(l_chars, 0, l_charsRead));
+//		}
+//		else
+//		{
+//			//Version 7.1 only supported streams for LargeObjects
+//			//but the jdbc spec indicates that streams should be
+//			//available for LONGVARCHAR instead
+//			LargeObjectManager lom = connection.getLargeObjectAPI();
+//			int oid = lom.create();
+//			LargeObject lob = lom.open(oid);
+//			OutputStream los = lob.getOutputStream();
+//			try
+//			{
+//				// could be buffered, but then the OutputStream returned by LargeObject
+//				// is buffered internally anyhow, so there would be no performance
+//				// boost gained, if anything it would be worse!
+//				int c = x.read();
+//				int p = 0;
+//				while (c > -1 && p < length)
+//				{
+//					los.write(c);
+//					c = x.read();
+//					p++;
+//				}
+//				los.close();
+//			}
+//			catch (IOException se)
+//			{
+//				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, se);
+//			}
+//			// lob is closed by the stream so don't call lob.close()
+//			setInt(i, oid);
+//		}
 	}
 
 	public void setClob(int i, Clob x) throws SQLException

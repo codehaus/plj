@@ -448,21 +448,6 @@ public class Driver implements java.sql.Driver {
 		}
 	}
 
-
-	public static void makeSSL(org.pgj.jdbc.postgresql.core.PGStream p_stream)
-			throws IOException {
-		if (logDebug)
-			debug("converting regular socket connection to ssl");
-		javax.net.ssl.SSLSocketFactory factory = (javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory
-				.getDefault();
-		p_stream.connection = (javax.net.ssl.SSLSocket) factory.createSocket(
-				p_stream.connection, p_stream.host, p_stream.port, true);
-		p_stream.pg_input = new BufferedInputStream(p_stream.connection
-				.getInputStream(), 8192);
-		p_stream.pg_output = new BufferedOutputStream(p_stream.connection
-				.getOutputStream(), 8192);
-	}
-
 	public static boolean sslEnabled() {
 		boolean l_return = false;
 		l_return = true;

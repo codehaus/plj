@@ -18,7 +18,6 @@ package org.pgj.jdbc.postgresql;
 import java.sql.SQLException;
 
 import org.pgj.jdbc.postgresql.core.Encoding;
-import org.pgj.jdbc.postgresql.fastpath.Fastpath;
 import org.pgj.jdbc.postgresql.largeobject.LargeObjectManager;
 
 public interface PGConnection
@@ -37,11 +36,6 @@ public interface PGConnection
 	 */
 	public LargeObjectManager getLargeObjectAPI() throws SQLException;
 
-	/**
-	 * This returns the Fastpath API for the current connection.
-	 * @since 7.3
-	 */
-	public Fastpath getFastpathAPI() throws SQLException;
 
         /*
          * This allows client code to add a handler for one of org.pgj.jdbc.postgresql's
