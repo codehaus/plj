@@ -5,6 +5,7 @@ package org.pgj.glue;
 
 import org.pgj.Channel;
 import org.pgj.Client;
+import org.pgj.typemapping.TypeMapper;
 
 /**
  * Wraps the client by glue code.
@@ -41,6 +42,15 @@ class ClientWrapper implements Client {
 	 */
 	protected Client getRealClient() {
 		return client;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.pgj.Client#getTypeMapper()
+	 */
+	public TypeMapper getTypeMapper() {
+		return client.getTypeMapper();
 	}
 
 }
