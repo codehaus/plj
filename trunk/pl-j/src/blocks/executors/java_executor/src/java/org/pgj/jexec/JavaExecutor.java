@@ -84,7 +84,7 @@ public class JavaExecutor extends ClassLoader
 		try {
 
 			//privileged call execution
-			if ("#privileged-class".equals(c.getClassname())) {
+			if ("#privileged-class".equals(c.getClassname().trim())) {
 				PrivilegedJSProc proc = (PrivilegedJSProc) this.privilegedCalls
 						.get(c.getMethodname());
 				if (proc == null)
@@ -237,9 +237,9 @@ public class JavaExecutor extends ClassLoader
 	 * @see org.apache.avalon.framework.activity.Initializable#initialize()
 	 */
 	public void initialize() throws Exception {
-		privilegedCalls.put("install_jar", null);
-		privilegedCalls.put("replace_jar", null);
-		privilegedCalls.put("remove_jar", null);
+		privilegedCalls.put("install_jar", new InstallJar(this));
+		privilegedCalls.put("replace_jar", new ReplaceJar(this));
+		privilegedCalls.put("remove_jar", new RemoveJar(this));
 		privilegedCalls.put("alter_java_path", null);
 	}
 
