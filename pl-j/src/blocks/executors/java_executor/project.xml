@@ -37,6 +37,14 @@
 			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
+		<dependency>
+			<id>pl-j</id>
+			<type>jar</type>
+			<artifactId>pl-j-tools</artifactId>
+			<version>0.0.1</version>
+			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
+		</dependency>
+
 	</dependencies>
 
 	<build>
