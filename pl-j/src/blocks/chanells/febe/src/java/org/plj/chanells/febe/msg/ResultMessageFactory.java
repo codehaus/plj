@@ -59,13 +59,16 @@ public class ResultMessageFactory implements MessageFactory {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				Field fld = res.get(i, j);
-				if (fld == null) {
+				if (fld == null || fld.isNull()) {
 					stream.SendChar('N');
 				} else {
 					stream.SendChar('D');
 					byte[] data = fld.get();
 					stream.SendInteger(data.length, 4);
 					stream.Send(data);
+					byte[] typeData = fld.rdbmsType().getBytes();
+					stream.SendInteger(typeData.length, 4);
+					stream.Send(typeData);
 				}
 			}
 		}

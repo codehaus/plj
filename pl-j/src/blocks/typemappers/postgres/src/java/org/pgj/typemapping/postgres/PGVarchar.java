@@ -77,9 +77,9 @@ public class PGVarchar extends AbstractPGField {
 		}
 		String tmp = obj.toString();
 		byte t[] = tmp.getBytes();
-		raw = new byte[t.length + 4];
-		raw[0] = 0;raw[1] = 0;raw[2] = 0;raw[3] = 0;
-		System.arraycopy(t, 0, raw, 4, t.length);
+		raw = new byte[t.length];
+		//raw[0] = 0;raw[1] = 0;raw[2] = 0;raw[3] = 0;
+		System.arraycopy(t, 0, raw, 0, t.length);
 	}
 
 	/**

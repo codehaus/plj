@@ -95,6 +95,10 @@ public class JavaExecutor extends ClassLoader
 			Object[] paramobjs = new Object[params.length];
 			Object callobj = callclass.newInstance();
 
+			for (int i = 0; i < params.length; i++) {
+				paramobjs[i] = params[i].defaultGet();
+			}
+
 			//---
 			// invoke method
 			//---
