@@ -46,7 +46,7 @@ public class PLJJDBCStatement implements Statement {
 	int lastUpdateCount = -1;
 
 	String cursorName = null;
-	
+
 	/**
 	 * Constructor: set client and connection.
 	 */
@@ -71,7 +71,7 @@ public class PLJJDBCStatement implements Statement {
 
 			zeroLastResources();
 			checkIfClosed();
-			if(cursorName == null)
+			if (cursorName == null)
 				cursorName = connection.getCursorName();
 
 			SQLCursorOpenWithSQL msg = new SQLCursorOpenWithSQL();
@@ -81,7 +81,7 @@ public class PLJJDBCStatement implements Statement {
 
 			Result r = (Result) connection.doSendReceive(msg);
 			try {
-				cursorName = (String) ((Field)r.get(0,0)).get(String.class);
+				cursorName = (String) ((Field) r.get(0, 0)).get(String.class);
 			} catch (MappingException e) {
 				throw new SQLException(e.getMessage());
 			}
@@ -145,7 +145,7 @@ public class PLJJDBCStatement implements Statement {
 	}
 
 	int maxRows = 0;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -273,28 +273,21 @@ public class PLJJDBCStatement implements Statement {
 		connection.checkClosed();
 
 		switch (getStatementType(sql)) {
-		case type_select:
-			lastActionResultSet = executeQuery(sql);
-		case type_update:
+			case type_select :
+				lastActionResultSet = executeQuery(sql);
+			case type_update :
 
-			break;
-		default: {
-			SimpleSQL ssql = new SimpleSQL();
-			ssql.setClient(client);
-			ssql.setSql(sql);
-			try {
-				synchronized (channel) {
-					channel.sendToRDBMS(ssql);
-					connection.doReceiveMessage();
-				}
-			} catch (CommunicationException e) {
-				//TODO here it should be fired a runtime exception?
-				throw new SQLException("CommunicationException: ".concat(e
-						.getMessage()));
-			} catch (MappingException e) {
-			    throw new SQLException("Type mapping exception:".concat(e.getMessage()));
+				break;
+			default : {
+				SimpleSQL ssql = new SimpleSQL();
+				ssql.setClient(client);
+				ssql.setSql(sql);
+				connection.doSendReceive(ssql);
+				//				synchronized (channel) {
+				//					channel.sendToRDBMS(ssql);
+				//					connection.doReceiveMessage();
+				//				}
 			}
-		}
 		}
 
 		return false;
