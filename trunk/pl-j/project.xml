@@ -3,7 +3,7 @@
     <artifactId>pl-j-api</artifactId>
     <name>pl-j</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.6</currentVersion>
+    <currentVersion>0.1.0</currentVersion>
     <organization>
         <name>The pl-j developer group</name>
         <url>http://plj.codehaus.org</url>
@@ -11,12 +11,9 @@
     <inceptionYear>2003</inceptionYear>
     <package>org.pgj</package>
     <description>
-    Pl-j is a stored procedure platform. It`s primary target is PostgreSQL and Java. 
-	It is possible to adopt other object oriented languages and database platforms.
-	
-	The implementation is built from jakarta-avalon blocks.
+     PL-J is a Java Stored Procedure Server targeting PostgreSQL 7.4 and 8.0. It runs Java UDFs and triggers, builds on modern IoC patterns, provides JDBC implementation, logging and more...
 	</description>
-    <shortDescription>Java stored procedures for SQL databases</shortDescription>
+    <shortDescription>Java Stored Procedure Server for PostgreSQL</shortDescription>
     <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10430</issueTrackingUrl>
     <siteAddress>plj.codehaus.org</siteAddress>
     <siteDirectory>/home/projects/plj/public_html/</siteDirectory>
@@ -31,9 +28,34 @@
             <tag>alpha-0_0_1</tag>
         </version>
         <version>
-            <id>0.0.1</id>
+            <id>0.0.2</id>
             <name>alpha-0.0.2</name>
             <tag>alpha-0_0_2</tag>
+        </version>
+        <version>
+            <id>0.0.3</id>
+            <name>alpha-0.0.3</name>
+            <tag>alpha-0_0_3</tag>
+        </version>
+        <version>
+            <id>0.0.4</id>
+            <name>alpha-0.0.4</name>
+            <tag>alpha-0_0_2</tag>
+        </version>
+        <version>
+            <id>0.0.5</id>
+            <name>alpha-0.0.5</name>
+            <tag>alpha-0_0_5</tag>
+        </version>
+        <version>
+            <id>0.0.6</id>
+            <name>alpha-0.0.6</name>
+            <tag>alpha-0_0_6</tag>
+        </version>
+        <version>
+            <id>0.1.0</id>
+            <name>beta-0.1.0</name>
+            <tag>beta-0_1_0</tag>
         </version>
     </versions>
     <mailingLists>

@@ -291,6 +291,8 @@ public class PLJJDBCStatement implements Statement {
 				//TODO here it should be fired a runtime exception?
 				throw new SQLException("CommunicationException: ".concat(e
 						.getMessage()));
+			} catch (MappingException e) {
+			    throw new SQLException("Type mapping exception:".concat(e.getMessage()));
 			}
 		}
 		}

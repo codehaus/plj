@@ -3,7 +3,7 @@
     <artifactId>pl-j-bsfexec</artifactId>
     <name>pl-j-bsfexec</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.6</currentVersion>
+    <currentVersion>0.1.0</currentVersion>
     <inceptionYear>2004</inceptionYear>
     <logo>/images/logo.gif</logo>
     <shortDescription>BSF executor for PL-J</shortDescription>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.6</version>
+            <version>0.1.0</version>
             <type>jar</type>
             <properties/>
         </dependency>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-tools</artifactId>
-            <version>0.0.6</version>
+            <version>0.1.0</version>
             <type>jar</type>
             <properties/>
         </dependency>
