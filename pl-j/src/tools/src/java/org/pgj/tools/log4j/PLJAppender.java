@@ -12,6 +12,7 @@ import org.pgj.Client;
 import org.pgj.CommunicationException;
 import org.pgj.messages.Log;
 import org.pgj.tools.utils.ClientUtils;
+import org.pgj.typemapping.MappingException;
 
 
 /**
@@ -63,8 +64,10 @@ public class PLJAppender extends AppenderSkeleton {
 				channel.sendToRDBMS(log);
 			}
 		} catch (CommunicationException e) {
-			//TODO: what shall here happen?
-			System.err.println("gebasz!");
+			//TODO: Here it should log the error and the log message to the logger of the environment.
+			e.printStackTrace();
+		} catch (MappingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
