@@ -96,5 +96,6 @@ as '
 ' language 'plj';
 
 create trigger plpgj_test_lametrigger1 before insert on plj_testtable
+	for each row
 	execute procedure plpgj_test_lametrigger1fn();
 
