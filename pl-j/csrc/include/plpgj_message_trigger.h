@@ -27,7 +27,9 @@ typedef struct {
 	short reason;
 	short actionorder;
 	short row;
-	pparam parameters;
+	char** rownames;
+	//pparams _new;
+	//pparams _old;
 }str_msg_trigger_callreq;
 
 typedef str_msg_trigger_callreq* trigger_callreq;
