@@ -18,6 +18,10 @@
 #include "module_config.h"
 #include "commands/trigger.h"
 
+#include "utils/palloc.h"
+#include "utils/memutils.h"
+
+
 //
 //proto
 //
@@ -113,6 +117,8 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 				Oid typeOid;
 				Datum rawDatum;
 				StringInfo rawString;
+				FmgrInfo typeReceiveFn;
+				MemoryContext oldctx;
 				
 				if(res -> data[0][0].isnull == 1)
 					PG_RETURN_NULL();
@@ -124,7 +130,15 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 					elog(ERROR, "returned unknown data type %s", res -> types[0]);
 				
 				type = (Form_pg_type) GETSTRUCT(typetup);
-				rawString = makeStringInfo();
+
+				//
+				// (see http://jira.codehaus.org/secure/ViewIssue.jspa?key=PLJ-1)
+				//
+
+				oldctx = CurrentMemoryContext;
+				MemoryContextSwitchTo(QueryContext);
+
+				rawString = SPI_palloc(sizeof(StringInfoData));
 				initStringInfo(rawString);
 				elog(DEBUG1, "%d", res->data[0][0].length);
 				{
@@ -134,12 +148,16 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 				}
 				}
 				appendBinaryStringInfo(rawString, res->data[0][0].data, res->data[0][0].length);
-				elog(DEBUG1,"%d", rawString -> len);
 				rawDatum = PointerGetDatum(rawString);
+				
 				ret = OidFunctionCall1(type -> typreceive, rawDatum);
-				//ret = rawDatum;
+				
+				elog(DEBUG1, "raw oid: %d", ret);
+				//SPI_pfree(rawString);
 				ReleaseSysCache(typetup);
 				
+				MemoryContextSwitchTo(oldctx);
+
 				return ret;
 
 			} else if (res->rows == 0) {
