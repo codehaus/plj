@@ -1,0 +1,69 @@
+
+# -------------------------------
+# pl/pgj build configuration file
+# -------------------------------
+
+# where is phoenix we are building with?
+phoenix.root=phoenix/
+# why needed this?
+phoenix.apps=${phoenix.root}/apps
+phoenix.extlib=${phoenix.root}/lib
+phoenix.bin=${phoenix.root}/bin
+
+# building data
+build.dir=build
+# version of the software
+build.version=0.1
+# software name
+build.software=pl-pgj
+# the make command to use
+build.make=make
+
+# -------------------
+# block configuration
+# -------------------
+
+#where are the blocks
+blocks.base=src/blocks
+# chanell blocks
+blocks.chanells=${blocks.base}/chanells
+# executor blocks
+blocks.executors=${blocks.base}/executors
+# glue blocks
+blocks.glues=${blocks.base}/glues
+# typemapper blocks
+blocks.typemappers=${blocks.base}/typemappers
+
+#the chanell block to include
+blocks.chanells.chosen=${blocks.chanells}/CORBA
+#the executor block to include
+blocks.executors.chosen=${blocks.executors}/java_executor
+# the glue block to include
+blocks.glues.chosen=${blocks.glues}/default
+# the typemapper block to include
+blocks.typemappers.chosen=${blocks.typemappers}/postgres
+
+# --------------------------
+# postgres distribution info
+# --------------------------
+postgres.src.home=/home/bitfakk/source/other/postgresql-7.3/src/
+postgres.inst.home=/home/postgres/
+
+java.home=/opt/j2sdk1.4.0/
+
+# -----------------
+# installation info
+# -----------------
+
+# root directory of the install
+install.root=/home/postgres/
+# library directory for native code and/or language handler module.
+install.lib=${install.root}/lib/
+# install phoenix too
+install.with_phoenix=false
+# phoenix home directory
+install.phoenix.home=${install.root}/phoenix/
+# the place to put server archive file to
+install.phoenix.apps=${install.phoenix.home}/apps/
+
+c.channel=omni
