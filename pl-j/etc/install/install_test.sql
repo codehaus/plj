@@ -190,7 +190,7 @@ as '
 	method=doPreparedTest1
 ' language 'plj';
 
-create or replace function plpgj_test_jdbc_prep2()
+create or replace function plpgj_test_jdbc_prep2(int4)
 returns void
 as '
 	class=org.deadcat.jdbctests.JDBCTests
@@ -242,6 +242,22 @@ returns int8 as
 '
 	class=org.deadcat.typetests.BigIntTests
 	method=mul
+' language 'plj';
+
+-- bytea tests
+
+create function plpgj_test_bytea_log(bytea)
+returns void as
+'
+        class=org.deadcat.typetests.ByteaTest
+        method=printBytea
+' language 'plj';
+
+create function plpgj_test_bytea_returnthesame(bytea)
+returns bytea as
+'
+        class=org.deadcat.typetests.ByteaTest
+        method=returnTheSameBytea
 ' language 'plj';
 
 
