@@ -1,7 +1,7 @@
 
 include ../../Makefile.in
 
-CFLAGS=-I../../include/ -I$(POSTGRES_SRC_HOME)/include/
+CFLAGS=-I../../include/ -I$(POSTGRES_SRC_HOME)/include/ -Wall -g
 
 all: callmkr.a
 
