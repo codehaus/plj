@@ -4,6 +4,7 @@
 package org.pgj;
 
 import org.pgj.messages.Message;
+import org.pgj.messages.TriggerCallRequest;
 
 /**
  * Trigger execution interface.
@@ -17,5 +18,5 @@ public interface TriggerExecutor {
 	 * Execute a trigger.
 	 * @return the result or whatever
 	 */
-	public Message executeTrigger();
+	public Message executeTrigger(TriggerCallRequest trigger);
 }

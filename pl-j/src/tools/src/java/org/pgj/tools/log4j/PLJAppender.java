@@ -63,6 +63,7 @@ public class PLJAppender extends AppenderSkeleton {
 				channel.sendToRDBMS(log);
 			}
 		} catch (CommunicationException e) {
+			//TODO: what shall here happen?
 			System.err.println("gebasz!");
 			e.printStackTrace();
 		}

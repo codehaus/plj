@@ -4,6 +4,7 @@
 package org.pgj.messages;
 
 /**
+ * Base class for method calls.
  * @author Laszlo Hornyak
  */
 public abstract class AbstractCall extends Message {

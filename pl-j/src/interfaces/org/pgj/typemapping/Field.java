@@ -13,7 +13,7 @@ public interface Field {
 	 * @return true if the field is NULL.
 	 */
 	boolean isNull();
-	
+
 	/**
 	 * A field is created from array bytes (raw data).
 	 * @param raw			The raw byte[] data from the RDBMS.

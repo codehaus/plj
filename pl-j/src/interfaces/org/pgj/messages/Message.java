@@ -12,7 +12,6 @@ public abstract class Message {
 	private String protocol_version = null;
 	private String pgj_version = null;
 	private String jvm = null;
-	private Object sid = null;
 
 	/**
 	 * Client MUST be set.
@@ -74,22 +73,6 @@ public abstract class Message {
 	public void setClient(Client client) {
 		//needs java security first!!
 		this.client = client;
-	}
-
-	/**
-	 * Gets the sid.
-	 * @return Returns a Object
-	 */
-	public Object getSid() {
-		return sid;
-	}
-
-	/**
-	 * Sets the sid.
-	 * @param sid The sid to set
-	 */
-	public void setSid(Object sid) {
-		this.sid = sid;
 	}
 
 }
