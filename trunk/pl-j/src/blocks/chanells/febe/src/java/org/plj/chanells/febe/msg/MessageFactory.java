@@ -1,10 +1,12 @@
 /*
  * Created on Jan 18, 2004
  */
+
 package org.plj.chanells.febe.msg;
 
 import java.io.IOException;
 
+import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
 import org.pgj.typemapping.MappingException;
 import org.plj.chanells.febe.core.Encoding;
@@ -29,13 +31,15 @@ public interface MessageFactory {
 	 * @return
 	 * @throws IOException
 	 */
-	Message getMessage(PGStream stream, Encoding encoding) throws IOException, MappingException;
+	Message getMessage(PGStream stream, Encoding encoding) throws IOException,
+			MappingException, CommunicationException;
 
 	/**
 	 * 
 	 * @throws IOException
 	 */
-	void sendMessage(Message msg, PGStream stream) throws IOException, MappingException;
+	void sendMessage(Message msg, PGStream stream) throws IOException,
+			MappingException, CommunicationException;
 
 	/**
 	 * Get the name of the handled class.
