@@ -4,6 +4,8 @@
 
 package org.pgj.typemapping.postgres;
 
+import java.math.BigInteger;
+
 import org.apache.log4j.Category;
 import org.pgj.typemapping.MappingException;
 
@@ -26,7 +28,7 @@ public class PGSmallInt extends AbstractPGField {
 	protected void backMap(Object obj) throws MappingException {
 
 		if (raw == null)
-			raw = new byte[8];
+			raw = new byte[4];
 
 		if (!(obj instanceof Integer)) {
 			throw new MappingException("I can map only Integers, sorry");
@@ -37,25 +39,11 @@ public class PGSmallInt extends AbstractPGField {
 			return;
 		}
 
-		int value = ((Integer) obj).intValue();
-		//TODO false!
-		raw[7] = (byte) (value & 0x000000ff);
-		raw[6] = (byte) ((value & 0x0000ff00) >> 8);
-		raw[5] = (byte) ((value & 0x00ff0000) >> 16);
-		raw[4] = (byte) ((value & 0xff000000) >> 24);
-		raw[3] = 0;
-		raw[2] = 0;
-		raw[1] = 0;
-		raw[0] = 8;
-		System.out.println(">" + value);
-		System.out.println(">" + (value & 0x000000ff));
-		System.out.println(">" + ((value & 0x0000ff00) >> 8));
-		System.out.println(">" + ((value & 0x00ff0000) >> 16));
-		System.out.println(">" + ((value & 0xff000000) >> 24));
-		System.out.println("0:" + raw[0]);
-		System.out.println("1:" + raw[1]);
-		System.out.println("2:" + raw[2]);
-		System.out.println("3:" + raw[3]);
+		int value = ((Integer)obj).intValue();
+		raw[3] = (byte) (value & 0x000000ff);
+		raw[2] = (byte) ((value & 0x0000ff00) >> 8);
+		raw[1] = (byte) ((value & 0x00ff0000) >> 16);
+		raw[0] = (byte) ((value & 0xff000000) >> 24);
 	}
 
 	/**
@@ -97,13 +85,11 @@ public class PGSmallInt extends AbstractPGField {
 	 * @see org.pgj.typemapping.Field#defaultGet()
 	 */
 	public Object defaultGet() throws MappingException {
-		//TODO: this is NOT OKAY like this.
-		System.out.println(">" + raw[0]);
-		System.out.println(">" + raw[1]);
-		System.out.println(">" + raw[2]);
-		System.out.println(">" + raw[3]);
-		return new Integer(raw[7] + (((int) raw[6]) << 16)
-				+ (((int) raw[5]) << 8) + (((int) raw[4]) << 24));
+		byte[] b = new byte[4];
+		System.arraycopy(raw, 4, b, 0, 4);
+		BigInteger in = new BigInteger(b);
+		Integer x= new Integer(in.intValue());
+		return x;
 	}
 
 	/*
