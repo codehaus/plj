@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+
+<project default="jar:jar"
+	xmlns:maven="jelly:maven" >
+
+	<goal name="subprojects:compile">
+		<maven:reactor
+			basedir="${basedir}"
+			includes="src/blocks/**/**/project.xml"
+			excludes="project.xml"
+			goals="java:compile"
+			banner="Compiling"
+			ignoreFailures="true"
+			/>
+	</goal>
+
+	<goal name="subprojects:package">
+		<maven:reactor
+			basedir="${basedir}"
+			includes="src/blocks/**/**/project.xml"
+			excludes="project.xml"
+			goals="jar:jar"
+			banner="Compiling"
+			ignoreFailures="true"
+			/>
+	</goal>
+
+	<goal name="subprojects:docu">
+		<maven:reactor
+			basedir="${basedir}"
+			includes="src/blocks/**/**/project.xml"
+			excludes="project.xml"
+			goals="site:generate"
+			banner="Compiling"
+			ignoreFailures="true"
+			/>
+	</goal>
+
+	<goal name="subprojects:clean">
+		<maven:reactor
+			basedir="${basedir}"
+			includes="src/blocks/**/**/project.xml"
+			excludes="project.xml"
+			goals="clean"
+			banner="Compiling"
+			ignoreFailures="true"
+			/>
+	</goal>
+
+</project>
