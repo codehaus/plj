@@ -9,6 +9,7 @@
   <extends>../../project.xml</extends>
 
   <inceptionYear>2003</inceptionYear>
+  <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
 
   <description>Maps PostgreSQL types into java types.</description>
   <shortDescription>PostgreSQL typemapper.</shortDescription>
