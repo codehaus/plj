@@ -1,6 +1,6 @@
 #include "executor/spi.h"
 #include "pljelog.h"
-
+#include <stdlib.h>
 #include "plantable.h"
 
 void** plantable;
@@ -21,14 +21,14 @@ store_plantable(void* plan) {
 		}
 	}
 
-	new_plantable = SPI_palloc(plantable_size + 16);
+	new_plantable = malloc(plantable_size + 16);
 	for(i = 0; i <  plantable_size; i++){
 		new_plantable[i] = plantable[i];
 	}
 
 	new_plantable[plantable_size] = plan;
 	plantable_size += 16;
-	SPI_pfree(plantable);
+	free(plantable);
 	plantable = new_plantable;
 
 	return i+1;
@@ -47,7 +47,7 @@ int     remove_plantable_entry(unsigned int index){
 void
 init_plantable(void) {
 	int i;
-	plantable = SPI_palloc(DEFAULT_PLANTABLE_SIZE * sizeof(Oid));
+	plantable = malloc(DEFAULT_PLANTABLE_SIZE * sizeof(Oid));
 	for(i = 0; i< DEFAULT_PLANTABLE_SIZE; i++) {
 		plantable[i] = NULL;
 	}
