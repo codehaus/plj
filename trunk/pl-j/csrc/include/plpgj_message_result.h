@@ -15,13 +15,6 @@ extern "C" {
 
 #define PLPGJ_MESSAGE_RESULT	2
 
-//typedef void* raw;
-typedef struct str_raw{
-	int length;
-	unsigned short isnull;
-	void *data;
-}*raw;
-
 typedef struct {
 	base_message_content
 	int rows;
