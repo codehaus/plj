@@ -49,6 +49,12 @@
             <type>jar</type>
             <properties/>
         </dependency>
+		<dependency>
+			<groupId>avalon-framework</groupId>
+			<type>jar</type>
+			<artifactId>avalon-framework</artifactId>
+			<version>4.1.5</version>
+		</dependency>
     </dependencies>
 
 	<build>

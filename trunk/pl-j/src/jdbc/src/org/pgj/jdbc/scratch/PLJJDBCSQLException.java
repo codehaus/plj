@@ -10,19 +10,19 @@ import java.sql.SQLException;
  * SQL exception.
  * @author Laszlo Hornyak
  */
-public class PGJJDBCSQLException extends SQLException {
+public class PLJJDBCSQLException extends SQLException {
 
 	/**
 	 * 
 	 */
-	public PGJJDBCSQLException() {
+	public PLJJDBCSQLException() {
 		super();
 	}
 
 	/**
 	 * @param reason
 	 */
-	public PGJJDBCSQLException(String reason) {
+	public PLJJDBCSQLException(String reason) {
 		super(reason);
 	}
 
@@ -30,7 +30,7 @@ public class PGJJDBCSQLException extends SQLException {
 	 * @param reason
 	 * @param SQLState
 	 */
-	public PGJJDBCSQLException(String reason, String SQLState) {
+	public PLJJDBCSQLException(String reason, String SQLState) {
 		super(reason, SQLState);
 	}
 
@@ -39,7 +39,7 @@ public class PGJJDBCSQLException extends SQLException {
 	 * @param SQLState
 	 * @param vendorCode
 	 */
-	public PGJJDBCSQLException(String reason, String SQLState, int vendorCode) {
+	public PLJJDBCSQLException(String reason, String SQLState, int vendorCode) {
 		super(reason, SQLState, vendorCode);
 	}
 

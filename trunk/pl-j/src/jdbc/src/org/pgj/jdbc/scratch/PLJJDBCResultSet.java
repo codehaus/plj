@@ -30,7 +30,7 @@ import org.pgj.typemapping.MappingException;
 /**
  * @author Laszlo Hornyak
  */
-public class PGJJDBCResultSet implements ResultSet {
+public class PLJJDBCResultSet implements ResultSet {
 
 	/** We can communicate with the RDBMS across this chanell. */
 	private Channel chanell = null;
@@ -55,7 +55,7 @@ public class PGJJDBCResultSet implements ResultSet {
 	/**
 	 * 
 	 */
-	public PGJJDBCResultSet(Channel chanell, String cursorName) {
+	public PLJJDBCResultSet(Channel chanell, String cursorName) {
 		super();
 		this.chanell = chanell;
 		this.cursorName = cursorName;

@@ -24,10 +24,10 @@ import org.pgj.tools.channelutil.ClientUtils;
  * 
  * @author Laszlo Hornyak
  */
-public class PGJJDBCConnection implements Connection {
+public class PLJJDBCConnection implements Connection {
 
 	private final static Category log = Category
-			.getInstance(PGJJDBCConnection.class);
+			.getInstance(PLJJDBCConnection.class);
 
 	/** We are communicating with the backend using this chanell. */
 	private Channel communicationChanell = null;
@@ -44,7 +44,7 @@ public class PGJJDBCConnection implements Connection {
 	/**
 	 * 
 	 */
-	public PGJJDBCConnection() {
+	public PLJJDBCConnection() {
 		super();
 		Client cli = ClientUtils.getClientforThread();
 		communicationChanell = cli.getChannel();
@@ -55,7 +55,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public Statement createStatement() throws SQLException {
 		checkClosed();
-		return new PGJJDBCStatement(communicationChanell, this);
+		return new PLJJDBCStatement(client, this);
 	}
 
 	/* (non-Javadoc)
@@ -91,7 +91,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
 		checkClosed();
-		throw new PGJJDBCSQLException("transaction operations are unavailable");
+		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +107,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public void commit() throws SQLException {
 		checkClosed();
-		throw new PGJJDBCSQLException("transaction operations are unavailable");
+		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
@@ -115,7 +115,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public void rollback() throws SQLException {
 		checkClosed();
-		throw new PGJJDBCSQLException("transaction operations are unavailable");
+		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
@@ -186,7 +186,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public void setTransactionIsolation(int level) throws SQLException {
 		checkClosed();
-		throw new PGJJDBCSQLException("transaction operations are unavailable");
+		throw new PLJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
@@ -222,7 +222,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public Statement createStatement(int resultSetType, int resultSetConcurrency)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		PLJJDBCStatement sta = new PLJJDBCStatement(client, this);
 		log.error("not implemented");
 		checkClosed();
 		return null;
@@ -402,7 +402,7 @@ public class PGJJDBCConnection implements Connection {
 	/** Check if closed, throw an exception if so. */
 	synchronized void checkClosed() throws SQLException {
 		if (closed)
-			throw new PGJJDBCSQLException("Connection closed");
+			throw new PLJJDBCSQLException("Connection closed");
 	}
 
 }
