@@ -1,4 +1,3 @@
-
 package org.pgj.glue;
 
 import org.apache.avalon.excalibur.pool.Poolable;
@@ -8,6 +7,7 @@ import org.apache.avalon.framework.logger.LogEnabled;
 import org.apache.avalon.framework.logger.Logger;
 import org.pgj.Channel;
 import org.pgj.Client;
+import org.pgj.ExecutionCancelException;
 import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
 import org.pgj.messages.CallRequest;
@@ -21,27 +21,27 @@ import org.pgj.messages.TupleResult;
  * 
  * @author Laszlo Hornyak
  */
-public class GlueWorker
-		implements
-			Poolable,
-			Runnable,
-			Executable,
-			LogEnabled,
-			Startable {
+public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
+		Startable {
 
 	/** the chanell we are dealing with */
 	private Channel chanell;
+
 	/** The executor object */
 	private Executor executor = null;
+
 	/** The executor object */
 	private TriggerExecutor triggerExecutor = null;
+
 	/** Client */
 	private Client client;
+
 	/** Are we asked to terminate? */
 	private boolean terminating = false;
 
 	public GlueWorker() {
 	}
+
 	/** Logger */
 	private Logger logger = null;
 
@@ -55,31 +55,35 @@ public class GlueWorker
 		try {
 			while (true) {
 
-				Message msg = chanell.receiveFromRDBMS(client);
-				logger.debug("message in the glue");
+				try {
+					Message msg = chanell.receiveFromRDBMS(client);
+					logger.debug("message in the glue");
 
-				Message ans = null;
-				if (msg instanceof TriggerCallRequest) {
-					ans = ((TriggerExecutor) executor)
-							.executeTrigger((TriggerCallRequest) msg);
-				} else {
-					ans = executor.execute((CallRequest) msg);
-				}
+					Message ans = null;
+					if (msg instanceof TriggerCallRequest) {
+						ans = ((TriggerExecutor) executor)
+								.executeTrigger((TriggerCallRequest) msg);
+					} else {
+						ans = executor.execute((CallRequest) msg);
+					}
 
-				if (logger.isDebugEnabled()) {
-					logger.debug("executed, ansver is " + ans);
-					logger.debug("message: " + msg);
-				}
-				ans.setClient(msg.getClient());
-				if (logger.isDebugEnabled())
-					logger.debug("ansver:" + ans);
-				if ((ans instanceof Result)
-						|| (ans instanceof org.pgj.messages.Error)
-						|| (ans instanceof TupleResult)) {
-					chanell.sendToRDBMS(ans);
-				} else {
-					logger
-							.fatalError("Result should be Exception, Result or TupleResult");
+					if (logger.isDebugEnabled()) {
+						logger.debug("executed, ansver is " + ans);
+						logger.debug("message: " + msg);
+					}
+					ans.setClient(msg.getClient());
+					if (logger.isDebugEnabled())
+						logger.debug("ansver:" + ans);
+					if ((ans instanceof Result)
+							|| (ans instanceof org.pgj.messages.Error)
+							|| (ans instanceof TupleResult)) {
+						chanell.sendToRDBMS(ans);
+					} else {
+						logger
+								.fatalError("Result should be Exception, Result or TupleResult");
+					}
+				} catch (ExecutionCancelException e1) {
+					logger.debug("sql execution canceled", e1);
 				}
 			}
 		} catch (Throwable e) {
@@ -126,7 +130,9 @@ public class GlueWorker
 
 	/**
 	 * Sets the executor.
-	 * @param executor The executor to set
+	 * 
+	 * @param executor
+	 *            The executor to set
 	 */
 	public void setExecutor(Executor executor) {
 		this.executor = executor;
@@ -134,7 +140,9 @@ public class GlueWorker
 
 	/**
 	 * Sets the chanell.
-	 * @param chanell The chanell to set
+	 * 
+	 * @param chanell
+	 *            The chanell to set
 	 */
 	public void setChanell(Channel chanell) {
 		this.chanell = chanell;
@@ -142,7 +150,9 @@ public class GlueWorker
 
 	/**
 	 * Sets the client.
-	 * @param client The client to set
+	 * 
+	 * @param client
+	 *            The client to set
 	 */
 	public void setClient(Client client) {
 		this.client = client;
