@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Random;
 
 import org.apache.log4j.Category;
 
@@ -86,6 +87,53 @@ public class Businnes {
 		Category category = Category.getInstance(Businnes.class);
 		category.error(logThis);
 		return "logged: ".concat(logThis);
+	}
+
+
+	static Category logcat = Category.getInstance(Businnes.LogThread.class);
+
+	private class LogThread extends Thread {
+
+		boolean should_stop = false;
+		Random random = new Random();
+
+		private synchronized void pleaseStop() {
+			should_stop = true;
+		}
+
+		public void run() {
+			try {
+				while (!should_stop) {
+					logcat.warn(this.getName() + System.currentTimeMillis());
+					sleep(random.nextInt(100));
+				}
+			} catch (InterruptedException e) {
+				logcat.warn("ooops", e);
+			}
+		}
+	}
+
+	public String threadedLogTest() {
+		LogThread[] logthreads = new LogThread[100];
+		for (int i = 0; i < 100; i++) {
+			logthreads[i] = new LogThread();
+			logthreads[i].start();
+		}
+
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			logcat.warn("hoppa", e);
+		}
+		for (int i = 0; i < 100; i++) {
+			logthreads[i].pleaseStop();
+			try {
+				logthreads[i].join();
+			} catch (InterruptedException e1) {
+			}
+		}
+
+		return "ok";
 	}
 
 }

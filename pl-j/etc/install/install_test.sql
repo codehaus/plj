@@ -72,3 +72,13 @@ as '
         instantiation=session
 ' language 'plj';
 
+create or replace function plpgj_test_lametest8()
+returns varchar
+as '
+        class=org.deadcat_enterprises.Businnes
+        method=threadedLogTest
+        oneway=false
+        instantiation=session
+' language 'plj';
+
+
