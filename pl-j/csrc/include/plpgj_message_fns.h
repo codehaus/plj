@@ -17,6 +17,7 @@ extern "C" {
 #define MT_RESULT					1
 #define MT_EXCEPTION					2
 #define MT_SQL						3
+#define MT_LOG						4
 
 /**
  * Crete a call structure.
