@@ -1,3 +1,4 @@
+
 package org.pgj.typemapping.postgres;
 
 import java.util.HashMap;
@@ -29,12 +30,14 @@ public class PostgresTypeMapper
 			Initializable,
 			LogEnabled {
 
-	HashMap map = new HashMap();
+	/** Map for maping types into java classes */
+	private HashMap map = new HashMap();
 
-	HashMap backMap = new HashMap();
+	/** Map for maping classes into DB types. */
+	private HashMap backMap = new HashMap();
 
 	/** Avalon logger */
-	Logger logger = null;
+	private Logger logger = null;
 
 	public PostgresTypeMapper() {
 		super();
@@ -177,6 +180,10 @@ public class PostgresTypeMapper
 	 * @see TypeMapper#backMap(Object)
 	 */
 	public Field backMap(Object object) throws MappingException {
+
+		if (object == null) {
+			return null;
+		}
 
 		try {
 			logger
