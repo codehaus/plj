@@ -190,6 +190,14 @@ as '
 	method=doPreparedTest1
 ' language 'plj';
 
+create or replace function plpgj_test_jdbc_prep2()
+returns void
+as '
+	class=org.deadcat.jdbctests.JDBCTests
+	method=doPreparedQueryTest1
+' language 'plj';
+
+
 -- int4 tests
 
 create function plpgj_test_int4_add(int4, int4)
