@@ -39,6 +39,7 @@ typedef str_msg_trigger_callreq* trigger_callreq;
 typedef struct {
 	base_message_content;
 	char* tablename;
+	char** colnames;
 	int colcount;
 	pparam* _tuple;
 }str_msg_trigger_tupleresult;

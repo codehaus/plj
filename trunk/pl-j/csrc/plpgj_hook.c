@@ -20,7 +20,7 @@
 
 #include "utils/palloc.h"
 #include "utils/memutils.h"
-
+#include "access/xact.h"
 
 //
 //proto
@@ -40,6 +40,8 @@ Datum plpgj_result_do(plpgj_result);
 
 void plpgj_log_do(log_message);
 
+void plpgj_EOXactCallBack(bool isCommit, void*arg);
+
 //
 //impl
 //
@@ -54,6 +56,8 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 			plpgj_channel_initialize();
 	}
 
+	//elog(DEBUG1,"registering transaction callback");
+	//RegisterEOXactCallback(plpgj_EOXactCallBack, NULL);
 	elog(DEBUG1, "entering hook");
 	
 	
@@ -89,6 +93,10 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 					break;
 			case MT_LOG:
 					plpgj_log_do((log_message)ansver);
+					break;
+			case MT_TUPLRES:
+					elog(DEBUG1, "tuple result received");
+					
 					break;
 			default:
 				elog(FATAL, "received: unknown message.");
@@ -142,10 +150,10 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 				initStringInfo(rawString);
 				elog(DEBUG1, "%d", res->data[0][0].length);
 				{
-				int i = 0;
-				for(i = 0; i<res->data[0][0].length; i++){
-					elog(DEBUG1,">%d",(char)((char*)res->data[0][0].data)[i]);
-				}
+					int i = 0;
+					for(i = 0; i<res->data[0][0].length; i++){
+						elog(DEBUG1,">%d",(char)((char*)res->data[0][0].data)[i]);
+					}
 				}
 				appendBinaryStringInfo(rawString, res->data[0][0].data, res->data[0][0].length);
 				rawDatum = PointerGetDatum(rawString);
@@ -159,7 +167,6 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 				MemoryContextSwitchTo(oldctx);
 
 				return ret;
-
 			} else if (res->rows == 0) {
 				PG_RETURN_VOID();
 			}
@@ -167,13 +174,89 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 			//continue here!!
 			
 			
-			PG_RETURN_NULL();
+//			PG_RETURN_NULL();
 			//break;
 		}
 		if(message_type == MT_EXCEPTION){
 			PG_RETURN_NULL();
 		}
-	
+		if(message_type == MT_TUPLRES){
+			Datum ret;
+			HeapTuple rettup;
+			trigger_tupleres res = (trigger_tupleres)ansver;
+			elog(DEBUG1, "tuple handling...");
+			if(!CALLED_AS_TRIGGER(fcinfo))
+				elog(ERROR, 
+				"received a tuple result (the call wasn`t a trigger)");
+			TriggerData* tdata = (TriggerData*)fcinfo -> context;
+			if(TRIGGER_FIRED_FOR_STATEMENT(tdata->tg_event)){
+				elog(DEBUG1,"for statement doesn`t need to return anything.");
+				rettup = NULL;
+			} else {
+				Datum* datums;
+				int* columns;
+				char* nulls;
+				int i;
+				elog(DEBUG1, "creating a result tuple");
+				//copy tuple until i find out how to alloc one...
+				rettup = SPI_copytuple( tdata -> tg_trigtuple );
+				//rettup = SPI_palloc(HEAPTUPLESIZE);
+				
+				if(res -> colcount > 0){
+					datums = SPI_palloc( res -> colcount * sizeof(Datum));
+					columns = SPI_palloc( res -> colcount * sizeof(int) );
+					nulls = SPI_palloc( res -> colcount * sizeof(char) );
+				} else {
+					datums = NULL;
+					columns = NULL;
+					nulls = NULL;
+				}
+				for(i = 0; i < res -> colcount; i++){
+					HeapTuple typtup;
+					Oid typoid;
+					Form_pg_type typ;
+					TypeName* typnam;
+					StringInfoData* rawString;
+					
+					rawString = SPI_palloc(sizeof(StringInfoData));
+					initStringInfo(rawString);
+					appendBinaryStringInfo(rawString, res -> _tuple[i] -> data.data, res -> _tuple[i] -> data.length);
+					
+					typnam = makeTypeName(res -> _tuple[i] -> type);
+					typoid = LookupTypeName(typnam);
+					typtup = SearchSysCache(TYPEOID, typoid, 0, 0, 0);
+					typ = (Form_pg_type)GETSTRUCT(typtup);
+					
+					elog(DEBUG1, "trace 4.1");
+					
+					datums[i] = OidFunctionCall1(
+						typ -> typreceive,
+						PointerGetDatum(rawString)
+						);
+					//wrong
+					columns[i] = SPI_fnumber
+						(tdata -> tg_relation -> rd_att, 
+						res -> colnames[i]);
+					elog(DEBUG1, "trace 4.2 : %d", columns[i]);
+					nulls[i] = ' ';
+					ReleaseSysCache(typtup);
+					elog(DEBUG1, "trace 4.3");
+				}
+				elog(DEBUG1, "trace 5");
+				rettup = SPI_modifytuple(
+					tdata -> tg_relation,
+					rettup,
+					res -> colcount,
+					columns,
+					datums,
+					nulls
+					);
+				elog(DEBUG1, "trace 6");
+			}
+			return PointerGetDatum(rettup);
+		}
+		elog(DEBUG1, "no handler");
+		
 	}while( 1 );
 	
 	PG_RETURN_NULL();
@@ -251,4 +334,15 @@ void plpgj_log_do(log_message log){
 
 	elog(level,"[%s] -  %s ", log -> category, log -> message);
 
+}
+
+/**
+ * This may be the starting point of transaction externalisation.
+ */
+void plpgj_EOXactCallBack(bool isCommit, void*arg) {
+	if (isCommit) {
+		elog(DEBUG1, "Transaction commit - plpgj");
+	} else {
+		elog(DEBUG1, "Transaction rollback - plpgj");
+	}
 }
