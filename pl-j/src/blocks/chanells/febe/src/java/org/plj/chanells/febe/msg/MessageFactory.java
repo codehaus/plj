@@ -6,6 +6,7 @@ package org.plj.chanells.febe.msg;
 import java.io.IOException;
 
 import org.pgj.messages.Message;
+import org.pgj.typemapping.MappingException;
 import org.plj.chanells.febe.core.Encoding;
 import org.plj.chanells.febe.core.PGStream;
 
@@ -28,11 +29,17 @@ public interface MessageFactory {
 	 * @return
 	 * @throws IOException
 	 */
-	Message getMessage(PGStream stream, Encoding encoding) throws IOException;
+	Message getMessage(PGStream stream, Encoding encoding) throws IOException, MappingException;
 
 	/**
 	 * 
 	 * @throws IOException
 	 */
-	void sendMessage(Message msg, PGStream stream) throws IOException;
+	void sendMessage(Message msg, PGStream stream) throws IOException, MappingException;
+
+	/**
+	 * Get the name of the handled class.
+	 * @return the name of the class this type can create.
+	 */
+	String getHandledClassname();
 }

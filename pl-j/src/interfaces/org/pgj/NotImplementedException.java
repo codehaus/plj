@@ -31,14 +31,14 @@ public class NotImplementedException extends RuntimeException {
 	 * @param cause
 	 */
 	public NotImplementedException(String message, Throwable cause) {
-		super(message, cause);
+	//	super(message, cause);
 	}
 
 	/**
 	 * @param cause
 	 */
 	public NotImplementedException(Throwable cause) {
-		super(cause);
+	//	super(cause);
 	}
 
 }

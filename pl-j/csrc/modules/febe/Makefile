@@ -2,7 +2,7 @@
 include ../../Makefile.in
 include Makefile.in
 
-CFLAGS=-I../../include/ -I$(POSTGRES_SRC_HOME)/include/ -Iskeletons $(shell orbit2-config --cflags)
+CFLAGS=-I../../include/ -I$(POSTGRES_SRC_HOME)/include/ 
 
 all: module.a
 
@@ -10,7 +10,7 @@ all: module.a
 
 init.o: mkskeletons
 
-module.a: plpgj_chanell_init.o plpgj_chanell_work.o
+module.a: febe_channel_init.o febe_channel_work.o libpq-mini.o
 	ar r $@ $^ 
 
 clean:

@@ -30,14 +30,15 @@ public class CommunicationException extends Exception {
 	 * @param cause
 	 */
 	public CommunicationException(String message, Throwable cause) {
-		super(message, cause);
+		super(message);
+		
 	}
 
 	/**
 	 * @param cause
 	 */
 	public CommunicationException(Throwable cause) {
-		super(cause);
+		super(cause.getMessage());
 		// TODO Auto-generated constructor stub
 	}
 
