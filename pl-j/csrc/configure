@@ -806,7 +806,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-gnu-ld           assume the C compiler uses GNU ld default=no
   --with-pgsourcetree=<dir> Location of PostgreSQL source tree
-  --with-pgversion=<dir> Location of PostgreSQL source tree
+  --with-pgversion=<version> Version number of the PG source (74 or 80)
   --with-confmod=<module> configuration module
   --with-channel=<module> channel module
   --with-callmaker=<module> call maker module
