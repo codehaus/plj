@@ -31,6 +31,9 @@
 				<resource
 					id="excalibur-pool:excalibur-pool" 
 					version="1.0"/>
+				<resource
+					id="log4j:log4j" 
+					version="1.2.8"/>
 
 
 				<resource 
@@ -58,6 +61,8 @@
 		class="org.pgj.typemapping.postgres.PostgresTypeMapper">
 		<configuration>
 			<map>
+				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
+				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
 			</map>
 		</configuration>
 		<categories priority="DEBUG">
