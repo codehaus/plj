@@ -224,7 +224,7 @@ public class FEBEChannel
 				.put(
 						new Character(
 								(char) TriggerCallRequestMessageFactory.MESSAGE_HEADER_TRIGGER),
-						new TriggerCallRequestMessageFactory(logger));
+						new TriggerCallRequestMessageFactory(logger, typeMapper));
 	}
 	private ServerSocketFactory serverSocketFactory;
 
