@@ -4,6 +4,7 @@ package org.pgj.classloaders;
  * A classloader interface for PGJ. 
  * It is not only for loading classes, it stores it too.
  */
+//TODO: should be called PLJClassLoader
 public interface pgjClassLoader{
 	
 	public static String ROLE = "org.pgj.classloaders.pgjClassLoader";
