@@ -7,6 +7,8 @@
 #include "plpgj_messages.h"
 #include "plpgj_channel.h"
 #include "module_config.h"
+#include "libpq-mini.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,6 +50,7 @@ int plpgj_channel_initialize(){
 	if(min_conn != NULL)
 		PLJ_FEBE_INITED = 1;
 
+	return 1;
 }
 
 int plpgj_channel_initialized(){
