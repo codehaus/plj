@@ -1,0 +1,353 @@
+<?xml version="1.0"?>
+
+<!--
+	The container definition for tests and developement.
+	It starts up a FEBE channel on port 1984 and a PostgreSQL typemapper with
+	some configured datatypes, a java executor with a filesystem classloader
+	the glue and a brand new log4j adapter service.
+
+	Start merlin and have fun!
+
+-->
+
+<container name="pl-j-test">
+
+	<classloader>
+		<classpath>
+			<repository>
+				<resource 
+					id="avalon-framework:avalon-framework-impl" 
+					version="4.1.5"/>
+
+				<resource 
+					id="avalon-framework:avalon-framework-api" 
+					version="4.1.5"/>
+
+				<resource
+					id="cornerstone-sockets:cornerstone-sockets-api" 
+					version="1.0"/>
+				<resource 
+					id="cornerstone-sockets:cornerstone-sockets-impl" 
+					version="1.0"/>
+				<resource
+					id="excalibur-thread:excalibur-thread" 
+					version="1.1.1"/>
+				<resource
+					id="excalibur-collections:excalibur-collections" 
+					version="1.0"/>
+				<resource
+					id="excalibur:excalibur-threadcontext" 
+					version="1.0"/>
+				<resource
+					id="excalibur-pool:excalibur-pool" 
+					version="1.0"/>
+				<resource
+					id="log4j:log4j" 
+					version="1.2.8"/>
+				<resource
+					id="commons-beanutils:commons-beanutils" 
+					version="1.6.1"/>
+				<resource
+					id="commons-collections:commons-collections" 
+					version="3.0"/>
+				<resource
+					id="commons-logging:commons-logging" 
+					version="1.0.3"/>
+				<resource
+					id="logkit:logkit" 
+					version="2.0"/>
+
+
+				<resource 
+					id="pl-j:pl-j-api" 
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-javaexecutor"
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-febe"
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-postgres"
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-glue"
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-tools"
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-jdbc"
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-bsfexec"
+					version="0.0.5"/>
+
+			</repository>
+		</classpath>
+	</classloader>
+
+	<component
+		name="typemapper"
+		class="org.pgj.typemapping.postgres.PostgresTypeMapper">
+		<configuration>
+			<map>
+				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
+				<type db="int8" class="org.pgj.typemapping.postgres.PGBigInt"/>
+				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
+				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
+				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
+			</map>
+			<backmap>
+				<type class="java.lang.Integer" type="int4"/>
+				<type class="java.lang.String" type="varchar"/>
+				<type class="java.lang.Boolean" type="bool"/>
+				<type class="java.lang.Long" type="int8"/>
+				<type class="[B" type="bytea"/>
+			</backmap>
+			
+		</configuration>
+		<categories priority="DEBUG">
+			<category name="/typemapper"/>
+		</categories>
+	</component>
+
+	<component
+		name="channel"
+		class="org.plj.chanells.febe.FEBEChannel">
+		<configuration>
+			<database-encoding>en_US</database-encoding>
+			<passed-encoding>en_US</passed-encoding>
+			<port>1984</port>
+			<socket-factory-name>plain</socket-factory-name>
+		</configuration>
+		<dependencies>
+			<dependency key="socket-manager" source="socketmanager"/>
+			<dependency key="type-mapper" source="typemapper"/>
+		</dependencies>
+		<categories priority="DEBUG">
+			<category name="/channel"/>
+		</categories>
+	</component>
+
+	<component
+		name="socketmanager"
+		class="org.apache.avalon.cornerstone.blocks.sockets.DefaultSocketManager">
+		<configuration>
+			<server-sockets>
+				<factory name="plain"
+					class="org.apache.avalon.cornerstone.blocks.sockets.DefaultServerSocketFactory" />
+			</server-sockets>
+			<client-sockets>
+				<factory name="plain"
+					class="org.apache.avalon.cornerstone.blocks.sockets.DefaultSocketFactory" />
+			</client-sockets>
+		</configuration>
+		<categories priority="DEBUG">
+			<category name="/socketmanager"/>
+		</categories>
+	</component>
+
+	<!--
+		JDBC ClassLoader for PL-J. Handle with care!
+		Do not modify config unless you know what it exaclty does.
+		-->
+	<component
+		name="classloader"
+		class="org.pgj.tools.classloaders.impl.JDBCClassLoader">
+		<configuration>
+
+			<driver>org.pgj.jdbc.scratch.PLJJDBCDriver</driver>
+			<url>jdbc:default:database</url>
+			<user>default</user>
+			<password>default</password>
+
+			<select>select jar, classcode from sqlj.plj_classes where fqn = ?</select>
+			<store>insert into sqlj.plj_classes (classcode, fqn, jar) values (?, ?, ?)</store>
+			<delete>delete from sqlj.plj_classes where fqn = ?</delete>
+			<count>select count(*) from sqlj.plj_classes where fqn = ?</count>
+			<deleteJar>delete from sqlj.plj_classes where jar = ?</deleteJar>
+
+		</configuration>		
+	</component>
+	
+	<!--
+		The filsesystem based classloader implementation.
+	<component
+		name="classloader"
+		class="org.pgj.tools.classloaders.impl.FSClassLoader">
+		<configuration>
+			<root>/tmp/plj-tests/</root>
+			<preload>org.pgj.jdbc.scratch.PLJJDBCDriver</preload>
+			<preload>org.pgj.jdbc.postgresql.Driver</preload> 
+		</configuration>
+		<categories priority="DEBUG">
+			<category name="/classloader"/>
+		</categories>
+	</component>
+	-->
+	
+	<component
+		name="default-methodfinder"
+		class="org.pgj.tools.methodfinder.impl.DefaultMethodFinder">
+		<dependencies>
+			<dependency key="tuple-mapper" source="tuplemapper"/>
+		</dependencies>
+		<configuration>
+			<useDefault>true</useDefault>
+		</configuration>
+	</component>
+
+	<!--
+		Java executor component. Executes public static java methods.
+		-->
+	<component
+		name="executor"
+		class="org.pgj.jexec.JavaExecutor">
+		<dependencies>
+			<dependency key="default-methodfinder" source="classloader"/>
+			<dependency key="classloader" source="classloader"/>
+			<dependency key="tuple-mapper" source="tuplemapper"/>
+		</dependencies>
+		<configuration>
+			<tempDir>/tmp/</tempDir>
+		</configuration>
+		<categories priority="DEBUG">
+			<category name="/executor"/>
+		</categories>
+	</component>
+
+	<!--
+		Experimental!
+		JTA integration.
+		-->
+	<component 
+		name="jta-adapter"
+		class="org.pgj.tools.transactions.impl.FakeJTAAdapter"/>
+
+	<!--
+		The Controller component.
+		-->
+	<component
+		name="glue"
+		class="org.pgj.glue.Glue">
+		<dependencies>
+			<dependency key="channel" source="channel"/>
+			<dependency key="executor" source="executor"/>
+			<dependency key="jdbc-configurator" source="jdbc-configurator"/>
+			<dependency key="jta-adapter" source="jta-adapter"/>
+		</dependencies>
+		<categories priority="DEBUG">
+			<category name="/glue"/>
+		</categories>
+	</component>
+
+	<component
+		name="jdbc-configurator"
+		class="org.pgj.jdbc.core.JDBCInitializer">
+		<dependencies>
+			<dependency key="classloader" source="classloader"/>
+		</dependencies>
+		<categories priority="DEBUG">
+			<category name="/jdbc-initer"/>
+		</categories>
+		<configuration>
+			<class>org.pgj.jdbc.scratch.PLJJDBCDriver</class>
+			<!--
+				JDBC Connection configuration, including metadata and 
+				behavioral properties
+				-->
+			<jdbc-config>
+				<!--
+					==== Behavioral properties ====
+					-->
+				<!--
+					Throw an ExecutionCancelException is receiveing error message
+					from the client. Should be true for PostgreSQL always.
+					-->
+				<isStatementErrorIrrecoverable>
+					true</isStatementErrorIrrecoverable>
+				<!--
+					defaultFetchSize tells the fetchsize of the resultsets of 
+					the scratch driver.
+					-->
+				<defaultFetchSize>10</defaultFetchSize>
+				<!--
+					if false setFetchSize will have no effect and the default fetch size
+					will be applied.
+					-->
+				<canUserOverrideFetchSize>false</canUserOverrideFetchSize>
+				<!--
+					===== DatabaseMetadata =====
+					-->
+				<!--
+					Major and minor version, it has no real impotance, excepti if
+					your stored procedures use it, so configure whatever you like
+					-->
+				<DatabaseMajorVersion>7</DatabaseMajorVersion>
+				<DatabaseMinorVersion>4</DatabaseMinorVersion>
+				<!--
+					TRANSACTION_NONE = 0
+					TRANSACTION_READ_UNCOMMITTED = 1
+					TRANSACTION_READ_COMMITTED = 2
+					TRANSACTION_REPEATABLE_READ = 4
+					TRANSACTION_SERIALIZABLE = 8
+					TRANSACTION_SERIALIZABLE with PostgreSQL, but should be the
+					isolation level called when fireing up the UDF.
+					-->
+				<DefaultTransactionIsolation>8</DefaultTransactionIsolation>
+				<!--
+					-->
+				<DriverMajorVersion>0</DriverMajorVersion>
+				<DriverMinorVersion>1</DriverMinorVersion>
+				<!--
+					And so on...
+					-->
+			</jdbc-config>
+		</configuration>
+	</component>
+
+	<component
+		name="tuplemapper"
+		class="org.pgj.tools.tuplemapper.impl.reflected.ReflectedTupleMapper">
+		<dependencies>
+			<dependency key="classloader" source="classloader"/>
+		</dependencies>
+		<categories priority="DEBUG">
+			<category name="/tuplemapper"/>
+		</categories>
+		<configuration>
+			<relation name="plj_testtable" class="org.deadcat_enterprises.TestTableRecord"/>
+			<relation name="plj_testable2" class="org.deadcat_enterprises.TestTableRecord"/>
+		</configuration>
+	</component>
+
+	<component
+		name="log4j-init"
+		class="org.pgj.tools.log4j.Log4jInitComponent">
+		<dependencies>
+		</dependencies>
+		<categories priority="DEBUG">
+		</categories>
+		<configuration>
+			<properties>
+				<!--
+				The root logger is the PLJAppender, so all log categories
+				not configured here will go to RDBMS (or at least try to go there)
+				-->
+				<property name="log4j.rootLogger" value="INFO, plj"/>
+				<property name="log4j.appender.plj" value="org.pgj.tools.log4j.PLJAppender"/>
+				<property name="log4j.appender.plj.layout" value="org.apache.log4j.PatternLayout"/>
+				<property name="log4j.appender.plj.layout.conversionPattern" value=" %d [%t] %-5p %c{1} - %m%n"/>
+				
+				<!--
+				These entries are for the PostgreSQL typemapper`s 
+				Field implementations. (it uses log4j). Its logs should remain
+				local.
+				-->
+				
+			</properties>
+		</configuration>
+	</component>
+
+</container>
