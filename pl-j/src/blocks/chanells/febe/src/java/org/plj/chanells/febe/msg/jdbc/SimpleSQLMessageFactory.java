@@ -1,16 +1,12 @@
 /*
- * Created on Mar 25, 2004
+ * Created on Mar 26, 2004
  */
 
 package org.plj.chanells.febe.msg.jdbc;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 import org.pgj.messages.Message;
-import org.pgj.messages.SQL;
 import org.pgj.messages.SimpleSQL;
 import org.pgj.typemapping.MappingException;
 import org.plj.chanells.febe.core.Encoding;
@@ -19,32 +15,26 @@ import org.plj.chanells.febe.msg.MessageFactory;
 
 
 /**
- * MessageFactory to send and receive SQL (JDBC) messages.
- * 
+ * Sends SQL messages to the RDBMS.
  * @author Laszlo Hornyak
  */
-public class SQLMessageFactory implements MessageFactory {
+class SimpleSQLMessageFactory implements MessageFactory {
 
-	/** SQL message id for febe */
-	public static final int MESSAGE_HEADER_SQL = 'S';
-	private final static Map map = new HashMap();
-
-	Logger logger = null;
+	public static final int MESSAGE_SQLHEADER_SIMPLE = 'S';
 
 	/**
 	 * 
 	 */
-	public SQLMessageFactory(Logger logger) {
+	public SimpleSQLMessageFactory() {
 		super();
-		this.logger = logger;
-		map.put(SimpleSQL.class.getName(), new SimpleSQLMessageFactory());
+		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessageHeader()
 	 */
 	public int getMessageHeader() {
-		return MESSAGE_HEADER_SQL;
+		return MESSAGE_SQLHEADER_SIMPLE;
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +42,7 @@ public class SQLMessageFactory implements MessageFactory {
 	 */
 	public Message getMessage(PGStream stream, Encoding encoding)
 			throws IOException, MappingException {
-		//TODO: this should never happen, the backend should not send SQL messages.
+		//TODO: this hould never happen.
 		return null;
 	}
 
@@ -61,18 +51,23 @@ public class SQLMessageFactory implements MessageFactory {
 	 */
 	public void sendMessage(Message msg, PGStream stream) throws IOException,
 			MappingException {
-		SQL sql = (SQL) msg;
-		stream.SendChar(MESSAGE_HEADER_SQL);
-		String clname = msg.getClass().getName();
-		MessageFactory msgf = (MessageFactory) map.get(clname);
-		stream.SendChar(msgf.getMessageHeader());
-		msgf.sendMessage(msg, stream);
+		SimpleSQL sql = (SimpleSQL) msg;
+		String strsql = sql.getSql();
+		byte[] bsql = null;
+		if (strsql == null) {
+			bsql = new byte[0];
+		} else {
+			bsql = strsql.getBytes();
+		}
+		stream.SendInteger(bsql.length, 4);
+		stream.Send(bsql);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getHandledClassname()
 	 */
 	public String getHandledClassname() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
