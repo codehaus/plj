@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 /**
  * Message to prepare an SQL statement for execution.
+ * The RDBMS returns a result message to describe the created plan.
+ * For use in JDBC drivers.
  * 
  * @author Laszlo Hornyak
  */

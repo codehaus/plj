@@ -6,7 +6,9 @@ package org.pgj.messages;
 import java.util.ArrayList;
 
 /**
- * Open cursor with a prepared statement.
+ * Prepare a statement on the RDBMS. The prepared statement can be used
+ * to run statements with given parameters. The RDBMS returns a result message
+ * for the prepare message.
  * 
  * @author Laszlo Hornyak
  */

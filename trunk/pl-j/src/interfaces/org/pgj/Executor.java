@@ -31,12 +31,17 @@ public interface Executor{
 	/**
 	 * Initialize environment for new client. Called when a new client
 	 * connects.
+	 * Implementations should deal with resources such as JNDI contexts
+	 * ThreadLocal variables, application server connections, etc.
+	 * 
 	 * @param sessionClient the client of the session.
 	 */
 	public void initClientSession(Client sessionClient);
 
 	/**
 	 * Free allocated resources in the environment.
+	 * Implementations should free the resources allocated in
+	 * initClientSession().
 	 * @param sessionClient the client of the session.
 	 */
 	public void destroyClientSession(Client sessionClient);

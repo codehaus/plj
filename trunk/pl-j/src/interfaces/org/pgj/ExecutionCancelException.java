@@ -5,6 +5,10 @@ package org.pgj;
 
 /**
  * Please don't catch me!
+ * This exception is thrown if the RDBMS stops the execution of the
+ * java code. Typicaly the GLUE components or some privileged code throws it
+ * such as JDBC driver.
+ * 
  * @author Laszlo Hornyak
  */
 public class ExecutionCancelException extends Error {
