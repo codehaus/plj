@@ -39,6 +39,7 @@ int     remove_plantable_entry(unsigned int index){
 		return -1;
 	if(plantable_size <= index)
 		return -1;
+	SPI_freeplan(plantable[index]);
 	plantable[index] = NULL;
 	return index;
 }
