@@ -32,7 +32,9 @@ import org.plj.chanells.febe.core.Encoding;
 import org.plj.chanells.febe.core.PGStream;
 import org.plj.chanells.febe.msg.CallMessageFactory;
 import org.plj.chanells.febe.msg.ErrorMessageFactory;
+import org.plj.chanells.febe.msg.LogMessageFactory;
 import org.plj.chanells.febe.msg.MessageFactory;
+import org.plj.chanells.febe.msg.ResultMessageFactory;
 
 /**
  * A chanell built on FE/BE protocoll basing on the PostgreSQL JDBC team`s
@@ -60,6 +62,8 @@ public class FEBEChannel
 	 */
 	private Encoding defaultEncoding = null;
 	private Map messageFactoryMap = new HashMap();
+	private int port = 0;
+	String socketFactoryName = null;
 
 	/*
 	 * (non-Javadoc)
@@ -73,7 +77,7 @@ public class FEBEChannel
 			FEBEClient client;
 			Socket sock = serverSocket.accept();
 			client = new FEBEClient();
-			PGStream stream = new PGStream(sock);
+			PGStream stream = new PGStream(sock, logger);
 			client.setStream(stream);
 			return client;
 		} catch (IOException e) {
@@ -105,7 +109,9 @@ public class FEBEChannel
 					.get(type);
 			if (factory != null) {
 				logger.debug("handling with " + factory.getClass().getName());
-				return factory.getMessage(stream, encoding);
+				Message ret = factory.getMessage(stream, encoding);
+				ret.setClient(client);
+				return ret;
 			} else {
 				//debug block -->
 				try {
@@ -139,9 +145,9 @@ public class FEBEChannel
 		FEBEClient client = (FEBEClient) msg.getClient();
 		PGStream stream = client.getStream();
 		Encoding encoding = client.getEncoding();
-		byte[] hdr = {(byte) 255, 0, 0, 0};
+		//byte[] hdr = {0, 0, 0, 0};
 		try {
-			stream.Send(hdr);
+			//stream.Send(hdr);
 			Character type = null;
 			if (msg instanceof org.pgj.messages.Error) {
 				type = new Character('E');
@@ -152,7 +158,9 @@ public class FEBEChannel
 				throw new CommunicationException("unhandled type of message");
 			MessageFactory factory = (MessageFactory) messageFactoryMap
 					.get(type);
+			stream.SendChar(type.charValue());
 			factory.sendMessage(msg, stream);
+			stream.flush();
 		} catch (IOException e) {
 			throw new CommunicationException("could not send message to DB", e);
 		} catch (MappingException e) {
@@ -160,8 +168,6 @@ public class FEBEChannel
 			throw new CommunicationException("mapping excption occured", e);
 		}
 	}
-	private int port = 0;
-	String socketFactoryName = null;
 
 	/*
 	 * (non-Javadoc)
@@ -190,10 +196,16 @@ public class FEBEChannel
 		//init messageFactories
 		messageFactoryMap.put(new Character(
 				(char) ErrorMessageFactory.MESSAGE_HEADER_ERROR),
-				new ErrorMessageFactory());
+				new ErrorMessageFactory(logger));
 		messageFactoryMap.put(new Character(
 				(char) CallMessageFactory.MESSAGE_HEADER_CALL),
 				new CallMessageFactory(typeMapper, logger));
+		messageFactoryMap.put(new Character(
+				(char) LogMessageFactory.MESSAGE_HEADER_LOG),
+				new LogMessageFactory(logger));
+		messageFactoryMap.put(new Character(
+				(char) ResultMessageFactory.MESSAGE_HEADER_RESULT),
+				new ResultMessageFactory(logger, typeMapper));
 	}
 	private ServerSocketFactory serverSocketFactory;
 
