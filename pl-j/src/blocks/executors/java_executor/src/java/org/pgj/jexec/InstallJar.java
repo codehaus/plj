@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -39,7 +39,7 @@ public class InstallJar extends BasicPrivilegedJSProc {
 	 * @see org.pgj.jexec.PrivilegedJSProc#perform(org.pgj.messages.CallRequest)
 	 */
 	public Object perform(CallRequest call) throws Exception {
-		Vector params = call.getParams();
+		List params = call.getParams();
 		String jarToInstall = (String) (((Field) params.get(0))
 				.get(String.class));
 		String jarName = (String) (((Field) params.get(1)).get(String.class));
