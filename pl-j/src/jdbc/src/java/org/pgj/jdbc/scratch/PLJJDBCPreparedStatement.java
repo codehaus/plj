@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Vector;
 
 import org.pgj.CommunicationException;
+import org.pgj.ExecutionCancelException;
 import org.pgj.messages.Result;
 import org.pgj.messages.SQLExecute;
 import org.pgj.messages.SQLPrepare;
@@ -112,6 +113,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 */
 	private void doPrepare() throws SQLException {
 
+		if(prepared)
+			return;
+
 		Class[] args = new Class[paramClasses.size()];
 		for (int i = 0; i < args.length; i++) {
 			args[i] = (Class) paramClasses.get(i);
@@ -142,9 +146,26 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		try {
 			this.plan = ((Integer) ((Result) ans).get(0, 0).get(Integer.class))
 					.intValue();
+			prepared = true;
 		} catch (MappingException e2) {
 			throw new SQLException("Result cannot be mapped to int");
 		}
+	}
+
+	private Field[] doMakeFields() throws MappingException {
+		TypeMapper mapper = conn.client.getTypeMapper();
+		SQLExecute exec = new SQLExecute();
+		Field[] flds = new Field[params.size()];
+		for (int i = 0; i < flds.length; i++) {
+			Object o = params.get(i);
+			if (o == null) {
+				flds[i] = null;
+			} else {
+				flds[i] = mapper.backMap(o, mapper
+						.getRDBMSTypeFor((Class) this.paramClasses.get(i)));
+			}
+		}
+		return flds;
 	}
 
 	/**
@@ -164,8 +185,19 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#executeUpdate()
 	 */
 	public int executeUpdate() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		try {
+			doPrepare();
+			Field[] flds = doMakeFields();
+			SQLExecute exec = new SQLExecute();
+			exec.setAction(SQLExecute.ACTION_UPDATE);
+			exec.setParams(flds);
+			exec.setPlanid(plan);
+			Result ans = (Result) conn.doSendReceive(exec);
+			return ((Integer) ((Result) ans).get(0, 0).get(Integer.class))
+					.intValue();
+		} catch (MappingException e) {
+			throw new SQLException(e.getMessage());
+		}
 	}
 
 	/*
@@ -198,16 +230,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			doPrepare();
 			TypeMapper mapper = conn.client.getTypeMapper();
 			SQLExecute exec = new SQLExecute();
-			Field[] flds = new Field[params.size()];
-			for (int i = 0; i < flds.length; i++) {
-				Object o = params.get(i);
-				if (o == null) {
-					flds[i] = null;
-				} else {
-					flds[i] = mapper.backMap(o, mapper
-							.getRDBMSTypeFor((Class) this.paramClasses.get(i)));
-				}
-			}
+			Field[] flds = doMakeFields();
 			exec.setPlanid(plan);
 			exec.setParams(flds);
 			conn.doSendMessage(exec);
@@ -224,7 +247,14 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			params.setSize(i + 1);
 		}
 		params.set(i, obj);
-		paramClasses.add(i, clazz);
+		if (i >= paramClasses.size()) {
+			paramClasses.setSize(i + 1);
+			prepared = false;
+		} else {
+			if(paramClasses.get(i) != clazz)
+				prepared = false;
+		}
+		paramClasses.set(i, clazz);
 	}
 
 	/*
@@ -496,8 +526,23 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#executeQuery()
 	 */
 	public ResultSet executeQuery() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			doPrepare();
+			Field[] flds = doMakeFields();
+			SQLExecute exec = new SQLExecute();
+			exec.setAction(SQLExecute.ACTION_OPENCURSOR);
+			exec.setParams(flds);
+			exec.setPlanid(plan);
+
+			Result ansver = (Result) conn.doSendReceive(exec);
+
+			PLJJDBCResultSet res = new PLJJDBCResultSet(conn.client
+					.getChannel(), (String) ansver.get(0, 0).get(String.class));
+
+			return res;
+		} catch (MappingException e) {
+			throw new SQLException(e.getMessage());
+		}
 	}
 
 	/*
