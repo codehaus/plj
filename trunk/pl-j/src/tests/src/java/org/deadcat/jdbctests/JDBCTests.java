@@ -98,7 +98,7 @@ public class JDBCTests {
 		ResultSet res = null;
 		try{
 			conn = DriverManager.getConnection("jdbc:default:connection");
-			sta = conn.prepareStatement("select id, str from plj_prepsta_xmpl where id = ?");
+			sta = conn.prepareStatement("select id, str, 'static text' from plj_prepsta_xmpl where id < ?");
 			sta.setInt(1, i.intValue());
 			res = sta.executeQuery();
 			while(res.next()){
