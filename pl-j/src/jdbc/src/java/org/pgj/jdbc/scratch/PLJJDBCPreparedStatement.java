@@ -26,8 +26,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Vector;
 
+import org.pgj.CommunicationException;
 import org.pgj.messages.Result;
+import org.pgj.messages.SQLExecute;
 import org.pgj.messages.SQLPrepare;
+import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.TypeMapper;
 
@@ -191,7 +194,30 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#execute()
 	 */
 	public boolean execute() throws SQLException {
-		doPrepare();
+		try {
+			doPrepare();
+			TypeMapper mapper = conn.client.getTypeMapper();
+			SQLExecute exec = new SQLExecute();
+			Field[] flds = new Field[params.size()];
+			for (int i = 0; i < flds.length; i++) {
+				Object o = params.get(i);
+				if (o == null) {
+					flds[i] = null;
+				} else {
+					flds[i] = mapper.backMap(o, mapper
+							.getRDBMSTypeFor((Class) this.paramClasses.get(i)));
+				}
+			}
+			exec.setPlanid(plan);
+			exec.setParams(flds);
+			conn.communicationChanell.sendToRDBMS(exec);
+		} catch (MappingException e) {
+			e.printStackTrace();
+			throw new SQLException(e.getMessage());
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+			throw new SQLException(e.getMessage());
+		}
 		return false;
 	}
 

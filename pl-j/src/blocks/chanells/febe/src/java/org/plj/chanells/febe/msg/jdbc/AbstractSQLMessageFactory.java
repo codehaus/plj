@@ -21,6 +21,7 @@ abstract class AbstractSQLMessageFactory implements MessageFactory {
 	public static final int SQLTYPE_FETCH = 3;
 	public static final int SQLTYPE_CURSOR_OPEN = 4;
 	public static final int SQLTYPE_PREPARE = 5;
+	public static final int SQLTYPE_PEXECUTE = 6;
 
 	public abstract int getSQLType();
 	
