@@ -152,6 +152,8 @@ void* febe_receive_exception(){
 	ret -> msgtype = MT_EXCEPTION;
 	ret -> length = sizeof(error_message);
 
+	if(min_conn -> Pfdebug)
+		fflush(min_conn -> Pfdebug);
 	return ret;
 }
 
@@ -165,6 +167,10 @@ void* febe_receive_result() {
 
 	ret -> rows = febe_receive_integer_4();
 	ret -> cols = febe_receive_integer_4();
+	ret -> types = SPI_palloc( ret -> rows * (sizeof(char*)) );
+	for(i = 0; i < ret -> rows; i++) {
+		ret -> types[i] = NULL;
+	}
 
 	ret -> data = SPI_palloc( (ret -> rows) * sizeof(raw) );
 
@@ -179,15 +185,31 @@ void* febe_receive_result() {
 				ret -> data[i][j].isnull = 1;
 			} else {
 				int len;
+				ret -> data[i][j].isnull = 0;
 				len = febe_receive_integer_4();
 				ret -> data[i][j].length = len;
 				ret -> data[i][j].data = 
 					SPI_palloc(len);
 				pqGetnchar(ret -> data[i][j].data, len, min_conn);
+				{
+					//evil!
+					char buff[100];
+					int l;
+					l = febe_receive_integer_4();
+					pqGetnchar(buff, l, min_conn);
+					buff[l] = 0;
+					if(ret -> types[j] == NULL){
+						ret -> types[j] = SPI_palloc(strlen(buff));
+						strcpy(ret -> types[j], buff);
+					}
+				}
+					
 			}
 		}
 	}
 
+	if(min_conn -> Pfdebug)
+		fflush(min_conn -> Pfdebug);
 	return ret;
 }
 
@@ -202,6 +224,9 @@ message febe_receive_log() {
 	ret -> category = febe_receive_string();
 	ret -> message = febe_receive_string();
 
+	if(min_conn -> Pfdebug)
+		fflush(min_conn -> Pfdebug);
+
 	return ret;
 }
 
@@ -215,7 +240,7 @@ message plpgj_channel_receive(void){
 	//elog(DEBUG1, "header: %d", header);
 
 	ret = pqReadData(min_conn);
-	switch(ret) {
+	/*switch(ret) {
 		case 1: elog(DEBUG1, "got data from the server"); 
 		break;
 		case 0: elog(DEBUG1, "no data, but still okay (who knows?)"); 
@@ -223,7 +248,7 @@ message plpgj_channel_receive(void){
 		case -1: elog(DEBUG1, "got data from the server"); 
 		break;
 		default: elog(ERROR, "something is realy _very_ wrong");
-	}
+	}*/
 
 	ret = pqGetc(&type, min_conn);
 
