@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "plpgj_message_base.h"
+
 typedef struct {
 	base_message_content;
 	//class name
@@ -12,9 +14,10 @@ typedef struct {
 	//method name
 	char methodname[50];
 	// expected return type
-	char expect[50];
+	char* expect;
 	//parameters
-	
+	int nrOfParams;
+	pparam parameters;
 }str_msg_callreq;
 
 typedef str_msg_callreq* callreq;
