@@ -6,21 +6,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//import org.pgj.Channel;
-//import org.pgj.CommunicationException;
-//import org.pgj.glue.GlueWorker;
-
 public class Businnes {
 
 	public Businnes() {
 
 	}
 
+	public int test(Integer i) {
+		System.out.println("Wow, i got a number:" + i);
+
+		return 1;
+	}
+
+
 	public int test() {
 		System.out.println("Yes, yes it works!!! Oh what a feeling !!!");
-		
-		System.out.println("Hello\n\n"+System.getProperty("java.version")+"\n\n");
-		
+
+		System.out.println("Hello\n\n" + System.getProperty("java.version")
+				+ "\n\n");
+
 		return 1;
 	}
 
@@ -52,29 +56,5 @@ public class Businnes {
 
 		return 1;
 	}
-
-//	public void hackMe() {
-//		try {
-//
-//			Channel chanel = GlueWorker.getThreadChannel();
-//
-//			System.out.println(
-//				"Serious security failure: client code can get a channel");
-//
-//			try {
-//				chanel.sendToRDBMS(null);
-//			} catch (CommunicationException ce) {
-//
-//			}
-//
-//			System.out.println(
-//				"Even more serious security failure: client can send messages");
-//
-//		} catch (SecurityException se) {
-//			System.out.println(
-//				"I got something security exception, which is good.");
-//		}
-//
-//	}
 
 }
