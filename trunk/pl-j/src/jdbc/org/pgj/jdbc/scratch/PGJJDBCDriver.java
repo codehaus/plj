@@ -16,6 +16,7 @@ import org.pgj.NotImplementedException;
 /**
  * Embeded JDBC driver for PGJ to communicat with the database backend without
  * creating new connection or transaction.
+ * WARNING: This driver is for developement purposes only.
  * 
  * @author Laszlo Hornyak
  */

@@ -60,10 +60,10 @@ public class PGJJDBCStatement implements Statement {
 	 * @see java.sql.Statement#executeUpdate(java.lang.String)
 	 */
 	public int executeUpdate(String sql) throws SQLException {
-
+		
 		checkIfClosed();
 
-		
+		connection.checkClosed();
 		return 0;
 	}
 
@@ -72,6 +72,7 @@ public class PGJJDBCStatement implements Statement {
 	 */
 	public void close() throws SQLException {
 		checkIfClosed();
+		connection.checkClosed();
 
 		channel = null;
 
@@ -83,6 +84,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getMaxFieldSize() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -93,6 +95,7 @@ public class PGJJDBCStatement implements Statement {
 	public void setMaxFieldSize(int max) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -103,6 +106,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getMaxRows() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -113,6 +117,7 @@ public class PGJJDBCStatement implements Statement {
 	public void setMaxRows(int max) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -122,6 +127,7 @@ public class PGJJDBCStatement implements Statement {
 	 */
 	public void setEscapeProcessing(boolean enable) throws SQLException {
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -132,6 +138,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getQueryTimeout() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -142,6 +149,7 @@ public class PGJJDBCStatement implements Statement {
 	public void setQueryTimeout(int seconds) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -152,6 +160,7 @@ public class PGJJDBCStatement implements Statement {
 	public void cancel() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -162,6 +171,7 @@ public class PGJJDBCStatement implements Statement {
 	public SQLWarning getWarnings() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -172,6 +182,7 @@ public class PGJJDBCStatement implements Statement {
 	public void clearWarnings() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -182,6 +193,7 @@ public class PGJJDBCStatement implements Statement {
 	public void setCursorName(String name) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -192,6 +204,7 @@ public class PGJJDBCStatement implements Statement {
 	public boolean execute(String sql) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -202,6 +215,7 @@ public class PGJJDBCStatement implements Statement {
 	public ResultSet getResultSet() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -212,6 +226,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getUpdateCount() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -222,6 +237,7 @@ public class PGJJDBCStatement implements Statement {
 	public boolean getMoreResults() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -232,6 +248,7 @@ public class PGJJDBCStatement implements Statement {
 	public void setFetchDirection(int direction) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -242,6 +259,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getFetchDirection() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -252,6 +270,7 @@ public class PGJJDBCStatement implements Statement {
 	public void setFetchSize(int rows) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -262,6 +281,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getFetchSize() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -272,6 +292,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getResultSetConcurrency() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -282,6 +303,7 @@ public class PGJJDBCStatement implements Statement {
 	public int getResultSetType() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -292,6 +314,7 @@ public class PGJJDBCStatement implements Statement {
 	public void addBatch(String sql) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -302,6 +325,7 @@ public class PGJJDBCStatement implements Statement {
 	public void clearBatch() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 
 	}
@@ -312,6 +336,7 @@ public class PGJJDBCStatement implements Statement {
 	public int[] executeBatch() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -322,8 +347,8 @@ public class PGJJDBCStatement implements Statement {
 	public Connection getConnection() throws SQLException {
 
 		checkIfClosed();
-		// TODO Auto-generated method stub
-		return null;
+		connection.checkClosed();
+		return connection;
 	}
 
 	/* (non-Javadoc)
@@ -332,6 +357,7 @@ public class PGJJDBCStatement implements Statement {
 	public boolean getMoreResults(int current) throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -342,6 +368,7 @@ public class PGJJDBCStatement implements Statement {
 	public ResultSet getGeneratedKeys() throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -353,6 +380,7 @@ public class PGJJDBCStatement implements Statement {
 		throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -364,6 +392,7 @@ public class PGJJDBCStatement implements Statement {
 		throws SQLException {
 
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -374,6 +403,7 @@ public class PGJJDBCStatement implements Statement {
 	public int executeUpdate(String sql, String[] columnNames)
 		throws SQLException {
 		checkIfClosed();
+		connection.checkClosed();
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -386,6 +416,7 @@ public class PGJJDBCStatement implements Statement {
 		// TODO Auto-generated method stub
 
 		checkIfClosed();
+		connection.checkClosed();
 
 		return false;
 	}
@@ -396,6 +427,7 @@ public class PGJJDBCStatement implements Statement {
 	public boolean execute(String sql, int[] columnIndexes)
 		throws SQLException {
 		// TODO Auto-generated method stub
+		connection.checkClosed();
 		return false;
 	}
 
@@ -405,6 +437,7 @@ public class PGJJDBCStatement implements Statement {
 	public boolean execute(String sql, String[] columnNames)
 		throws SQLException {
 		// TODO Auto-generated method stub
+		connection.checkClosed();
 		return false;
 	}
 
@@ -413,6 +446,7 @@ public class PGJJDBCStatement implements Statement {
 	 */
 	public int getResultSetHoldability() throws SQLException {
 		// TODO Auto-generated method stub
+		connection.checkClosed();
 		return 0;
 	}
 
