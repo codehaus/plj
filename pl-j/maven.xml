@@ -12,7 +12,11 @@
 	</preGoal>
 
 	<preGoal name="multiproject:artifact">
-		<attainGoal name="jar:jar"/>
+		<attainGoal name="jar:install"/>
 	</preGoal>
-
+	
+	<postGoal name="site:generate">
+		<attainGoal name="multiproject:site"/>
+	</postGoal>
+	
 </project>
