@@ -9,9 +9,13 @@
   <!-- extend>${basedir}/../../../../project.xml</extend -->
 
   <inceptionYear>2003</inceptionYear>
+  <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
 
-  <description>Java sources.</description>
-  <shortDescription>Sources for pl-j written in java.</shortDescription>
+  <description>
+  The current channel built on TCP/IP sockets and the PostgreSQL group`s 
+  frontend-backend (shortly fe/be) protocol.
+  </description>
+  <shortDescription>Simple and quick channel implementation.</shortDescription>
 
 	<dependencies>
 		<dependency>
