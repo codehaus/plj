@@ -90,12 +90,18 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 
 #elif POSTGRES_VERSION == 80
 
-	func_src = DatumGetCString(DirectFunctionCall1(textout,
+	{
+	bool isnull;
+	elog(DEBUG1,"[call maker] source = %s", procStruct -> prosrc.vl_dat);
+	func_src = procStruct -> prosrc.vl_dat;
+	/*
+	DatumGetCString(DirectFunctionCall1(textout,
 							   SysCacheGetAttr(PROCOID,
-								   proctup,
+								   proctup -> ,
 								   Anum_pg_proc_prosrc,
 								   &isnull)));
-
+	*/
+	}
 
 #else
 
@@ -380,6 +386,7 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 
 	i = 0;
 
+	elog(DEBUG1, "[call maker] PL-J call maker module");
 	ret = SPI_palloc(sizeof(str_msg_callreq));
 	memset(ret, 0, sizeof(str_msg_callreq));
 	ret->msgtype = MT_CALLREQ;
@@ -390,28 +397,38 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 	procstruct = (Form_pg_proc) GETSTRUCT(proctup);
 	ReleaseSysCache(proctup);
 
-#if POSTGRES_VERSION == 74
 
+	elog(DEBUG1, "[call maker] geting function description");
+#if (POSTGRES_VERSION == 74)
+
+	elog(DEBUG1, "[call maker] 7.4 spec");
 	func_src =
 		DatumGetCString(DirectFunctionCall1
 						(textout, PointerGetDatum(&procstruct->prosrc)));
 
-#elif POSTGRES_VERSION == 80
+#elif (POSTGRES_VERSION == 80)
 
+	{
+	bool isnull;
+	elog(DEBUG1, "[call maker] 8.0 spec");
+	Datum d = DirectFunctionCall1 (textout, SysCacheGetAttr(PROCOID, proctup, Anum_pg_proc_prosrc, &isnull));
+	elog(DEBUG1, "[call maker] making c string");
 	func_src =
-		DatumGetCString(DirectFunctionCall1
-						(textout,
-						 SysCacheGetAttr(PROCOID, proctup,
-										 Anum_pg_proc_prosrc, &isnull)));
-
+		DatumGetCString(d);
+	}
 #else
 
 #error NOT SUPPORTED POSTGRESQL VERSION (but i guess i told about it)
 #endif
 
+	elog(DEBUG1, "[call maker] function source: %s", func_src);
 	func_src_len = strlen(func_src);
 
 	plpgj_fill_callstruct(procstruct, ret->classname, ret->methodname);
+
+	
+	elog(DEBUG1, "[call maker] class name: %s", ret->classname);
+	elog(DEBUG1, "[call maker] method name: %s", ret->methodname);
 
 	ret->nrOfParams = fcinfo->nargs;
 	if (ret->nrOfParams > 0)
