@@ -17,6 +17,10 @@ import org.postgresql.pljava.TriggerData;
  * 
  * @avalon.component name="method-finder"
  * @avalon.service type="org.pgj.tools.methodfinder.MethodFinder"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.tools.methodfinder.MethodFinder"
+ * 
  * @author Laszlo Hornyak
  */
 public class PLJavaMethodFinder extends DefaultMethodFinder {

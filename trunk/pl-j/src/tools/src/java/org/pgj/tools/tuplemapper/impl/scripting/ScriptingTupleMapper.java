@@ -23,8 +23,11 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @avalon.component name="scriptingtuplemapper" lifestyle="singleton"
  * @avalon.service type="org.pgj.tools.tuplemapper.TupleMapper"
+ * 
+ * @dna.component name="scriptingtuplemapper"
+ * @dna.service type="org.pgj.tools.tuplemapper.TupleMapper"
+ * 
  */
-//TODO: edit comments for ScriptingTupleMapper
 public class ScriptingTupleMapper implements Configurable, TupleMapper, LogEnabled{
 
 	private String script = null;

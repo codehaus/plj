@@ -41,6 +41,11 @@ import org.pgj.typemapping.TypeMapper;
  * @avalon.component name="java-executor"
  * @avalon.service type="org.pgj.Executor"
  * @avalon.service type="org.pgj.TriggerExecutor"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.Executor"
+ * @dna.service type="org.pgj.TriggerExecutor"
+ * 
  */
 public class JavaExecutor extends ClassLoader
 		implements

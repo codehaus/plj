@@ -26,6 +26,10 @@ import org.pgj.tools.jdbc.JDBCConfigurator;
  * 
  * @avalon.component name="jdbc-initializer" lifestyle="singleton"
  * @avalon.service type="org.pgj.tools.jdbc.JDBCConfigurator" version="1.0"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.tools.jdbc.JDBCConfigurator" version="1.0"
+ * 
  */
 public class JDBCInitializer implements Configurable, LogEnabled,
 		Initializable, JDBCConfigurator, Serviceable {

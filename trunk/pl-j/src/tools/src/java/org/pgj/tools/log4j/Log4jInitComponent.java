@@ -22,6 +22,8 @@ import org.apache.log4j.PropertyConfigurator;
  * @author Laszlo Hornyak
  * 
  * @avalon.component name="log4j-init" lifestyle="singleton"
+ * 
+ * @dna.component name="log4j-init"
  */
 public class Log4jInitComponent implements Configurable, LogEnabled {
 

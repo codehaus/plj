@@ -29,6 +29,9 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @avalon.component name="map-tuplemapper" lifestyle="singleton"
  * @avalon.service type="org.pgj.tools.tuplemapper.TupleMapper"
+ * 
+ * @dna.component name="map-tuplemapper"
+ * @dna.service type="org.pgj.tools.tuplemapper.TupleMapper"
  */
 public class MapMapper
 		implements
@@ -105,8 +108,11 @@ public class MapMapper
 	}
 
 	/**
-	 * @avalon.dependency type="org.pgj.typemapping.TypeMapper"
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
+	 * 
+	 * @avalon.dependency type="org.pgj.typemapping.TypeMapper"
+	 * 
+	 * @dna.dependency type="org.pgj.typemapping.TypeMapper"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		// TODO Auto-generated method stub

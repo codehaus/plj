@@ -23,6 +23,10 @@ import org.apache.avalon.framework.service.Serviceable;
  * 
  * @avalon.component name="ds-classloader"
  * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.tools.classloaders.PLJClassLoader"
+ * 
  */
 public class DataSourceClassLoader extends JDBCClassLoader implements Serviceable{
 	
