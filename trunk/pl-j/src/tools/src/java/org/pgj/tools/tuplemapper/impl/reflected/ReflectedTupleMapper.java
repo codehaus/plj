@@ -61,6 +61,7 @@ public class ReflectedTupleMapper
 				String name = confs[i].getAttribute("name");
 				String cls = confs[i].getAttribute("class");
 				classNameMap.put(name, cls);
+				classNameBackMap.put(cls, name);
 			}
 	}
 
@@ -125,7 +126,7 @@ public class ReflectedTupleMapper
 	public Tuple backMap(Object obj, TypeMapper typeMapper)
 			throws MappingException {
 		if (obj == null) {
-			return new Tuple();
+			throw new MappingException("can't map null");
 		}
 
 		try {
