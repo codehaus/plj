@@ -6,16 +6,34 @@
 
 #include "plpgj_messages.h"
 #include "plpgj_channel.h"
+#include "module_config.h"
 #include <unistd.h>
 #include <stdlib.h>
 
-int initialized = 0;
+int	PLJ_FEBE_INITED		= 0;
+char*	PLJ_JAVA_HOST		= NULL;
+char*	PLJ_UNIX_SOCKET		= NULL;
+char*	PLJ_CONNECT_TIMEOUT	= NULL;
+int	PLJ_PORT		= -1;
+
+#define CONFIG_COPY(a,b) tmp=plj_get_configvalue_string(a);\
+	b = malloc(strlen(tmp));\
+	strcpy(a,tmp);
 
 int plpgj_channel_initialize(){
-	initialized = 1;
+	char* tmp;
+
+	CONFIG_COPY("febe-mini.host",PLJ_JAVA_HOST)
+
+	PLJ_PORT = plj_get_configvalue_int("febe-mini.port");
+
+	CONFIG_COPY("febe-mini.unix-socket",PLJ_UNIX_SOCKET)
+	CONFIG_COPY("febe-mini.connect-timeout",PLJ_CONNECT_TIMEOUT)
+
+	PLJ_FEBE_INITED = 1;
 }
 
 int plpgj_channel_initialized(){
-	return initialized;
+	return PLJ_FEBE_INITED;
 }
 
