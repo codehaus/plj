@@ -7,7 +7,7 @@
 #include "postgres.h"
 #include "fmgr.h"
 #include "plpgj_messages.h"
-#include "plpgj_chanell.h"
+#include "plpgj_channel.h"
 #include "plpgj_message_fns.h"
 #include "plpgj_core.h"
 
@@ -38,20 +38,20 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 	callreq req;
 	int message_type;
 	
-	if(!plpgj_chanell_initialized())
-			plpgj_chanell_initialize();
+	if(!plpgj_channel_initialized())
+			plpgj_channel_initialize();
 	
 	elog(DEBUG1, "entering hook");
 	
 		
 	req = plpgj_create_call(fcinfo);
-	plpgj_chanell_send((message)req);
+	plpgj_channel_send((message)req);
 	free_message(req);
 	
 	do{
 		void* ansver = NULL;
 		elog(DEBUG1, "waiting for ansver");
-		ansver = plpgj_chanell_receive();
+		ansver = plpgj_channel_receive();
 		message_type = plpgj_message_type(ansver);
 		switch(message_type){
 			case MT_RESULT:

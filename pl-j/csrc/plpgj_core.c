@@ -4,7 +4,7 @@
  * author:				Laszlo Hornyak
  */
 
-#include "plpgj_chanell.h"
+#include "plpgj_channel.h"
 #include "plpgj_core.h"
 
 #include "postgres.h"
