@@ -17,7 +17,6 @@ public class Tuple {
 
 	private String relationName = null;
 
-	//TODO: map is not realy safe for this purpose...
 	private Map fieldMap = new HashMap();
 
 	/**
