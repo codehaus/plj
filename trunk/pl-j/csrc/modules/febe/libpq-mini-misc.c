@@ -1047,15 +1047,6 @@ pqSocketCheck(PGconn_min *conn, int forRead, int forWrite, time_t end_time)
 		return -1;
 	}
 
-#ifdef USE_SSL
-	/* Check for SSL library buffering read bytes */
-	if (forRead && conn->ssl && SSL_pending(conn->ssl) > 0)
-	{
-		/* short-circuit the select */
-		return 1;
-	}
-#endif
-
 	/* We will retry as long as we get EINTR */
 	do
 		result = pqSocketPoll(conn->sock, forRead, forWrite, end_time);
