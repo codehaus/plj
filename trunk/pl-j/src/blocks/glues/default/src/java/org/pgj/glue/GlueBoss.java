@@ -59,6 +59,7 @@ public class GlueBoss implements Runnable, LogEnabled, Startable {
 				do {
 					cli = chanell.getConnection(-1);
 					logger.debug("I HAVE A CIENT:"+cli);
+
 					if (terminating)
 						return;
 				} while (cli == null);

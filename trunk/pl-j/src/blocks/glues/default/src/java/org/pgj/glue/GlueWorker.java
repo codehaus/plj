@@ -26,13 +26,13 @@ public class GlueWorker
 
 	public static final String CHANELL_KEY = "CHANELL_KEY";
 	/** the chanell we are dealing with */
-	Channel chanell;
+	private Channel chanell;
 	/** The executor object */
-	Executor executor;
+	private Executor executor;
 	/** Client */
-	Client client;
+	private Client client;
 	/** Are we asked to terminate? */
-	boolean terminating = false;
+	private boolean terminating = false;
 	/**
 	 * ThreadLocal variable to store the channel.
 	 */
@@ -82,8 +82,10 @@ public class GlueWorker
 				Message msg = chanell.receiveFromRDBMS(client);
 				logger.debug("message in the glue");
 				Message ans = executor.execute((CallRequest) msg);
-				if (logger.isDebugEnabled())
+				if (logger.isDebugEnabled()){
 					logger.debug("executed, ansver is " + ans);
+					logger.debug("message: "+msg);
+				}
 				ans.setClient(msg.getClient());
 				if (logger.isDebugEnabled())
 					logger.debug("ansver:" + ans);
