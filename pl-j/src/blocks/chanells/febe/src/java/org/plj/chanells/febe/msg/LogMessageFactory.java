@@ -1,8 +1,5 @@
 /*
  * Created on Mar 6, 2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 
 package org.plj.chanells.febe.msg;
@@ -50,14 +47,16 @@ public class LogMessageFactory implements MessageFactory {
 	 */
 	public void sendMessage(Message msg, PGStream stream) throws IOException,
 			MappingException {
+		logger.debug("LogMessageFactory: sending log");
 		Log log = (Log) msg;
-		stream.SendIntegerR(log.getLevel(), 4);
+		stream.SendInteger(log.getLevel(), 4);
 		byte[] cat = log.getCategory().getBytes();
-		stream.SendIntegerR(cat.length, 4);
+		stream.SendInteger(cat.length, 4);
 		stream.Send(cat);
 		byte[] mesg = log.getMessage().getBytes();
-		stream.SendIntegerR(mesg.length, 4);
+		stream.SendInteger(mesg.length, 4);
 		stream.Send(mesg);
+		logger.debug("LogMessageFactory: log sent");
 	}
 
 	/* (non-Javadoc)
