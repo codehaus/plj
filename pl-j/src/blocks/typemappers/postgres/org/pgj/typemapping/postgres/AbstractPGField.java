@@ -1,7 +1,8 @@
 package org.pgj.typemapping.postgres;
 
 import org.apache.log4j.Category;
-import org.pgj.typemapping.*;
+import org.pgj.typemapping.Field;
+import org.pgj.typemapping.MappingException;
 
 /**
  * @author bitfakk
