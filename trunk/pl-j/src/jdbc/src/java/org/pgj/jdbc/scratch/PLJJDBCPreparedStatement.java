@@ -233,7 +233,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			Field[] flds = doMakeFields();
 			exec.setPlanid(plan);
 			exec.setParams(flds);
-			conn.doSendMessage(exec);
+			exec.setAction(SQLExecute.ACTION_EXECUTE);
+			Result res = (Result)conn.doSendReceive(exec);
 		} catch (MappingException e) {
 			e.printStackTrace();
 			throw new SQLException(e.getMessage());
@@ -536,8 +537,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 			Result ansver = (Result) conn.doSendReceive(exec);
 
-			PLJJDBCResultSet res = new PLJJDBCResultSet(conn.client
-					.getChannel(), (String) ansver.get(0, 0).get(String.class));
+			
+			PLJJDBCResultSet res = new PLJJDBCResultSet(conn, (String) ansver.get(0, 0).get(String.class));
 
 			return res;
 		} catch (MappingException e) {
