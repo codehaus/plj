@@ -1,6 +1,9 @@
 #include "libpq-mini.h"
 #include "febe-config.h"
 
+#include "executor/spi.h"
+#include "utils/elog.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -16,57 +19,68 @@ PGconn_min* pq_min_connect(){
 	PGconn_min* conn;
 	int ret;
 	int on = 1;
+	struct hostent* server;
 
 	conn = (PGconn_min*)malloc(sizeof(PGconn_min));
-	conn -> raddr = NULL;
+	bzero(conn, sizeof(sizeof(PGconn_min)));
 	conn -> laddr = NULL;
 	conn -> pghost = PLJ_JAVA_HOST;
 	conn -> pgport = PLJ_PORT;
 	conn -> pgunixsocket = PLJ_UNIX_SOCKET;
 	conn -> connect_timeout = PLJ_CONNECT_TIMEOUT;
 
-	//buffers are empty	
-	conn->inStart = conn->inCursor = conn->inEnd = 0;
+	//in buff
+	conn -> inBuffer = malloc(128);
+	conn -> inBufSize = 128;
+	conn -> inCursor = 0;
+	conn -> inStart = 0;
+	conn -> inEnd = 0;
 
-	conn->outCount = 0;
+	//out buff
+	conn -> outBuffer = malloc(256);
+	conn -> outMsgStart = 0;
+	conn -> outMsgEnd = 0;
+	conn -> outBufSize = 256;
+	conn -> outCount = 0;
 
-	conn -> sock = socket(AF_INET, SOCK_STREAM, 0);
-	if(conn -> sock < 0)
-		goto error;
+	conn -> status = CONNECTION_NEEDED;
 
-	conn -> laddr = (struct sockaddr*)malloc(sizeof(struct sockaddr_in));
-	conn -> raddr = (struct sockaddr*)malloc(sizeof(struct sockaddr_in));
-	
-	((struct sockaddr_in*)conn -> laddr) -> sin_family = AF_INET;
-//	((struct sockaddr_in*)conn -> laddr) -> sin_addr.s_addr = 
-//		htonl(INADDR_);
-//	((struct sockaddr_in*)conn -> laddr) -> sin_addr.sin_port = htons(0);
-	
-	ret = bind(conn -> sock, conn -> laddr, sizeof(struct sockaddr_in));
-	if(ret < 0){
-		goto error;
-	}
+	conn -> Pfdebug = 0;
 
-	ret = connect(conn -> sock, conn -> raddr, sizeof(struct sockaddr_in));
-	if(ret < 0){
-		goto error;
-	}
+   elog(DEBUG1,"socket");
+   conn -> sock = socket(AF_INET, SOCK_STREAM, 0);
+    if ( conn -> sock < 0){
+        perror("socket");
+	goto error;
+    }
+   elog(DEBUG1,"socket done");
 
-	ret = setsockopt
-		(conn -> sock, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on) < 0);
-	if(ret){
-		//TODO: error or warn here.
-	}
+    server = gethostbyname(conn -> pghost);
+    if (server == NULL) {
+	perror("gethostbyname");
+	goto error;
+    }
 
-	return conn;
+   elog(DEBUG1,"host done: %d ", server->h_length);
+    
+    conn -> raddr.sin_family = AF_INET;
+    bcopy((char *)server->h_addr,
+	 &((conn -> raddr).sin_addr.s_addr),
+         server->h_length);
+    elog(DEBUG1,"addr set");
+    conn -> raddr.sin_port = htons(conn -> pgport);
+   elog(DEBUG1,"connect");
+    if (connect(conn -> sock ,&(conn -> raddr), sizeof(struct sockaddr_in)) < 0){
+	perror("connect");
+	goto error;
+    }
+   elog(DEBUG1,"connect done");
+
+    return conn;
 
 error:
+	elog(ERROR,"returning error");
 	if(conn != NULL){
-		if(conn -> raddr != NULL)
-			free(conn -> raddr);
-		if(conn -> laddr != NULL)
-			free(conn -> laddr);
-
 		free(conn);
 	}
 	return NULL;
@@ -81,4 +95,7 @@ void pq_min_finish(PGconn_min* conn){
 
 }
 
+void pq_min_set_trace(PGconn_min* conn, FILE* tf){
+	conn -> Pfdebug = tf;
+}
 
