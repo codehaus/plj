@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<typemapper>
+		<map>
+				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
+				<type db="int8" class="org.pgj.typemapping.postgres.PGBigInt"/>
+				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
+				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
+				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
+				<type db="text" class="org.pgj.typemapping.postgres.PGText"/>
+			</map>
+			<backmap>
+				<type class="java.lang.Integer" type="int4"/>
+				<type class="java.lang.String" type="varchar"/>
+				<type class="java.lang.Boolean" type="bool"/>
+				<type class="java.lang.Long" type="int8"/>
+				<type class="[B" type="bytea"/>
+			</backmap>
+	</typemapper>
+	<channel>
+		<database-encoding>en_US</database-encoding>
+		<passed-encoding>en_US</passed-encoding>
+		<port>1984</port>
+		<socket-factory-name>plain</socket-factory-name>
+	</channel>
+	<socketmanager>
+		<server-sockets>
+				<factory name="plain" class="org.apache.avalon.cornerstone.blocks.sockets.DefaultServerSocketFactory"/>
+		</server-sockets>
+		<client-sockets>
+			<factory name="plain" class="org.apache.avalon.cornerstone.blocks.sockets.DefaultSocketFactory"/>
+		</client-sockets>
+	</socketmanager>
+	<classloader>
+		<driver>org.pgj.jdbc.scratch.PLJJDBCDriver</driver>
+		<url>jdbc:default:database</url>
+		<user>default</user>
+		<password>default</password>
+		<select>select classcode from sqlj.plj_classes where fqn = ?</select>
+		<store>insert into sqlj.plj_classes (classcode, fqn, jar) values (?, ?, ?)</store>
+		<delete>delete from sqlj.plj_classes where fqn = ?</delete>
+		<count>select count(*) from sqlj.plj_classes where fqn = ?</count>
+		<deleteJar>delete from sqlj.plj_classes where jar = ?</deleteJar>
+		</classloader>
+	<default-methodfinder>
+		<useDefault>true</useDefault>
+	</default-methodfinder>
+	<executor>
+		<tempDir>/tmp/</tempDir>
+	</executor>
+	<scriptloader>
+		<cached>true</cached>
+		<load>select lang, script, name from sqlj.plj_scripts where name = ?</load>
+		<store>insert into sqlj.plj_scripts (name, lang, script) values (?, ?, ?)</store>
+		<delete>delete from sqlj.plj_scripts where name = ?</delete>
+	</scriptloader>
+	<bsf-executor>
+		<tempDir>/tmp/</tempDir>
+	</bsf-executor>
+	<jta-adapter/>
+	<glue/>
+	<jdbc-configurator>
+		<class>org.pgj.jdbc.scratch.PLJJDBCDriver</class>
+	<jdbc-config>
+				<!--
+					==== Behavioral properties ====
+					-->
+				<!--
+					Throw an ExecutionCancelException is receiveing error message
+					from the client. Should be true for PostgreSQL always.
+					-->
+				<isStatementErrorIrrecoverable>true</isStatementErrorIrrecoverable>
+				<!--
+					defaultFetchSize tells the fetchsize of the resultsets of 
+					the scratch driver.
+					-->
+				<defaultFetchSize>10</defaultFetchSize>
+				<!--
+					if false setFetchSize will have no effect and the default fetch size
+					will be applied.
+					-->
+				<canUserOverrideFetchSize>false</canUserOverrideFetchSize>
+				<!--
+					Use the plan pool feature.
+					-->
+				<usePlanPool>false</usePlanPool>
+				<!--
+					===== DatabaseMetadata =====
+					-->
+				<!--
+					Major and minor version, it has no real impotance, excepti if
+					your stored procedures use it, so configure whatever you like
+					-->
+				<DatabaseMajorVersion>7</DatabaseMajorVersion>
+				<DatabaseMinorVersion>4</DatabaseMinorVersion>
+				<!--
+					TRANSACTION_NONE = 0
+					TRANSACTION_READ_UNCOMMITTED = 1
+					TRANSACTION_READ_COMMITTED = 2
+					TRANSACTION_REPEATABLE_READ = 4
+					TRANSACTION_SERIALIZABLE = 8
+					TRANSACTION_SERIALIZABLE with PostgreSQL, but should be the
+					isolation level called when fireing up the UDF.
+					-->
+				<DefaultTransactionIsolation>8</DefaultTransactionIsolation>
+				<!--
+					-->
+				<DriverMajorVersion>0</DriverMajorVersion>
+				<DriverMinorVersion>1</DriverMinorVersion>
+				<!--
+					And so on...
+					-->
+		</jdbc-config>
+	</jdbc-configurator>
+	<tuplemapper>
+		<relation name="plj_testtable" class="org.deadcat_enterprises.TestTableRecord"/>
+		<relation name="plj_testable2" class="org.deadcat_enterprises.TestTableRecord"/>
+		</tuplemapper>
+		<log4j-init>
+		<properties>
+			<!--
+			The root logger is the PLJAppender, so all log categories
+			not configured here will go to RDBMS (or at least try to go there)
+			-->
+			<property name="log4j.rootLogger" value="INFO, plj"/>
+			<property name="log4j.appender.plj" value="org.pgj.tools.log4j.PLJAppender"/>
+			<property name="log4j.appender.plj.layout" value="org.apache.log4j.PatternLayout"/>
+			<property name="log4j.appender.plj.layout.conversionPattern" value=" %d [%t] %-5p %c{1} - %m%n"/>
+				
+				<!--
+				These entries are for the PostgreSQL typemapper`s 
+				Field implementations. (it uses log4j). Its logs should remain
+				local.
+				-->
+				
+		</properties>
+	</log4j-init>
+</config>

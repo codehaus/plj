@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<document>
+	<properties>
+		<title>JDBC implementation in PL-J</title>
+		<author email="kocka at forgeahead dot hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+		<section name="Why a new JDBC driver?">
+			<p>Stored procedures need special JDBC connections to the database:
+				<ul>
+					<li>Normal programs run outside the database, stored procedures run inside.</li>
+					<li>The transactional context is the same as the caller. Commit, begin and rollback is not
+					allowed.</li>
+					<li>The new driver uses PL-J`s communication API</li>
+				</ul>
+			</p>
+		</section>
+		<section name="Implementation basis">
+			<p> Implementing a JDBC driver is a very big job, so we imported the PostgreSQL JDBC team`s source code.
+			with lots of core functionality rewrite, this will be hopefully soon a good JDBC driver in PL-J.
+			</p>
+		</section>
+
+	</body>
+</document>
+
