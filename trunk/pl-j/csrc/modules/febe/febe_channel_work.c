@@ -400,6 +400,22 @@ febe_receive_tupres()
 	return (message) res;
 }
 
+sql_msg_cursor_fetch
+febe_receive_sql_fetch(void)
+{
+	sql_msg_cursor_fetch ret;
+
+	ret = SPI_palloc(sizeof(struct str_sql_msg_cursor_fetch));
+	ret -> length = sizeof(struct str_sql_msg_cursor_fetch);
+	ret -> msgtype = MT_SQL;
+	ret -> sqltype = SQL_TYPE_FETCH;
+	ret -> cursorname = febe_receive_string();
+	ret -> count = febe_receive_integer_4();
+	ret -> direction = febe_receive_integer_4();
+
+	return ret;
+}
+
 sql_msg_statement
 febe_receive_sql_statement(void)
 {
@@ -413,7 +429,9 @@ febe_receive_sql_statement(void)
 	return ret;
 }
 
-sql_msg_prepapre febe_receive_sql_prepare(void){
+sql_msg_prepapre 
+febe_receive_sql_prepare(void)
+{
 	sql_msg_prepapre ret;
 	int i;
 
@@ -480,6 +498,19 @@ sql_pexecute febe_receive_sql_pexec(void){
 	return ret;
 }
 
+sql_msg_cursor_close 
+febe_receive_sql_cursorclose(){
+	sql_msg_cursor_close ret;
+
+	ret = SPI_palloc(sizeof(struct str_sql_msg_cursor_close));
+	ret -> msgtype = MT_SQL;
+	ret -> sqltype = SQL_TYPE_CURSOR_CLOSE;
+	ret -> length = sizeof(struct str_sql_msg_cursor_close);
+	ret -> cursorname = febe_receive_string();
+
+	return ret;
+}
+
 sql_msg
 febe_receive_sql(void)
 {
@@ -492,16 +523,15 @@ febe_receive_sql(void)
 			return (sql_msg) febe_receive_sql_statement();
 		case SQL_TYPE_PREPARE:
 			return (sql_msg) febe_receive_sql_prepare();
-		case SQL_TYPE_PEXECUTE:{
-			sql_msg msg;
-//			pljelog(DEBUG1, "====");
-			msg = (sql_msg) febe_receive_sql_pexec();
-//			pljelog(DEBUG1, "====");
-			return msg;
-			}
+		case SQL_TYPE_PEXECUTE:
+			return (sql_msg) febe_receive_sql_pexec();
+		case SQL_TYPE_FETCH:
+			return (sql_msg) febe_receive_sql_fetch();
+		case SQL_TYPE_CURSOR_CLOSE:
+			return (sql_msg)febe_receive_sql_cursorclose();
 		default:
 			//pljlogging_error = 1;
-//			elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
+		elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
 
 	}
 	return NULL;				//which never happens, but syntax failure otherwise.

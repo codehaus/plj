@@ -25,6 +25,7 @@
 #include "pljelog.h"
 #include "plantable.h"
 #include "envstack.h"
+#include <string.h>
 
 /*	*/
 
@@ -50,6 +51,9 @@ Datum		plpgj_result_do(plpgj_result);
 void		plpgj_log_do(log_message);
 
 
+void plpgj_utl_sendint(int);
+void plpgj_utl_sendstr(const char*);
+void plpgj_utl_senderror(const char*);
 
 void		plpgj_EOXactCallBack(bool isCommit, void *arg);
 
@@ -102,7 +106,8 @@ void unreg_error_callback() {
 	if (callbacks_init) {
 		elog(DEBUG1, "unreg_error_callback: 1");
 		//XXX this will fuck up the env if someone else registers a callback in a reentrant sp.
-		if(error_context_stack -> callback == plpgj_ErrorContextCallback){
+		
+		if(error_context_stack != NULL && error_context_stack -> callback == plpgj_ErrorContextCallback){
 			elog(DEBUG1, "unreg_error_callback: 2");
 			error_context_stack = error_context_stack -> previous;
 			elog(DEBUG1, "unreg_error_callback: 3");
@@ -442,7 +447,6 @@ plpgj_sql_do(sql_msg msg)
 				TypeName *typnam;
 				void *plan;
 				int planid;
-				plpgj_result res;
 
 				prep = (sql_msg_prepapre) msg;
 				argtypes = prep -> ntypes == 0 ? NULL : SPI_palloc(prep -> ntypes * sizeof(Oid) );
@@ -454,43 +458,20 @@ plpgj_sql_do(sql_msg msg)
 				elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
 				pljlogging_error = 1;
 				//THIS WILL FUCK YOUR SYSTEM IF YOU HAVE prepare
-				plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
+				
+				PG_TRY();
+					
+					elog(DEBUG1,"success");
+					plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
+				PG_CATCH();
+					elog(DEBUG1,"failure");
+				PG_END_TRY();
+				
 				pljlogging_error = 0;
 				elog(DEBUG1, "SQL_TYPE_PREPARE done, leaving nolog area");
 				planid = store_plantable(plan);
 
-				//create result
-				res = SPI_palloc(sizeof(str_plpgj_result));
-				res -> msgtype = MT_RESULT;
-				res -> length = sizeof(str_plpgj_result);
-				res -> rows = 1;
-				res -> cols = 1;
-				res -> types = SPI_palloc(sizeof(char*));
-				res -> types[0] = "int4";
-				res -> data = SPI_palloc(sizeof(raw));
-				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
-				res -> data[0] -> length = 8;
-				res -> data[0] -> isnull = 0;
-				//res -> data[0] -> data = SPI_palloc(sizeof(12));
-				{
-					Form_pg_type int4typ;
-					HeapTuple int4htp;
-					Oid int4oid;
-					TypeName* int4nam;
-					Datum d;
-					
-					int4nam = makeTypeName("int4");
-					int4oid = LookupTypeName(int4nam);
-					int4htp = SearchSysCache(TYPEOID, int4oid, 0, 0, 0);
-					int4typ = (Form_pg_type)GETSTRUCT(int4htp);
-					ReleaseSysCache(int4htp);
-
-					d = OidFunctionCall1(int4typ -> typsend, UInt32GetDatum(planid));
-					res -> data[0] -> data = DatumGetPointer(d);
-				}
-				pljelog(DEBUG1,"1");
-				pljloging = 0;
-				plpgj_channel_send((message)res);
+				plpgj_utl_sendint(planid);
 				pljloging = 1;
 			}
 			break;
@@ -550,31 +531,63 @@ plpgj_sql_do(sql_msg msg)
 				pljelog(DEBUG1,"executing.");
 				{
 				int ret;
+				Portal pret;
 				pljlogging_error = 1;
-				ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
+				elog(DEBUG1, "action:%d", sql -> action);
+				PG_TRY();
+					switch(sql -> action){
+						case SQL_PEXEC_ACTION_OPENCURSOR:
+							pljelog(DEBUG1,"SQL_PEXEC_ACTION_OPENCURSOR");
+							pret = SPI_cursor_open(NULL, plantable[sql -> planid], values, nulls);
+							break;
+						case SQL_PEXEC_ACTION_EXECUTE:
+							pljelog(DEBUG1,"SQL_PEXEC_ACTION_EXECUTE");
+							ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
+							break;
+						case SQL_PEXEC_ACTION_UPDATE:
+							pljelog(DEBUG1,"SQL_PEXEC_ACTION_UPDATE");
+							ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
+							break;
+					}
+				PG_CATCH();
+					//send back error
+				PG_END_TRY();
 				pljlogging_error = 0;
 				pljelog(DEBUG1,"executed.");
-				switch (ret) {
+				//TODO: add logic here!!
+				switch (sql -> action){
+				case SQL_PEXEC_ACTION_EXECUTE:
+					switch (ret) {
 					case SPI_ERROR_ARGUMENT:
 						pljelog(DEBUG1, "SPI_ERROR_ARGUMENT");
+						plpgj_utl_senderror("SPI_ERROR_ARGUMENT");
 						break;
 					case SPI_ERROR_PARAM:
 						pljelog(DEBUG1, "SPI_ERROR_PARAM");
+						plpgj_utl_senderror("SPI_ERROR_PARAM");
 						break;
 					default:
 						pljelog(DEBUG1,"success?");
+						plpgj_utl_sendint(1);
 						break;
-				}
-				}
-				//TODO: add logic here!!
-				switch (sql -> action){
-					case SQL_PEXEC_ACTION_EXECUTE:
+					}
 					break;
-					case SQL_PEXEC_ACTION_UPDATE:
+				case SQL_PEXEC_ACTION_UPDATE:
+					plpgj_utl_sendint(ret);
 					break;
-					case SQL_PEXEC_ACTION_OPENCURSOR:
+				case SQL_PEXEC_ACTION_OPENCURSOR:
+					if(pret == NULL) {
+						elog(DEBUG1, "OPOENC 1");
+						plpgj_utl_senderror("Cursor open error");
+					} else {
+						elog(DEBUG1, "OPOENC 2");
+						plpgj_utl_sendstr(pret -> name);
+						elog(DEBUG1, "OPOENC 3");
+					}
 					break;
 				}
+			}
+
 			}
 			break;
 		case SQL_TYPE_CURSOR_CLOSE:
@@ -582,6 +595,7 @@ plpgj_sql_do(sql_msg msg)
 				Portal		portal;
 				sql_msg_cursor_close sql_c_c = (sql_msg_cursor_close) msg;
 
+				elog(DEBUG1, "closing cursot %s", sql_c_c -> cursorname);
 				portal = GetPortalByName(sql_c_c->cursorname);
 				if (!PortalIsValid(portal))
 				{
@@ -589,12 +603,14 @@ plpgj_sql_do(sql_msg msg)
 					pljelog(ERROR, "the portal %s does not exist!",
 							sql_c_c->cursorname);
 
-					/*
-					 * TODO throw back an exception!
-					 */
+					plpgj_utl_senderror("Cursor close error");
 				}
-
-				PortalDrop(portal, 0);
+				PG_TRY();
+					PortalDrop(portal, 0);
+					plpgj_utl_sendint(1);
+				PG_CATCH();
+					plpgj_utl_senderror("Portal drop problem");
+				PG_END_TRY();
 
 			}
 			break;
@@ -613,16 +629,77 @@ plpgj_sql_do(sql_msg msg)
 			break;
 		case SQL_TYPE_FETCH:
 			{
-				/*
-				 * Portal portal;
-				 *
-				 * sql_msg_cursor_fetch sql_c_f = (sql_msg_cursor_fetch)msg;
-				 *
-				 * portal = GetPortalByName(sql_c_f->cursorname);
-				 * if(!PortalIsValid(portal))
-				 * TODO send back error.
-				 */
+				
+			Portal portal;
+			plpgj_result result;
+			int i, j;
+			
+			sql_msg_cursor_fetch sql_c_f = (sql_msg_cursor_fetch)msg;
+			pljelog(DEBUG1, "fetching from %s", sql_c_f -> cursorname);
+			
+			//portal = GetPortalByName(sql_c_f -> cursorname);
+			portal = SPI_cursor_find(sql_c_f -> cursorname);
+			if(!PortalIsValid(portal)) {
+				plpgj_utl_senderror("Cursor invalid");
+				break;
 			}
+			elog(DEBUG1, "f 1");
+			SPI_cursor_fetch(portal, /*((sql_msg_cursor_fetch)msg) -> direction ==*/ 1 , ((sql_msg_cursor_fetch)msg) -> count);
+			if(SPI_processed < 0){
+				plpgj_utl_senderror("Not processed");
+				break;
+			}
+			elog(DEBUG1, "f 2");
+
+			result = SPI_palloc(sizeof(str_plpgj_result));
+			result -> msgtype = MT_RESULT;
+			result -> length = sizeof(str_plpgj_result);
+			result -> cols = SPI_tuptable -> tupdesc -> natts;
+			result -> rows = SPI_processed;
+			elog(DEBUG1, "rows: %d, cols: %d", result -> rows, result -> cols);
+			result -> types = SPI_palloc(result -> cols * sizeof(char*));
+			elog(DEBUG1, "f 3");
+			for(j = 0; j < result -> cols; j++){
+				HeapTuple typtup;
+				Form_pg_type typstr;
+				typtup = SearchSysCache(TYPEOID,SPI_tuptable -> tupdesc -> attrs[j] -> atttypid, 0,0,0);
+				typstr = (Form_pg_type)GETSTRUCT(typtup);
+				ReleaseSysCache(typtup);
+				result -> types[j] = NameStr(typstr -> typname);
+				elog(DEBUG1, "COLUMN [%d]: %s", j, result -> types[j]);
+			}
+			elog(DEBUG1, "f 4");
+			if(result -> rows > 0){
+				result -> data = SPI_palloc(sizeof(raw) * result -> rows);
+			} else {
+				result -> data = NULL;
+			}
+			elog(DEBUG1, "f 5");
+			for(i = 0; i < result -> rows; i++){
+				
+				result -> data[i] = SPI_palloc(result -> cols * sizeof(struct str_raw));
+				for(j = 0; j < result -> cols; j++){
+					HeapTuple typtup;
+					Form_pg_type typstr;
+					bool isnull;
+					Datum binDat;
+					typtup = SearchSysCache(TYPEOID, SPI_tuptable -> tupdesc -> attrs[j] -> atttypid , 0,0,0);
+					typstr = (Form_pg_type)GETSTRUCT(typtup);
+					binDat = OidFunctionCall1(typstr -> typsend , SPI_getbinval(SPI_tuptable -> vals[i], SPI_tuptable -> tupdesc, j, &isnull ));
+					if(isnull){
+						result -> data[i][j].isnull = 1;
+					} else {
+						result -> data[i][j].isnull = 0;
+						result -> data[i][j].length = datumGetSize(binDat, false, typstr -> typlen)
+			                                + (typstr -> typbyval ? 4 : 0);;
+						result -> data[i][j].data = DatumGetPointer(binDat);
+					}
+				}
+			}
+			elog(DEBUG1, "sending ansver");
+			plpgj_channel_send(result);
+			}
+			
 			break;
 		default:
 			pljelog(FATAL, "Unhandled SQL message.");
@@ -697,11 +774,9 @@ plpgj_ErrorContextCallback(void *arg)
 {
 	bool reenable_loging;
 
-	if (!pljlogging_error)
+//	if (!pljlogging_error)
 		return;
 	pljlogging_error = 0;
-	
-	elog(DEBUG1, "AAAAAA!");
 	
 	reenable_loging = pljloging;
 
@@ -738,6 +813,97 @@ plpgj_ErrorContextCallback(void *arg)
 
 }
 
+void plpgj_utl_sendstr(const char* str) {
+				plpgj_result res;
+				res = SPI_palloc(sizeof(str_plpgj_result));
+				res -> msgtype = MT_RESULT;
+				res -> length = sizeof(str_plpgj_result);
+				res -> rows = 1;
+				res -> cols = 1;
+				res -> types = SPI_palloc(sizeof(char*));
+				res -> types[0] = "varchar";
+				res -> data = SPI_palloc(sizeof(raw));
+				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
+				res -> data[0] -> length = 4 + strlen(str);
+				res -> data[0] -> isnull = 0;
+				elog(DEBUG1, "plpgj_utl_sendstr, 1");
+				{
+					Form_pg_type int4typ;
+					HeapTuple int4htp;
+					Oid int4oid;
+					TypeName* int4nam;
+					Datum d;
+					StringInfo      rawString;
+					
+					int4nam = makeTypeName("varchar");
+					int4oid = LookupTypeName(int4nam);
+					int4htp = SearchSysCache(TYPEOID, int4oid, 0, 0, 0);
+				elog(DEBUG1, "plpgj_utl_sendstr, 2");
+					int4typ = (Form_pg_type)GETSTRUCT(int4htp);
+					ReleaseSysCache(int4htp);
+				elog(DEBUG1, "plpgj_utl_sendstr, 2.1");
+
+					rawString = SPI_palloc(sizeof(StringInfoData));
+				elog(DEBUG1, "plpgj_utl_sendstr, 2.1.1");
+					initStringInfo(rawString);
+				elog(DEBUG1, "plpgj_utl_sendstr, 2.1.2: %d, %s", strlen(str), str);
+					appendBinaryStringInfo(rawString, str, strlen(str));
+				elog(DEBUG1, "plpgj_utl_sendstr, 2.1.3");
+					d = OidFunctionCall1(int4typ -> typsend, OidFunctionCall1(int4typ -> typinput, PointerGetDatum(str)));
+				elog(DEBUG1, "plpgj_utl_sendstr, 2.2");
+					res -> data[0] -> data = DatumGetPointer(d);
+				elog(DEBUG1, "plpgj_utl_sendstr, 3");
+				}
+				pljelog(DEBUG1,"1");
+				pljloging = 0;
+				plpgj_channel_send((message)res);
+				elog(DEBUG1, "plpgj_utl_sendstr, 4");
+				pljloging = 1;
+
+
+}
+
+void plpgj_utl_sendint(int i) {
+				plpgj_result res;
+				res = SPI_palloc(sizeof(str_plpgj_result));
+				res -> msgtype = MT_RESULT;
+				res -> length = sizeof(str_plpgj_result);
+				res -> rows = 1;
+				res -> cols = 1;
+				res -> types = SPI_palloc(sizeof(char*));
+				res -> types[0] = "int4";
+				res -> data = SPI_palloc(sizeof(raw));
+				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
+				res -> data[0] -> length = 8;
+				res -> data[0] -> isnull = 0;
+				//res -> data[0] -> data = SPI_palloc(sizeof(12));
+				{
+					Form_pg_type int4typ;
+					HeapTuple int4htp;
+					Oid int4oid;
+					TypeName* int4nam;
+					Datum d;
+					
+					int4nam = makeTypeName("int4");
+					int4oid = LookupTypeName(int4nam);
+					int4htp = SearchSysCache(TYPEOID, int4oid, 0, 0, 0);
+					int4typ = (Form_pg_type)GETSTRUCT(int4htp);
+					ReleaseSysCache(int4htp);
+
+					d = OidFunctionCall1(int4typ -> typsend, UInt32GetDatum(i));
+					res -> data[0] -> data = DatumGetPointer(d);
+				}
+				pljelog(DEBUG1,"1");
+				pljloging = 0;
+				plpgj_channel_send((message)res);
+				pljloging = 1;
+
+}
+
+void plpgj_utl_senderror(const char* errorstr){
+	
+}
+
 typedef struct plj_envstack_struct {
 	short logging;
 	short logging_error;
@@ -745,6 +911,8 @@ typedef struct plj_envstack_struct {
 } *plj_envstack;
 
 plj_envstack envstack = NULL;
+sigjmp_buf *PG_exception_stack = NULL;
+
 
 void envstack_push(void) {
 	plj_envstack nenv;

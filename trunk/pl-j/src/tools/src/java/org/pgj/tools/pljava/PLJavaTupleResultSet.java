@@ -35,7 +35,7 @@ class PLJavaTupleResultSet implements ResultSet {
 
 	private Tuple tuple = null;
 
-	Logger logger = Logger.getLogger(PLJavaTupleResultSet.class);
+	private Logger logger = Logger.getLogger(PLJavaTupleResultSet.class);
 
 	/**
 	 *  
@@ -110,8 +110,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#beforeFirst()
 	 */
 	public void beforeFirst() throws SQLException {
-		// TODO Auto-generated method stub
-
+		logger.warn("void beforeFirst(): makes no sense");
 	}
 
 	/*
@@ -140,8 +139,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#close()
 	 */
 	public void close() throws SQLException {
-		// TODO Auto-generated method stub
-
+		logger.warn("close(): does not make sense");
 	}
 
 	/*
