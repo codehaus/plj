@@ -97,7 +97,7 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 				return NULL;
 			}
 			strncpy(ret->classname, func_src+i+start, end-start);
-			elog(DEBUG1,"class <- %s", ret->classname);
+			//elog(DEBUG1,"class <- %s", ret->classname);
 		}else
 		if(strncmp(func_src+i+namestart, "method", 6) == 0){
 			if(end - start > 50){
@@ -105,23 +105,23 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 				return NULL;
 			}
 			strncpy(ret->methodname, func_src+i+start, end-start);
-			elog(DEBUG1,"method <- %s", ret->methodname);
+			//elog(DEBUG1,"method <- %s", ret->methodname);
 		}else
 		if(strncmp(func_src+i+namestart, "oneway", 6) == 0){
-			elog(DEBUG1, "nothing to do with oneway calls");
+			//elog(DEBUG1, "nothing to do with oneway calls");
 		}else{
 			elog(DEBUG1,"didn`t match any");
 		}
 		
 		i+=end+1;
-		elog(DEBUG1,"moving to: %d",i);
+		//elog(DEBUG1,"moving to: %d",i);
 		if(i >= func_src_len)
 			break;
 	}
 	
 	//need to get EXPECT field!!
 	
-	elog(DEBUG1, func_src);
+	//elog(DEBUG1, func_src);
 	return ret;
 }
 
