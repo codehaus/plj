@@ -10,7 +10,7 @@ all: module.a
 
 init.o: mkskeletons
 
-module.a: febe_channel_init.o febe_channel_work.o libpq-mini.o
+module.a: febe_channel_init.o febe_channel_work.o libpq-mini.o libpq-mini-misc.o libpq-mini-secure.o pqexpbuffer.o
 	ar r $@ $^ 
 
 clean:
