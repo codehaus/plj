@@ -139,7 +139,7 @@ create trigger plpgj_test_lametrigger1 before insert on plj_testtable
 
 create table plj_testable2(
 	id	int primary key,
-	name	varchar;
+	name	varchar
 );
 
 create or replace function plpgj_test_t2_beforeinsert() returns trigger
@@ -173,8 +173,21 @@ returns varchar
 as '
         class=org.deadcat.jdbctests.JDBCTests
         method=doTest1
-        oneway=false
-        instantiation=session
+' language 'plj';
+
+create sequence plj_prepsta_xmpl_seq;
+create table plj_prepsta_xmpl(
+	id integer not null default nextval('plj_prepsta_xmpl_seq'),
+	t timestamp not null default now(),
+	str varchar not null,
+	str_maynull varchar
+);
+
+create or replace function plpgj_test_jdbc_prep1()
+returns void
+as '
+	class=org.deadcat.jdbctests.JDBCTests
+	method=doPreparedTest1
 ' language 'plj';
 
 -- int4 tests
