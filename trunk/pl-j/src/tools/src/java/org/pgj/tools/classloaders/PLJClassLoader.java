@@ -24,7 +24,20 @@ public interface PLJClassLoader {
 	 * Store compiled class.
 	 * @param name		the name of the class
 	 * @param raw		the raw data
+	 * @param jar		the name of the jar to store in (has importance only from the point of view of deletion.)
 	 */
-	void store(String name, byte[] raw);
+	void store(String name, byte[] raw, String jar);
 
+	/**
+	 * 
+	 * @param name
+	 * @throws ClassNotFoundException
+	 */
+	void removeClass(String name) throws ClassNotFoundException;
+
+	/**
+	 * Remove a jar file.
+	 * @param name	the name of the jar file
+	 */
+	void removeJar(String name);
 }
