@@ -11,11 +11,11 @@ import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
 
 /**
- * @author Laszlo Hornyak
- *
  * The logic that wakes up glue workers.
  * This logic runs as in a separate thread and listens the chanell for inclmming connections.
  * For all connections, it allocates a worker that will deal with the connection.
+ * 
+ * @author Laszlo Hornyak
  */
 public class GlueBoss implements Runnable, LogEnabled, Startable {
 
