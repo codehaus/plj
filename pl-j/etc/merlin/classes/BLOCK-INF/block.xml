@@ -51,22 +51,22 @@
 
 				<resource 
 					id="pl-j:pl-j-api" 
-					version="0.0.1"/>
+					version="0.0.2"/>
 				<resource
 					id="pl-j:pl-j-javaexecutor"
-					version="0.0.1"/>
+					version="0.0.2"/>
 				<resource
 					id="pl-j:pl-j-febe"
-					version="0.0.1"/>
+					version="0.0.2"/>
 				<resource
 					id="pl-j:pl-j-postgres"
-					version="0.0.1"/>
+					version="0.0.2"/>
 				<resource
 					id="pl-j:pl-j-glue"
-					version="0.0.1"/>
+					version="0.0.2"/>
 				<resource
 					id="pl-j:pl-j-tools"
-					version="0.0.1"/>
+					version="0.0.2"/>
 
 			</repository>
 		</classpath>
@@ -143,6 +143,7 @@
 		class="org.pgj.jexec.JavaExecutor">
 		<dependencies>
 			<dependency key="classloader" source="classloader"/>
+			<dependency key="tuple-mapper" source="tuplemapper"/>
 		</dependencies>
 		<configuration>
 			<tempDir>/tmp/</tempDir>
@@ -168,12 +169,13 @@
 		name="tuplemapper"
 		class="org.pgj.tools.tuplemapper.impl.reflected.ReflectedTupleMapper">
 		<dependencies>
+			<dependency key="classloader" source="classloader"/>
 		</dependencies>
-		<categories>
+		<categories priority="DEBUG">
 			<category name="/tuplemapper"/>
 		</categories>
 		<configuration>
-			<!-- relation name="plj_test" class="org.deadcat_enterprises.TestTableRecord"/ -->
+			<relation name="plj_testtable" class="org.deadcat_enterprises.TestTableRecord"/>
 		</configuration>
 	</component>
 
