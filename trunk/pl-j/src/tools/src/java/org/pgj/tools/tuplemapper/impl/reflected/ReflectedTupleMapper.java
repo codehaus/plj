@@ -18,6 +18,7 @@ import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Field;
@@ -138,8 +139,10 @@ public class ReflectedTupleMapper
 			while (i.hasNext()) {
 				String key = i.next().toString();
 				if (!"class".equals(key)) {
-					t.addField(key, typeMapper.backMap(BeanUtils.getProperty(
-							obj, key)));
+					logger.debug("value: "+PropertyUtils
+							.getProperty(obj, key).getClass().getName());
+					t.addField(key, typeMapper.backMap(PropertyUtils
+							.getProperty(obj, key)));
 				}
 			}
 
