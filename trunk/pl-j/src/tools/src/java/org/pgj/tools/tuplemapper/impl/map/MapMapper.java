@@ -4,11 +4,14 @@
 package org.pgj.tools.tuplemapper.impl.map;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.avalon.framework.logger.LogEnabled;
 import org.apache.avalon.framework.logger.Logger;
 import org.pgj.tools.tuplemapper.TupleMapper;
+import org.pgj.typemapping.Field;
+import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
 
 
@@ -33,9 +36,15 @@ public class MapMapper implements LogEnabled, TupleMapper{
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.tuplemapper.TupleMapper#mapTuple(org.pgj.typemapping.Tuple)
 	 */
-	public Object mapTuple(Tuple tuple) {
+	public Object mapTuple(Tuple tuple) throws MappingException {
 		HashMap map = new HashMap();
-		//TODO incomplete!
+		Map fldmap = tuple.getFieldMap();
+		Iterator it = fldmap.keySet().iterator();
+		while(it.hasNext()){
+			String fldName = (String)it.next();
+			Field fld = (Field)fldmap.get(fldName);
+			map.put(fldName, fld.defaultGet());
+		}
 		return map;
 	}
 
