@@ -12,6 +12,9 @@
 #include "plpgj_core.h"
 
 #include "utils/portal.h"
+#include "lib/stringinfo.h"
+#include "nodes/makefuncs.h"
+#include "parser/parse_type.h"
 
 //
 //proto
@@ -89,19 +92,65 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 			//TODO what now? we should return a value HERE.
 			// PG_RETURN...
 			
-			Datum ret;
 			
 			plpgj_result res = (plpgj_result)ansver;
 			elog(DEBUG1, "number of rows: %d", res->rows);
 			elog(DEBUG1, "number of cols: %d", res->cols);
 			
 			if(res->rows == 1 && res->cols == 1){
+				Datum ret;
+				HeapTuple typetup;
+				Form_pg_type type;
+				TypeName* typeName;
+				Oid typeOid;
+				Datum rawDatum;
+				StringInfo rawString;
 				
+				elog(DEBUG1,"hello");
+				if(res -> data[0][0].isnull == 1)
+					PG_RETURN_NULL();
+				elog(DEBUG1,"tp 0");
+
+				typeName = makeTypeName(res -> types[0]);
+				elog(DEBUG1,"tp 0.1 %s",res -> types[0]);
+				if(typeName == NULL)
+					elog(DEBUG1,"egyebkent null");
+				typeOid = typenameTypeId(typeName);
+				elog(DEBUG1,"tp 0.2");
+				typetup = SearchSysCache(TYPEOID, typeOid, 0, 0, 0);
+				elog(DEBUG1, "trace point 1");
+				if (!HeapTupleIsValid(typetup))
+					elog(ERROR, "returned unknown data type %s", res -> types[0]);
 				
+				type = (Form_pg_type) GETSTRUCT(typetup);
+				elog(DEBUG1, "trace point 2");
+				rawString = makeStringInfo();
+				initStringInfo(rawString);
+				elog(DEBUG1, "%d", res->data[0][0].length);
+				{
+				int i = 0;
+				for(i = 0; i<res->data[0][0].length; i++){
+					elog(DEBUG1,">%d",(char)((char*)res->data[0][0].data)[i]);
+				}
+				}
+				appendBinaryStringInfo(rawString, res->data[0][0].data, res->data[0][0].length);
+				elog(DEBUG1,"%d", rawString -> len);
+				rawDatum = PointerGetDatum(rawString);
+				elog(DEBUG1, "trace point 3");
+				ret = OidFunctionCall1(type -> typreceive, rawDatum);
+				//ret = rawDatum;
+				elog(DEBUG1, "trace point 4");
+				ReleaseSysCache(typetup);
+				elog(DEBUG1, "trace point 5");
 				
-			} //else if
+				return ret;
+
+			} else if (res->rows == 0) {
+				PG_RETURN_VOID();
+			}
 			
 			//continue here!!
+			
 			
 			PG_RETURN_NULL();
 			//break;
@@ -179,14 +228,12 @@ void plpgj_log_do(log_message log){
 			level = DEBUG5;
 			break;
 		case 2:
-			level = WARNING;
-			break;
-		case 3:
 			level = INFO;
 			break;
-		case 5: level = INFO;
+		default:
+			level = WARNING;
 	}
 
-	elog(level,"");
+	elog(level,"[%s] -  %s ", log -> category, log -> category);
 
 }
