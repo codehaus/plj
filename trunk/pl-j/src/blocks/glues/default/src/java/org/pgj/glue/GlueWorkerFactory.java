@@ -9,12 +9,10 @@ import org.apache.avalon.framework.logger.Logger;
  *
  * Factory for GLUE workers. This class is for adopting factoring to excalibur pool.
  */
-class GlueWorkerFactory implements ObjectFactory, LogEnabled {
+class GlueWorkerFactory implements ObjectFactory {
 
-	Logger logger = null;
-
-	public GlueWorkerFactory() {
-	}
+	private Logger logger = null;
+	private GlueConfiguration gConf = null;
 
 	/**
 	 * @see ObjectFactory#decommission(Object)
@@ -33,15 +31,18 @@ class GlueWorkerFactory implements ObjectFactory, LogEnabled {
 	 * @see ObjectFactory#newInstance()
 	 */
 	public Object newInstance() throws Exception {
+		
 		GlueWorker gw = new GlueWorker();
 		gw.enableLogging(logger);
+		gw.setGConf(gConf);
 		return gw;
 	}
 
-	/**
-	 * @see LogEnabled#enableLogging(Logger)
-	 */
-	public void enableLogging(Logger arg0) {
-		logger = arg0;
+	public void setGConf(GlueConfiguration conf) {
+		gConf = conf;
+	}
+
+	public void setLogger(Logger logger) {
+		this.logger = logger;
 	}
 }
