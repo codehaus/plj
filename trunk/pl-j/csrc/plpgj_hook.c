@@ -57,7 +57,7 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 	
 	do{
 		void* ansver = NULL;
-		elog(DEBUG1, "waiting for ansver");
+		elog(DEBUG1, "waiting for a message");
 		ansver = plpgj_channel_receive();
 		message_type = plpgj_message_type(ansver);
 		switch(message_type){
@@ -113,8 +113,6 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 
 				typeName = makeTypeName(res -> types[0]);
 				elog(DEBUG1,"tp 0.1 %s",res -> types[0]);
-				if(typeName == NULL)
-					elog(DEBUG1,"egyebkent null");
 				typeOid = typenameTypeId(typeName);
 				elog(DEBUG1,"tp 0.2");
 				typetup = SearchSysCache(TYPEOID, typeOid, 0, 0, 0);
@@ -234,6 +232,6 @@ void plpgj_log_do(log_message log){
 			level = WARNING;
 	}
 
-	elog(level,"[%s] -  %s ", log -> category, log -> category);
+	elog(level,"[%s] -  %s ", log -> category, log -> message);
 
 }

@@ -128,7 +128,7 @@
 		name="classloader"
 		class="org.pgj.jexec.FSClassLoader">
 		<configuration>
-			<root>/tmp/</root>
+			<root>/tmp/plj-tests/</root>
 		</configuration>
 		<categories priority="DEBUG">
 			<category name="/classloader"/>
