@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Introduction</title>
+		<author email="kocka at forgeahead.hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+		<p>PL/J is a system to run stored procedures and user defined functions (UDF) in
+		a relational database management system (RDBMS).
+		</p>
+		<p>A less specific declaration: PL/J is a java stored sprocedure system for 
+		PostgreSQL, that runs java in a separate process.</p>
+	</body>
+</document>
+
