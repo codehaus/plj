@@ -13,22 +13,21 @@ package org.pgj;
 public class CommunicationException extends Exception {
 
 	/**
-	 * 
+	 * @see Exception#Exception()
 	 */
 	public CommunicationException() {
 		super();
 	}
 
 	/**
-	 * @param message
+     * @see Exception#Exception(String)
 	 */
 	public CommunicationException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param message
-	 * @param cause
+     * @see Exception#Exception(String, Throwable)
 	 */
 	public CommunicationException(String message, Throwable cause) {
 		super(message);
@@ -36,11 +35,10 @@ public class CommunicationException extends Exception {
 	}
 
 	/**
-	 * @param cause
+     * @see Exception#Exception(Throwable)
 	 */
 	public CommunicationException(Throwable cause) {
 		super(cause.getMessage());
-		// TODO Auto-generated constructor stub
 	}
 
 }
