@@ -120,9 +120,7 @@ as '
 ' language 'plj';
 
 
-
-
--- JDBC tests
+-- trigger tests
 
 create table plj_testtable(
 	id	int primary key,
@@ -141,6 +139,8 @@ create trigger plpgj_test_lametrigger1 before insert on plj_testtable
 	for each row
 	execute procedure plpgj_test_lametrigger1fn();
 
+-- JDBC tests
+
 create or replace function plpgj_test_jdbctest1()
 returns varchar
 as '
@@ -149,3 +149,28 @@ as '
         oneway=false
         instantiation=session
 ' language 'plj';
+
+-- int4 tests
+
+create function plpgj_test_int4_add(int4, int4)
+returns int4 as
+'
+	class=org.deadcat.typetests.SmallIntTests
+	method=add
+' language 'plj';
+
+create function plpgj_test_int4_sub(int4, int4)
+returns int4 as
+'
+	class=org.deadcat.typetests.SmallIntTests
+	method=sub
+' language 'plj';
+
+create function plpgj_test_int4_mul(int4, int4)
+returns int4 as
+'
+	class=org.deadcat.typetests.SmallIntTests
+	method=sub
+' language 'plj';
+
+
