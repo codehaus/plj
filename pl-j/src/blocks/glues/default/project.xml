@@ -4,7 +4,7 @@
   <artifactId>pl-j-glue</artifactId>
   <name>pl-j-glue</name>
   <groupId>pl-j</groupId>
-  <currentVersion>0.1.0</currentVersion>
+  <currentVersion>0.1.1</currentVersion>
   <inceptionYear>2003</inceptionYear>
   <description>The glue. It is the heart of the system, it forwards messages between executors and channels, handles errors.</description>
   <shortDescription>The GLUE component.</shortDescription>
@@ -42,13 +42,13 @@
     <dependency>
       <groupId>pl-j</groupId>
       <artifactId>pl-j-api</artifactId>
-      <version>0.1.0</version>
+      <version>${pom.currentVersion}</version>
       <type>jar</type>
     </dependency>
     <dependency>
       <groupId>pl-j</groupId>
       <artifactId>pl-j-tools</artifactId>
-      <version>0.1.0</version>
+      <version>${pom.currentVersion}</version>
       <type>jar</type>
     </dependency>
     <dependency>

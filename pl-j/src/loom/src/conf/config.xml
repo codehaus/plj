@@ -78,7 +78,7 @@
 					defaultFetchSize tells the fetchsize of the resultsets of 
 					the scratch driver.
 					-->
-				<defaultFetchSize>10</defaultFetchSize>
+				<defaultFetchSize>1024</defaultFetchSize>
 				<!--
 					if false setFetchSize will have no effect and the default fetch size
 					will be applied.
