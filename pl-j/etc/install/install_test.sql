@@ -170,7 +170,7 @@ create function plpgj_test_int4_mul(int4, int4)
 returns int4 as
 '
 	class=org.deadcat.typetests.SmallIntTests
-	method=sub
+	method=mul
 ' language 'plj';
 
 
