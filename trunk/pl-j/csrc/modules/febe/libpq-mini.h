@@ -6,29 +6,33 @@
  * author:			Laszlo Hornyak
  */
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
 struct pg_conn_min
 {
 	char	*pghost;
 	char	*pghostaddr;
-	char	*pgport;
+	int	pgport;
 	char	*pgunixsocket;
 	char	*pgtty;
 	char	*connect_timeout;
-	/** Connection data */
+	// Connection data
 	int	sock;
-	SockAddr	laddr;	/** Local address */
-	SockAddr	raddr;  /** Remote address */
+	struct sockaddr*	laddr;	/** Local address */
+	struct sockaddr*	raddr;  /** Remote address */
 	int	db_encoding;	/** The encoding of the DB (orig.: client_encoding)*/
 	/** Buffer */
 	char	*inBuffer;
 	int	inBuffSize;
 	int	inCursor;
+	int	inStart;
 	int	inEnd;
 	
 	char	*outBuffer;
 	int	outBuffSize;
 	int	outCount;
-}
+};
 
 typedef struct pg_conn_min PGconn_min;
 
