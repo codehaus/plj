@@ -70,6 +70,16 @@ public class PGVarchar extends AbstractPGField {
 	 * @see AbstractPGField#backMap(Object)
 	 */
 	protected void backMap(Object obj) throws MappingException {
+		if(obj == null)
+		{
+			setNull(true);
+			return;
+		}
+		String tmp = obj.toString();
+		byte t[] = tmp.getBytes();
+		raw = new byte[t.length + 4];
+		raw[0] = 0;raw[1] = 0;raw[2] = 0;raw[3] = 0;
+		System.arraycopy(t, 0, raw, 4, t.length);
 	}
 
 	/**
