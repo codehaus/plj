@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/interfaces"/>
+	<classpathentry kind="src" path="src/tools/src/java"/>
 	<classpathentry kind="src" path="src/blocks/typemappers/postgres/src/java"/>
 	<classpathentry kind="src" path="src/blocks/glues/default/src/java"/>
 	<classpathentry kind="src" path="src/blocks/executors/java_executor/src/java"/>
 	<classpathentry kind="src" path="src/tests"/>
-	<classpathentry kind="src" path="src/tools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src/jdbc"/>
 	<classpathentry kind="src" path="src/blocks/chanells/febe/src/java"/>
