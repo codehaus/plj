@@ -129,7 +129,7 @@
 
 	<component
 		name="classloader"
-		class="org.pgj.jexec.FSClassLoader">
+		class="org.pgj.tools.classloaders.impl.FSClassLoader">
 		<configuration>
 			<root>/tmp/plj-tests/</root>
 		</configuration>
@@ -173,7 +173,7 @@
 			<category name="/tuplemapper"/>
 		</categories>
 		<configuration>
-			<relation name="plj_test" class="org.deadcat_enterprises.TestTableRecord"/>
+			<!-- relation name="plj_test" class="org.deadcat_enterprises.TestTableRecord"/ -->
 		</configuration>
 	</component>
 

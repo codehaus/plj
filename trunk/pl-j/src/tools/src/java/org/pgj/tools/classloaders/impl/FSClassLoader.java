@@ -31,7 +31,7 @@ import org.pgj.tools.classloaders.PLJClassLoader;
  * @since 0.1
  * 
  * @avalon.component name="fsclassloader" lifestyle="singleton"
- * @avalon.service type="org.pgj.classloaders.pgjClassLoader"
+ * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
  */
 public class FSClassLoader extends SecureClassLoader
 		implements

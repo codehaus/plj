@@ -166,7 +166,7 @@ public class JavaExecutor extends ClassLoader
 
 	/**
 	 * @see Serviceable#service(ServiceManager)
-	 * @avalon.dependency key="classloader" type="org.pgj.classloaders.pgjClassLoader"
+	 * @avalon.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
 	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 * @avalon.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper" optional="true"
 	 */
