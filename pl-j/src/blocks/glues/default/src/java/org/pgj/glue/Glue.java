@@ -73,7 +73,9 @@ public class Glue
 			gb.setThreadPool(threadPool);
 			gb.setWorkerPool(workerPool);
 			gb.setExecutor(executor);
+			
 			threadPool.execute(gb);
+
 			logger.debug("started");
 		} catch (Throwable t) {
 			logger.fatalError("glue threads cannot start", t);
