@@ -6,7 +6,7 @@
 void** plantable;
 int plantable_size = -1;
 
-#define DEFAULT_PLANTABLE_SIZE			8
+#define DEFAULT_PLANTABLE_SIZE			512
 
 int
 store_plantable(void* plan) {
@@ -21,14 +21,26 @@ store_plantable(void* plan) {
 		}
 	}
 
-	new_plantable = SPI_palloc(plantable_size + 1);
+	new_plantable = SPI_palloc(plantable_size + 16);
 	for(i = 0; i <  plantable_size; i++){
 		new_plantable[i] = plantable[i];
 	}
-	
-	plantable_size += 10;
-	plantable[i] = plan;
-	return i;
+
+	new_plantable[plantable_size] = plan;
+	plantable_size += 16;
+	SPI_pfree(plantable);
+	plantable = new_plantable;
+
+	return i+1;
+}
+
+int     remove_plantable_entry(unsigned int index){
+	if(plantable == NULL)
+		return -1;
+	if(plantable_size <= index)
+		return -1;
+	plantable[index] = NULL;
+	return index;
 }
 
 void
