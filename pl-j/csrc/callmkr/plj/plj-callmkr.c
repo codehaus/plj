@@ -19,10 +19,16 @@
 #include "fmgr.h"
 #include "executor/spi.h"
 #include "regex.h"
+#include "pg_config.h"
 
 #ifndef MAX_NO_OPTS
 #define MAX_NO_OPTS		10
 #warning MAX_NO_OPTS not defined, using default 10
+#endif
+
+#ifndef POSTGRES_VERSION
+#warning POSTGRES_VERSION is the default 74
+#define POSTGRES_VERSION 74
 #endif
 
 const char* __func_opt_regexp = "\\(\\w*\\)=\\(.*\\)$";
@@ -64,8 +70,30 @@ void plpgj_fill_callstruct(
 	regmatch_t matches[MAX_NO_OPTS];
 
 	plpgj_create_call_regex_init();
+	
+	#if POSTGRES_VERSION == 74
 
 	func_src = DatumGetCString( DirectFunctionCall1(textout, PointerGetDatum( &procStruct->prosrc ) ) );
+	
+	#elif POSTGRES_VERSION == 75
+
+	func_src = DatumGetCString( DirectFunctionCall1(textout, 
+		SysCacheGetAttr(
+			PROCOID,
+			proctup,
+			Anum_pg_proc_prosrc,
+			&isnull
+			)
+			)
+		);
+
+
+	#else
+	
+	#error UNSUPPORTED PG VERSION, MUST BE 7.4 OR 7.5DEV
+	
+	#endif
+	
 	elog(DEBUG1,func_src);
 	func_src_len = strlen(func_src);
 
@@ -311,8 +339,23 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	proctup = SearchSysCache(PROCOID, ObjectIdGetDatum(funcoid), 0,0,0 );
 	procstruct = (Form_pg_proc) GETSTRUCT(proctup);
 	ReleaseSysCache(proctup);
+
+	#if POSTGRES_VERSION == 74
+
 	func_src = DatumGetCString( DirectFunctionCall1(textout, PointerGetDatum( &procstruct->prosrc ) ) );
 	
+	#elif POSTGRES_VERSION == 75
+
+		func_src = DatumGetCString(
+			DirectFunctionCall1(textout, SysCacheGetAttr(PROCOID, proctup, Anum_pg_proc_prosrc, &isnull) )
+			);
+
+	#else
+
+	#error NOT SUPPORTED POSTGRESQL VERSION (but i guess i told about it)
+
+	#endif
+
 	func_src_len = strlen(func_src);
 	
 	plpgj_fill_callstruct(procstruct, ret -> classname, ret -> methodname);
