@@ -10,8 +10,9 @@
 			<p>
 				You can find documentation at the following URLs:
 				<ul>
+					
 					<li><a href="http://docs.codehaus.org/pages/listpages.action?key=PLJ">Online documentation</a></li>
-					<li><a href="http://ashkelon.forgeahead.hu/">Generated javadocs</a></li>
+					<li><a href="http://ashkelon.forgeahead.hu/">Generated javadocs (ashkelon)</a></li>
 				</ul>
 			</p>
 		</section>

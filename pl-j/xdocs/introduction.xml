@@ -86,6 +86,12 @@
 				we have a JDBC implementation.
 				</p>
 			</subsection>
+			<subsection name="BSF - Script executor">
+				<p>
+				PL-J contains a experimental executor component based on the Bean Scripting
+				Framework, which is the defacto standard interface of the 
+				</p>
+			</subsection>
 		</section>
 
 	</body>
