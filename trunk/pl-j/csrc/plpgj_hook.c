@@ -38,9 +38,11 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 	callreq req;
 	int message_type;
 	
-	if(!plpgj_channel_initialized())
+	if(!plpgj_channel_initialized()){
+			elog(DEBUG1, "initing channel");
 			plpgj_channel_initialize();
-	
+	}
+
 	elog(DEBUG1, "entering hook");
 	
 		
