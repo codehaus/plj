@@ -24,4 +24,6 @@ public interface DbPlatform {
 			String comment, String udfName, String returns, List params);
 
 	String getDefaultRDBMSType(String fqn);
+	
+	String getName();
 }

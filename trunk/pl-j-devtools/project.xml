@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <pomVersion>1</pomVersion>
-  <artifactId>null</artifactId>
+  <artifactId>pl-j-devtools</artifactId>
+  <!--name>pl-j-devtools</name -->
   <name>pl-j-devtools</name>
-  <groupId>null</groupId>
+  <currentVersion>0.1</currentVersion>
+  <groupId>pl-j</groupId>
   <organization>
     <name>The PL-J team</name>
     <url>http://plj.codehaus.org/</url>
@@ -35,9 +37,14 @@
       <artifactId>qdox</artifactId>
       <version>1.5</version>
       <type>jar</type>
+      <properties>
+        <jar.bundle>true</jar.bundle>
+      </properties>
     </dependency>
   </dependencies>
-  <build />
+  <build>
+    <sourceDirectory>main/src/java</sourceDirectory>
+  </build>
   <reports>
     <report>maven-jira-plugin</report>
   </reports>

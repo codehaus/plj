@@ -4,8 +4,10 @@
 
 package org.plj.devtools.base;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,7 +15,13 @@ import java.util.Set;
  * 
  * @author Laszlo Hornyak
  */
-public class PostgreSQLPLJ extends GenericDbPlatform {
+public class PostgreSQLPLJ extends AbstractPostgreSQLPlatform {
+
+	public static final Map pgTypeMap = new HashMap();
+	
+	public String getDefaultRDBMSType(String fqn) {
+		return super.getDefaultRDBMSType(fqn);
+	}
 
 	public String createUdf(String clazz, String method, Set properties,
 			String comment, String udfName, String returns, List params) {
@@ -58,27 +66,11 @@ public class PostgreSQLPLJ extends GenericDbPlatform {
 		return buf.toString();
 	}
 
-	public String deployJar(String jar, String jarname) {
-		StringBuffer buf = new StringBuffer("SELECT sqlj.deploy_jar(\'");
-		buf.append(jarname);
-		buf.append("\');\n\n");
-		return buf.toString();
-	}
-
-	public String undeployJar(String jarname) {
-		StringBuffer buf = new StringBuffer("SELECT sqlj.remove_jar(\'");
-		buf.append(jarname);
-		buf.append("\');\n\n");
-		return buf.toString();
-	}
-
 	/* (non-Javadoc)
-	 * @see org.plj.devtools.base.DbPlatform#comment(java.lang.String)
+	 * @see org.plj.devtools.base.DbPlatform#getName()
 	 */
-	public String comment(String comment) {
-		if(comment != null)
-			return "--" + comment.replaceAll("\n", "\n--") + "\n\n";
-		return "-- not documented\n\n";
+	public String getName() {
+		return "PostgreSQL 8.0 PL-J";
 	}
 
 }
