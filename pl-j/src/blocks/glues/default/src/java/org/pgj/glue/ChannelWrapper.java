@@ -17,6 +17,7 @@ import org.pgj.messages.Message;
 import org.pgj.messages.TXOperation;
 import org.pgj.messages.TriggerCallRequest;
 import org.pgj.tools.transactions.JTAAdapter;
+import org.pgj.typemapping.MappingException;
 
 /**
  * Wraps Channel to add some additional logic.
@@ -81,7 +82,7 @@ public class ChannelWrapper implements Channel {
 	 * 
 	 */
 	public Message receiveFromRDBMS(Client client)
-			throws CommunicationException {
+			throws CommunicationException, MappingException {
 
 		/*
 		 * Why this evil endless loop instead of an elegant recursion? This
@@ -130,7 +131,7 @@ public class ChannelWrapper implements Channel {
 	 * 
 	 * @see org.pgj.Channel#sendToRDBMS(org.pgj.messages.Message)
 	 */
-	public void sendToRDBMS(Message msg) throws CommunicationException {
+	public void sendToRDBMS(Message msg) throws CommunicationException, MappingException {
 		msg.setClient(clientWrapper.getRealClient());
 		realChannel.sendToRDBMS(msg);
 	}
