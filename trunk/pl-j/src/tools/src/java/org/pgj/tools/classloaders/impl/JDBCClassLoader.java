@@ -1,7 +1,6 @@
 
 package org.pgj.tools.classloaders.impl;
 
-import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.apache.avalon.framework.activity.Initializable;
-import org.apache.avalon.framework.activity.Startable;
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
@@ -49,6 +47,13 @@ public class JDBCClassLoader extends ClassLoader
 	 * @see PLJClassLoader#load(String)
 	 */
 	public Class load(String fqn) throws ClassNotFoundException {
+
+		try {
+			return this.getClass().getClassLoader().loadClass(fqn);
+		} catch (ClassNotFoundException clne) {
+			logger.debug("ok, trying from repo:" + fqn);
+		}
+
 		ResultSet res = null;
 		Connection conn = null;
 		PreparedStatement sta = null;
@@ -82,36 +87,6 @@ public class JDBCClassLoader extends ClassLoader
 					res.close();
 			} catch (SQLException sqle) {
 				logger.error("Error closing result set.", sqle);
-			}
-		}
-	}
-
-	/**
-	 * @see PLJClassLoader#store(String, byte[])
-	 */
-	public void store(String name, byte[] raw) {
-		Connection conn = null;
-		PreparedStatement sta = null;
-		try {
-			conn = getConnection();
-			sta = conn.prepareStatement(configStore);
-			sta.setString(1, name);
-			sta.setBytes(2, raw);
-			sta.execute();
-		} catch (SQLException e) {
-			logger.fatalError("", e);
-		} finally {
-			try {
-				if (sta != null)
-					sta.close();
-			} catch (SQLException e1) {
-				logger.error("", e1);
-			}
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e1) {
-				logger.error("", e1);
 			}
 		}
 	}
@@ -162,7 +137,6 @@ public class JDBCClassLoader extends ClassLoader
 	 */
 	public void initialize() throws Exception {
 		//load driver class
-		Class.forName(configDriver);
 	}
 
 	/**
@@ -247,6 +221,11 @@ public class JDBCClassLoader extends ClassLoader
 	 * @throws SQLException
 	 */
 	protected Connection getConnection() throws SQLException {
+		try {
+			Class.forName(configDriver);
+		} catch (ClassNotFoundException e) {
+			logger.warn("configured JDBC driver not found", e);
+		}
 		return DriverManager.getConnection(configUrl, configUser, configPwd);
 	}
 
@@ -262,9 +241,9 @@ public class JDBCClassLoader extends ClassLoader
 			sta.setBytes(1, raw);
 			sta.setString(2, name);
 			if (jar == null) {
-				sta.setString(3, jar);
-			} else {
 				sta.setNull(3, Types.VARCHAR);
+			} else {
+				sta.setString(3, jar);
 			}
 			sta.execute();
 		} catch (SQLException e) {
