@@ -1,8 +1,8 @@
+
 package org.pgj.jexec;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Vector;
 
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
@@ -23,6 +23,7 @@ import org.pgj.messages.TriggerCallRequest;
 import org.pgj.messages.TupleResult;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.jdbc.JDBCConfigurator;
+import org.pgj.tools.methodfinder.MethodFinder;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.tools.utils.ClientUtils;
 import org.pgj.typemapping.Tuple;
@@ -37,8 +38,13 @@ import org.pgj.typemapping.TypeMapper;
  * @avalon.service type="org.pgj.Executor"
  * @avalon.service type="org.pgj.TriggerExecutor"
  */
-public class JavaExecutor extends ClassLoader implements Executor,
-		TriggerExecutor, Configurable, Serviceable, LogEnabled {
+public class JavaExecutor extends ClassLoader
+		implements
+			Executor,
+			TriggerExecutor,
+			Configurable,
+			Serviceable,
+			LogEnabled {
 
 	/** avalon logger object */
 	private Logger logger = null;
@@ -50,6 +56,8 @@ public class JavaExecutor extends ClassLoader implements Executor,
 	private TypeMapper typemapper = null;
 
 	private TupleMapper tupleMapper = null;
+	
+	private MethodFinder methodFinder = null;
 
 	public static final String FN_UTILITIES_CLASS = "org.pgj.jexec.Utils";
 
@@ -70,29 +78,12 @@ public class JavaExecutor extends ClassLoader implements Executor,
 		try {
 			Class callclass = classloader.load(c.getClassname());
 
-			Vector paramvector = c.getParams();
-			org.pgj.typemapping.Field[] params = new org.pgj.typemapping.Field[paramvector
-					.size()];
-
-			Class[] paramclasses = new Class[params.length];
-
-			for (int i = 0; i < params.length; i++) {
-				params[i] = (org.pgj.typemapping.Field) paramvector.get(i);
-				paramclasses[i] = params[i].getPreferredClass();
-			}
-
-			Method callm = null;
-
-			callm = callclass.getMethod(c.getMethodname(), paramclasses);
-			Object[] paramobjs = new Object[params.length];
-			Object callobj = callclass.newInstance();
-
-			for (int i = 0; i < params.length; i++) {
-				paramobjs[i] = params[i].defaultGet();
-			}
+			Method callm = methodFinder.findMethod(c, callclass);
+			Object[] paramobjs = methodFinder.createParameters(c, callm);
 			Thread.currentThread().setContextClassLoader(
 					new PGJClassLoaderAdapter(this.classloader));
-			obj = callm.invoke(callobj, paramobjs);
+			obj = callm.invoke(null, paramobjs);
+
 			Thread.currentThread().setContextClassLoader(null);
 			logger.debug("<----creating result");
 			Result ret = typemapper.createResult(obj);
@@ -150,10 +141,13 @@ public class JavaExecutor extends ClassLoader implements Executor,
 	 *                    optional="true"
 	 * @avalon.dependency key="jdbc-configurator"
 	 *                    type="org.pgj.tools.jdbc.JDBCConfigurator"
+	 * @avalon.dependency key="method-finder"
+	 *                    type="org.pgj.tools.methodfinder.MethodFinder"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classloader = (PLJClassLoader) arg0.lookup("classloader");
 		typemapper = (TypeMapper) arg0.lookup("type-mapper");
+		methodFinder = (MethodFinder)arg0.lookup("method-finder");
 		try {
 			tupleMapper = (TupleMapper) arg0.lookup("tuple-mapper");
 		} catch (ServiceException e) {
@@ -172,58 +166,11 @@ public class JavaExecutor extends ClassLoader implements Executor,
 		try {
 			logger.debug("executing trigger --> ");
 
-			Tuple tpl = trigger.getReason() == TriggerCallRequest.TRIGGER_REASON_DELETE ? trigger
-					.getOld()
-					: trigger.getNew();
-			Class pcl = tupleMapper.getMappedClass(tpl);
-			logger.debug("class" + pcl);
-			Class[] paramClasses = null;
-
-			if (trigger.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW) {
-				switch (trigger.getReason()) {
-				case TriggerCallRequest.TRIGGER_REASON_UPDATE:
-					paramClasses = new Class[2];
-					paramClasses[0] = pcl;
-					paramClasses[1] = pcl;
-					break;
-				case TriggerCallRequest.TRIGGER_REASON_DELETE:
-				case TriggerCallRequest.TRIGGER_REASON_INSERT:
-					paramClasses = new Class[1];
-					paramClasses[0] = pcl;
-					break;
-				}
-			} else {
-				logger.debug("statement trigger");
-				paramClasses = new Class[0];
-			}
-
 			Class triggerClass = classloader.load(trigger.getClassname());
-			Method triggerMethod = triggerClass.getDeclaredMethod(trigger
-					.getMethodname(), paramClasses);
-			Object triggerObj = triggerClass.newInstance();
-			Object[] paramObjects = null;
+			Method triggerMethod = methodFinder.findMethod(trigger, triggerClass);
+			Object[] paramObjects = methodFinder.createParameters(trigger, triggerMethod);
 
-			if (trigger.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW) {
-				switch (trigger.getReason()) {
-				case TriggerCallRequest.TRIGGER_REASON_UPDATE:
-					paramObjects = new Object[2];
-					paramObjects[0] = tupleMapper.mapTuple(trigger.getNew());
-					paramObjects[1] = tupleMapper.mapTuple(trigger.getOld());
-					break;
-				case TriggerCallRequest.TRIGGER_REASON_DELETE:
-					paramObjects = new Object[1];
-					paramObjects[0] = tupleMapper.mapTuple(trigger.getOld());
-					break;
-				case TriggerCallRequest.TRIGGER_REASON_INSERT:
-					paramObjects = new Object[1];
-					paramObjects[0] = tupleMapper.mapTuple(trigger.getNew());
-					break;
-				}
-			} else {
-				paramObjects = new Object[0];
-			}
-
-			Object retObj = triggerMethod.invoke(triggerObj, paramObjects);
+			Object retObj = triggerMethod.invoke(null, paramObjects);
 			Tuple t = tupleMapper.backMap(retObj, typemapper);
 
 			TupleResult res = new TupleResult();
