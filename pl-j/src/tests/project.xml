@@ -3,7 +3,7 @@
     <artifactId>pl-j-tests</artifactId>
     <name>pl-j-tests</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.5</currentVersion>
+    <currentVersion>0.0.6</currentVersion>
     <inceptionYear>2004</inceptionYear>
     <logo>/images/logo.gif</logo>
     <shortDescription>Test stored procedure set for PL-J</shortDescription>

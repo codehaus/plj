@@ -3,7 +3,7 @@
     <artifactId>pl-j-api</artifactId>
     <name>pl-j</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.5</currentVersion>
+    <currentVersion>0.0.6</currentVersion>
     <organization>
         <name>The pl-j developer group</name>
         <url>http://plj.codehaus.org</url>

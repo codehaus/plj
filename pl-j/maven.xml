@@ -57,7 +57,6 @@
 		<copy todir="${maven.build.dir}/loomlibs">
 			<fileset dir="${maven.repo.local}" includesfile="loomincludes.properties"/>
 		</copy>
-		<echo message="${maven.loom.lib.include}, ${maven.repo.local}"/>
 	</preGoal>
 
 	<goal name="dbunit-tests">
