@@ -4,6 +4,7 @@
     <artifactId>pl-j-jdbc</artifactId>
     <name>pl-j-jdbc</name>
     <groupId>pl-j</groupId>
+    <currentVersion>0.0.5</currentVersion>
     <inceptionYear>2004</inceptionYear>
     <description>JDBC code</description>
     <dependencies>
@@ -17,14 +18,14 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5</version>
             <type>jar</type>
             <properties/>
         </dependency>
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-tools</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5</version>
             <type>jar</type>
             <properties/>
         </dependency>
