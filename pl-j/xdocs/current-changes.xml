@@ -5,8 +5,8 @@
 		<author email="kocka at forgeahead.hu">Laszlo Hornyak</author>
 	</properties>
 	<body>
+		<section name="Current changes in PL-J">
 		<p>
-		Current changes in PL-J
 		<ul>
 			<li>
 				The bad old native CORBA implementation is replaced with a protocol based on PostgreSQL`s
@@ -23,6 +23,7 @@
 			</li>
 		</ul>
 		</p>
+		</section>
 	</body>
 </document>
 
