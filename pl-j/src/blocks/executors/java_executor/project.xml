@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
   <id>pl-j-javaexecutor</id>
   <name>pl-j-javaexecutor</name>
-  <currentVersion>0.0.2</currentVersion>
+  <currentVersion>0.0.3</currentVersion>
 
   <!-- extend>${basedir}/../../../../project.xml</extend -->
 
@@ -32,14 +32,14 @@
 			<id>pl-j</id>
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 		<dependency>
 			<id>pl-j</id>
 			<type>jar</type>
 			<artifactId>pl-j-tools</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 	</dependencies>

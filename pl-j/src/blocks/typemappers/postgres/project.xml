@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
   <id>pl-j-postgres</id>
   <name>pl-j-postgres</name>
-  <currentVersion>0.0.2</currentVersion>
+  <currentVersion>0.0.3</currentVersion>
   
   <extends>../../project.xml</extends>
 
@@ -39,7 +39,7 @@
 			<id>pl-j</id>
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 	</dependencies>

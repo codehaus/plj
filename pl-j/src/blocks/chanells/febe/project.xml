@@ -5,7 +5,7 @@
   <groupId>pl-j</groupId>
   <artifactId>pl-j-febe</artifactId>
   <name>pl-j-febe</name>
-  <currentVersion>0.0.2</currentVersion>
+  <currentVersion>0.0.3</currentVersion>
 
   <!-- extend>${basedir}/../../../../project.xml</extend -->
 
@@ -50,7 +50,7 @@
 			<groupId>pl-j</groupId>
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 	</dependencies>
