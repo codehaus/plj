@@ -11,7 +11,7 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/largeobject/LargeObjectManager.java,v 1.1 2004-06-12 17:33:11 kocka Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/largeobject/LargeObjectManager.java,v 1.2 2004-07-06 18:22:22 kocka Exp $
  *
  *-------------------------------------------------------------------------
  */
@@ -23,8 +23,6 @@ import java.sql.SQLException;
 
 import org.pgj.jdbc.postgresql.Driver;
 import org.pgj.jdbc.postgresql.core.BaseConnection;
-import org.pgj.jdbc.postgresql.fastpath.Fastpath;
-import org.pgj.jdbc.postgresql.fastpath.FastpathArg;
 import org.pgj.jdbc.postgresql.util.PSQLException;
 
 /*
@@ -70,7 +68,7 @@ import org.pgj.jdbc.postgresql.util.PSQLException;
 public class LargeObjectManager
 {
 	// the fastpath api for this connection
-	private Fastpath fp;
+//	private Fastpath fp;
 
 	/*
 	 * This mode indicates we want to write to an object
@@ -107,7 +105,7 @@ public class LargeObjectManager
 	public LargeObjectManager(BaseConnection conn) throws SQLException
 	{
 		// We need Fastpath to do anything
-		this.fp = conn.getFastpathAPI();
+//		this.fp = conn.getFastpathAPI();
 
 		// Now get the function oid's for the api
 		//
@@ -135,7 +133,7 @@ public class LargeObjectManager
 		if (res == null)
 			throw new PSQLException("postgresql.lo.init");
 
-		fp.addFunctions(res);
+//		fp.addFunctions(res);
 		res.close();
 		if (Driver.logDebug)
 			Driver.debug("Large Object initialised");
@@ -151,7 +149,8 @@ public class LargeObjectManager
 	 */
 	public LargeObject open(int oid) throws SQLException
 	{
-		return new LargeObject(fp, oid, READWRITE);
+//		return new LargeObject(fp, oid, READWRITE);
+		return null;
 	}
 
 	/*
@@ -164,7 +163,8 @@ public class LargeObjectManager
 	 */
 	public LargeObject open(int oid, int mode) throws SQLException
 	{
-		return new LargeObject(fp, oid, mode);
+//		return new LargeObject(fp, oid, mode);
+		return null;
 	}
 
 	/*
@@ -177,9 +177,10 @@ public class LargeObjectManager
 	 */
 	public int create() throws SQLException
 	{
-		FastpathArg args[] = new FastpathArg[1];
-		args[0] = new FastpathArg(READWRITE);
-		return fp.getInteger("lo_creat", args);
+//		FastpathArg args[] = new FastpathArg[1];
+//		args[0] = new FastpathArg(READWRITE);
+//		return fp.getInteger("lo_creat", args);
+		return 0;
 	}
 
 	/*
@@ -191,9 +192,10 @@ public class LargeObjectManager
 	 */
 	public int create(int mode) throws SQLException
 	{
-		FastpathArg args[] = new FastpathArg[1];
-		args[0] = new FastpathArg(mode);
-		return fp.getInteger("lo_creat", args);
+//		FastpathArg args[] = new FastpathArg[1];
+//		args[0] = new FastpathArg(mode);
+//		return fp.getInteger("lo_creat", args);
+		return 0;
 	}
 
 	/*
@@ -204,9 +206,9 @@ public class LargeObjectManager
 	 */
 	public void delete(int oid) throws SQLException
 	{
-		FastpathArg args[] = new FastpathArg[1];
-		args[0] = new FastpathArg(oid);
-		fp.fastpath("lo_unlink", false, args);
+//		FastpathArg args[] = new FastpathArg[1];
+//		args[0] = new FastpathArg(oid);
+//		fp.fastpath("lo_unlink", false, args);
 	}
 
 	/*

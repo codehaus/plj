@@ -203,9 +203,9 @@ public class TestUtil
 	 * not an Postgres connection.
 	 */
 	public static boolean haveMinimumServerVersion(Connection con, String version) throws SQLException {
-		if (con instanceof org.pgj.jdbc.postgresql.jdbc1.AbstractJdbc1Connection) {
-			return ((org.pgj.jdbc.postgresql.jdbc1.AbstractJdbc1Connection)con).haveMinimumServerVersion(version);
-		}
+//		if (con instanceof org.pgj.jdbc.postgresql.jdbc1.AbstractJdbc1Connection) {
+//			return ((org.pgj.jdbc.postgresql.jdbc1.AbstractJdbc1Connection)con).haveMinimumServerVersion(version);
+//		}
 		return false;
 	}
 

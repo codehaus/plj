@@ -1,10 +1,6 @@
 package org.pgj.jdbc.postgresql.jdbc1;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -20,14 +16,11 @@ import org.pgj.jdbc.postgresql.core.BaseResultSet;
 import org.pgj.jdbc.postgresql.core.BaseStatement;
 import org.pgj.jdbc.postgresql.core.Field;
 import org.pgj.jdbc.postgresql.core.QueryExecutor;
-import org.pgj.jdbc.postgresql.largeobject.LargeObject;
-import org.pgj.jdbc.postgresql.largeobject.LargeObjectManager;
-import org.pgj.jdbc.postgresql.util.PGbytea;
 import org.pgj.jdbc.postgresql.util.PGobject;
 import org.pgj.jdbc.postgresql.util.PSQLException;
 import org.pgj.jdbc.postgresql.util.PSQLState;
 
-/* $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/jdbc1/AbstractJdbc1Statement.java,v 1.1 2004-06-12 17:33:11 kocka Exp $
+/* $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/jdbc1/AbstractJdbc1Statement.java,v 1.2 2004-07-06 18:22:22 kocka Exp $
  * This class defines methods of the jdbc1 specification.  This class is
  * extended by org.pgj.jdbc.postgresql.jdbc2.AbstractJdbc2Statement which adds the jdbc2
  * methods.  The real Statement class (for jdbc1) is org.pgj.jdbc.postgresql.jdbc1.Jdbc1Statement
@@ -1167,28 +1160,7 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 	 */
 	public void setBytes(int parameterIndex, byte x[]) throws SQLException
 	{
-		if (connection.haveMinimumCompatibleVersion("7.2"))
-		{
-			//Version 7.2 supports the bytea datatype for byte arrays
-			if (null == x)
-			{
-				setNull(parameterIndex, Types.VARBINARY);
-			}
-			else
-			{
-				setString(parameterIndex, PGbytea.toPGString(x), PG_BYTEA);
-			}
-		}
-		else
-		{
-			//Version 7.1 and earlier support done as LargeObjects
-			LargeObjectManager lom = connection.getLargeObjectAPI();
-			int oid = lom.create();
-			LargeObject lob = lom.open(oid);
-			lob.write(x);
-			lob.close();
-			setInt(parameterIndex, oid);
-		}
+		//TODO reimplement me!!
 	}
 
 	/*
@@ -1241,106 +1213,7 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 	 */
 	public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException
 	{
-		if (null == x)
-		{
-			setNull(parameterIndex, Types.TIMESTAMP);
-		}
-		else
-		{
-			// Use the shared StringBuffer
-			synchronized (sbuf)
-			{
-				sbuf.setLength(0);
-				sbuf.ensureCapacity(32);
-				sbuf.append("'");
-				//format the timestamp
-				//we do our own formating so that we can get a format
-				//that works with both timestamp with time zone and
-				//timestamp without time zone datatypes.
-				//The format is '2002-01-01 23:59:59.123456-0130'
-				//we need to include the local time and timezone offset
-				//so that timestamp without time zone works correctly
-				int l_year = x.getYear() + 1900;
-				sbuf.append(l_year);
-				sbuf.append('-');
-				int l_month = x.getMonth() + 1;
-				if (l_month < 10)
-					sbuf.append('0');
-				sbuf.append(l_month);
-				sbuf.append('-');
-				int l_day = x.getDate();
-				if (l_day < 10)
-					sbuf.append('0');
-				sbuf.append(l_day);
-				sbuf.append(' ');
-				int l_hours = x.getHours();
-				if (l_hours < 10)
-					sbuf.append('0');
-				sbuf.append(l_hours);
-				sbuf.append(':');
-				int l_minutes = x.getMinutes();
-				if (l_minutes < 10)
-					sbuf.append('0');
-				sbuf.append(l_minutes);
-				sbuf.append(':');
-				int l_seconds = x.getSeconds();
-				if (l_seconds < 10)
-					sbuf.append('0');
-				sbuf.append(l_seconds);
-				// Make decimal from nanos.
-				char[] l_decimal = {'0', '0', '0', '0', '0', '0', '0', '0', '0'};
-				char[] l_nanos = Integer.toString(x.getNanos()).toCharArray();
-				System.arraycopy(l_nanos, 0, l_decimal, l_decimal.length - l_nanos.length, l_nanos.length);
-				sbuf.append('.');
-				if (connection.haveMinimumServerVersion("7.2"))
-				{
-					sbuf.append(l_decimal, 0, 6);
-				}
-				else
-				{
-					// Because 7.1 include bug that "hh:mm:59.999" becomes "hh:mm:60.00".
-					sbuf.append(l_decimal, 0, 2);
-				}
-				//add timezone offset
-				int l_offset = -(x.getTimezoneOffset());
-				int l_houros = l_offset / 60;
-				if (l_houros >= 0)
-				{
-					sbuf.append('+');
-				}
-				else
-				{
-					sbuf.append('-');
-				}
-				if (l_houros > -10 && l_houros < 10)
-					sbuf.append('0');
-				if (l_houros >= 0)
-				{
-					sbuf.append(l_houros);
-				}
-				else
-				{
-					sbuf.append(-l_houros);
-				}
-				int l_minos = l_offset - (l_houros * 60);
-				if (l_minos != 0)
-				{
-					if (l_minos > -10 && l_minos < 10)
-						sbuf.append('0');
-					if (l_minos >= 0)
-					{
-						sbuf.append(l_minos);
-					}
-					else
-					{
-						sbuf.append(-l_minos);
-					}
-				}
-				sbuf.append("'");
-				bind(parameterIndex, sbuf.toString(), PG_TIMESTAMPTZ);
-			}
-
-		}
+		//TODO reimplement me!!
 	}
 
 	/*
@@ -1361,36 +1234,7 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 	 */
 	public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException
 	{
-		if (connection.haveMinimumCompatibleVersion("7.2"))
-		{
-			//Version 7.2 supports AsciiStream for all PG text types (char, varchar, text)
-			//As the spec/javadoc for this method indicate this is to be used for
-			//large String values (i.e. LONGVARCHAR)  PG doesn't have a separate
-			//long varchar datatype, but with toast all text datatypes are capable of
-			//handling very large values.  Thus the implementation ends up calling
-			//setString() since there is no current way to stream the value to the server
-			try
-			{
-				InputStreamReader l_inStream = new InputStreamReader(x, "ASCII");
-				char[] l_chars = new char[length];
-				int l_charsRead = l_inStream.read(l_chars, 0, length);
-				setString(parameterIndex, new String(l_chars, 0, l_charsRead), PG_TEXT);
-			}
-			catch (UnsupportedEncodingException l_uee)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_uee);
-			}
-			catch (IOException l_ioe)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_ioe);
-			}
-		}
-		else
-		{
-			//Version 7.1 supported only LargeObjects by treating everything
-			//as binary data
-			setBinaryStream(parameterIndex, x, length);
-		}
+		//TODO reimplement me!!
 	}
 
 	/*
@@ -1410,36 +1254,7 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 	 */
 	public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException
 	{
-		if (connection.haveMinimumCompatibleVersion("7.2"))
-		{
-			//Version 7.2 supports AsciiStream for all PG text types (char, varchar, text)
-			//As the spec/javadoc for this method indicate this is to be used for
-			//large String values (i.e. LONGVARCHAR)  PG doesn't have a separate
-			//long varchar datatype, but with toast all text datatypes are capable of
-			//handling very large values.  Thus the implementation ends up calling
-			//setString() since there is no current way to stream the value to the server
-			try
-			{
-				InputStreamReader l_inStream = new InputStreamReader(x, "UTF-8");
-				char[] l_chars = new char[length];
-				int l_charsRead = l_inStream.read(l_chars, 0, length);
-				setString(parameterIndex, new String(l_chars, 0, l_charsRead), PG_TEXT);
-			}
-			catch (UnsupportedEncodingException l_uee)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_uee);
-			}
-			catch (IOException l_ioe)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_ioe);
-			}
-		}
-		else
-		{
-			//Version 7.1 supported only LargeObjects by treating everything
-			//as binary data
-			setBinaryStream(parameterIndex, x, length);
-		}
+		//TODO reimplement me!
 	}
 
 	/*
@@ -1458,67 +1273,7 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 	 */
 	public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException
 	{
-		if (connection.haveMinimumCompatibleVersion("7.2"))
-		{
-			//Version 7.2 supports BinaryStream for for the PG bytea type
-			//As the spec/javadoc for this method indicate this is to be used for
-			//large binary values (i.e. LONGVARBINARY)	PG doesn't have a separate
-			//long binary datatype, but with toast the bytea datatype is capable of
-			//handling very large values.  Thus the implementation ends up calling
-			//setBytes() since there is no current way to stream the value to the server
-			byte[] l_bytes = new byte[length];
-			int l_bytesRead;
-			try
-			{
-				l_bytesRead = x.read(l_bytes, 0, length);
-			}
-			catch (IOException l_ioe)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, l_ioe);
-			}
-			if (l_bytesRead == length)
-			{
-				setBytes(parameterIndex, l_bytes);
-			}
-			else
-			{
-				//the stream contained less data than they said
-				byte[] l_bytes2 = new byte[l_bytesRead];
-				System.arraycopy(l_bytes, 0, l_bytes2, 0, l_bytesRead);
-				setBytes(parameterIndex, l_bytes2);
-			}
-		}
-		else
-		{
-			//Version 7.1 only supported streams for LargeObjects
-			//but the jdbc spec indicates that streams should be
-			//available for LONGVARBINARY instead
-			LargeObjectManager lom = connection.getLargeObjectAPI();
-			int oid = lom.create();
-			LargeObject lob = lom.open(oid);
-			OutputStream los = lob.getOutputStream();
-			try
-			{
-				// could be buffered, but then the OutputStream returned by LargeObject
-				// is buffered internally anyhow, so there would be no performance
-				// boost gained, if anything it would be worse!
-				int c = x.read();
-				int p = 0;
-				while (c > -1 && p < length)
-				{
-					los.write(c);
-					c = x.read();
-					p++;
-				}
-				los.close();
-			}
-			catch (IOException se)
-			{
-				throw new PSQLException("postgresql.unusual", PSQLState.UNEXPECTED_ERROR, se);
-			}
-			// lob is closed by the stream so don't call lob.close()
-			setInt(parameterIndex, oid);
-		}
+		//TODO reimplement me!!
 	}
 
 
@@ -2069,51 +1824,52 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 	 */
 	private String modifyJdbcCall(String p_sql) throws SQLException
 	{
-		//Check that this is actually a call which should start with a {
-        //if not do nothing and treat this as a standard prepared sql
-		if (!p_sql.trim().startsWith("{")) {
-			return p_sql;
-		}
-
-		// syntax checking is not complete only a few basics :(
-		originalSql = p_sql; // save for error msgs..
-		String l_sql = p_sql;
-		int index = l_sql.indexOf ("="); // is implied func or proc?
-		boolean isValid = true;
-		if (index > -1)
-		{
-			isFunction = true;
-			isValid = l_sql.indexOf ("?") < index; // ? before =
-		}
-		l_sql = l_sql.trim ();
-		if (l_sql.startsWith ("{") && l_sql.endsWith ("}"))
-		{
-			l_sql = l_sql.substring (1, l_sql.length() - 1);
-		}
-		else
-			isValid = false;
-		index = l_sql.indexOf ("call");
-		if (index == -1 || !isValid)
-			throw new PSQLException ("postgresql.call.malformed",PSQLState.STATEMENT_NOT_ALLOWED_IN_FUNCTION_CALL,
-									 new Object[]{l_sql, JDBC_SYNTAX});
-		l_sql = l_sql.replace ('{', ' '); // replace these characters
-		l_sql = l_sql.replace ('}', ' ');
-		l_sql = l_sql.replace (';', ' ');
-
-		// this removes the 'call' string and also puts a hidden '?'
-		// at the front of the line for functions, this will
-		// allow the registerOutParameter to work correctly
-		// because in the source sql there was one more ? for the return
-		// value that is not needed by the postgres syntax.  But to make
-		// sure that the parameter numbers are the same as in the original
-		// sql we add a dummy parameter in this case
-		l_sql = (isFunction ? "?" : "") + l_sql.substring (index + 4);
-		if (connection.haveMinimumServerVersion("7.3")) {
-			l_sql = "select * from " + l_sql + " as " + RESULT_ALIAS + ";";
-		} else {
-			l_sql = "select " + l_sql + " as " + RESULT_ALIAS + ";";
-		}
-		return l_sql;
+//		//Check that this is actually a call which should start with a {
+//        //if not do nothing and treat this as a standard prepared sql
+//		if (!p_sql.trim().startsWith("{")) {
+//			return p_sql;
+//		}
+//
+//		// syntax checking is not complete only a few basics :(
+//		originalSql = p_sql; // save for error msgs..
+//		String l_sql = p_sql;
+//		int index = l_sql.indexOf ("="); // is implied func or proc?
+//		boolean isValid = true;
+//		if (index > -1)
+//		{
+//			isFunction = true;
+//			isValid = l_sql.indexOf ("?") < index; // ? before =
+//		}
+//		l_sql = l_sql.trim ();
+//		if (l_sql.startsWith ("{") && l_sql.endsWith ("}"))
+//		{
+//			l_sql = l_sql.substring (1, l_sql.length() - 1);
+//		}
+//		else
+//			isValid = false;
+//		index = l_sql.indexOf ("call");
+//		if (index == -1 || !isValid)
+//			throw new PSQLException ("postgresql.call.malformed",PSQLState.STATEMENT_NOT_ALLOWED_IN_FUNCTION_CALL,
+//									 new Object[]{l_sql, JDBC_SYNTAX});
+//		l_sql = l_sql.replace ('{', ' '); // replace these characters
+//		l_sql = l_sql.replace ('}', ' ');
+//		l_sql = l_sql.replace (';', ' ');
+//
+//		// this removes the 'call' string and also puts a hidden '?'
+//		// at the front of the line for functions, this will
+//		// allow the registerOutParameter to work correctly
+//		// because in the source sql there was one more ? for the return
+//		// value that is not needed by the postgres syntax.  But to make
+//		// sure that the parameter numbers are the same as in the original
+//		// sql we add a dummy parameter in this case
+//		l_sql = (isFunction ? "?" : "") + l_sql.substring (index + 4);
+//		if (connection.haveMinimumServerVersion("7.3")) {
+//			l_sql = "select * from " + l_sql + " as " + RESULT_ALIAS + ";";
+//		} else {
+//			l_sql = "select " + l_sql + " as " + RESULT_ALIAS + ";";
+//		}
+//		return l_sql;
+		return null;
 	}
 
 	/** helperfunction for the getXXX calls to check isFunction and index == 1
@@ -2158,16 +1914,16 @@ public abstract class AbstractJdbc1Statement implements BaseStatement
 
 
     public void setUseServerPrepare(boolean flag) throws SQLException {
-        //Server side prepared statements were introduced in 7.3
-        if (connection.haveMinimumServerVersion("7.3")) {
-			if (m_useServerPrepare != flag)
-				deallocateQuery();
-			m_useServerPrepare = flag;
-		} else {
-			//This is a pre 7.3 server so no op this method
-			//which means we will never turn on the flag to use server
-			//prepared statements and thus regular processing will continue
-		}
+//        //Server side prepared statements were introduced in 7.3
+//        if (connection.haveMinimumServerVersion("7.3")) {
+//			if (m_useServerPrepare != flag)
+//				deallocateQuery();
+//			m_useServerPrepare = flag;
+//		} else {
+//			//This is a pre 7.3 server so no op this method
+//			//which means we will never turn on the flag to use server
+//			//prepared statements and thus regular processing will continue
+//		}
 	}
 
 	public boolean isUseServerPrepare()

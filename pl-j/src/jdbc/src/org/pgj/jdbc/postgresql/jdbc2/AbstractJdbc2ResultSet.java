@@ -9,7 +9,7 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/jdbc2/AbstractJdbc2ResultSet.java,v 1.1 2004-06-12 17:33:11 kocka Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/jdbc/src/org/pgj/jdbc/postgresql/jdbc2/AbstractJdbc2ResultSet.java,v 1.2 2004-07-06 18:22:22 kocka Exp $
  *
  *-------------------------------------------------------------------------
  */
@@ -309,8 +309,8 @@ public abstract class AbstractJdbc2ResultSet extends org.pgj.jdbc.postgresql.jdb
 		if (wasNullFlag)
 			return null;
 
-		if (((AbstractJdbc2Connection) connection).haveMinimumCompatibleVersion("7.2"))
-		{
+//		if (((AbstractJdbc2Connection) connection).haveMinimumCompatibleVersion("7.2"))
+//		{
 			//Version 7.2 supports AsciiStream for all the PG text types
 			//As the spec/javadoc for this method indicate this is to be used for
 			//large text values (i.e. LONGVARCHAR)	PG doesn't have a separate
@@ -318,14 +318,14 @@ public abstract class AbstractJdbc2ResultSet extends org.pgj.jdbc.postgresql.jdb
 			//handling very large values.  Thus the implementation ends up calling
 			//getString() since there is no current way to stream the value from the server
 			return new CharArrayReader(getString(i).toCharArray());
-		}
-		else
-		{
-			// In 7.1 Handle as BLOBS so return the LargeObject input stream
-			Encoding encoding = connection.getEncoding();
-			InputStream input = getBinaryStream(i);
-			return encoding.getDecodingReader(input);
-		}
+//		}
+//		else
+//		{
+//			// In 7.1 Handle as BLOBS so return the LargeObject input stream
+//			Encoding encoding = connection.getEncoding();
+//			InputStream input = getBinaryStream(i);
+//			return encoding.getDecodingReader(input);
+//		}
 	}
 
 
