@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * 
  * @author Laszlo Hornyak
  */
-public class SQLCursorOpenWithPrep extends SQLCursor {
+public class SQLPerformPrep extends SQLCursor {
 
 	private String statementID = null;
 	private ArrayList data = new ArrayList();

@@ -144,6 +144,7 @@ public class FEBEChannel
 		} catch (MappingException me) {
 			//TODO: is it right to throw a CommunicationException instead of a
 			// MappingException?
+			logger.error("mapping exception, rethrowing", me);
 			throw new CommunicationException("error at receiveing message.", me);
 		}
 	}

@@ -2,7 +2,6 @@ package org.pgj.glue;
 
 import org.apache.avalon.excalibur.pool.DefaultPool;
 import org.apache.avalon.excalibur.pool.Pool;
-import org.apache.excalibur.thread.ThreadPool;
 import org.apache.avalon.excalibur.thread.impl.DefaultThreadPool;
 import org.apache.avalon.framework.activity.Initializable;
 import org.apache.avalon.framework.activity.Startable;
@@ -14,15 +13,11 @@ import org.apache.avalon.framework.logger.Logger;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
+import org.apache.excalibur.thread.ThreadPool;
 import org.pgj.Channel;
-import org.pgj.Client;
-import org.pgj.CommunicationException;
-import org.pgj.ExecutionCancelException;
 import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
-import org.pgj.messages.CallRequest;
-import org.pgj.messages.Message;
-import org.pgj.messages.TriggerCallRequest;
+import org.pgj.tools.transactions.JTAAdapter;
 
 /**
  * Glue is the glue component, containing worker threads.
@@ -44,6 +39,9 @@ public class Glue implements Configurable, Initializable, Serviceable,
 	/** Factory that creates workers */
 	private GlueWorkerFactory gwfactory = null;
 
+	/** JTA Adapter. May be null, as it is an optional resource. */
+	private JTAAdapter jtaAdatper = null;
+	
 	/** flag to show if the component is terminating */
 	private boolean terminating = false;
 
@@ -116,8 +114,8 @@ public class Glue implements Configurable, Initializable, Serviceable,
 	 * @see Serviceable#service(ServiceManager)
 	 * @avalon.dependency key="channel" type="org.pgj.Channel"
 	 * @avalon.dependency key="executor" type="org.pgj.Executor"
-	 * @avalon.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor"
-	 *                    optional="true"
+	 * @avalon.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor" optional="true"
+	 * @avalon.dependency key="jta-adapter" type="org.pgj.tools.transactions.JTAAdapter" optional="true"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		chanell = (Channel) arg0.lookup("channel");
@@ -133,5 +131,5 @@ public class Glue implements Configurable, Initializable, Serviceable,
 		}
 		logger.debug("serviced");
 	}
-
+	
 }
