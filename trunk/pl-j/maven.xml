@@ -47,4 +47,16 @@
 			/>
 	</goal>
 
+	<postGoal name="java:compile">
+		<attainGoal name="subprojects:compile"/>
+	</postGoal>
+
+	<postGoal name="java:jar-resources">
+		<attainGoal name="subprojects:package"/>
+	</postGoal>
+
+	<postGoal name="clean">
+		<attainGoal name="subprojects:clean"/>
+	</postGoal>
+
 </project>
