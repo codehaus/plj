@@ -6,7 +6,7 @@ as '
 	method=test
 	oneway=false
 	instantiation=session
-' language 'pl/pgj';
+' language 'plj';
 
 create or replace function plpgj_test_lametest2(in int)
 returns varchar
@@ -15,7 +15,7 @@ as '
 	method=test
 	oneway=false
 	instantiation=session
-' language 'pl/pgj';
+' language 'plj';
 
 
 create or replace function plpgj_test_jdbc1()
@@ -25,5 +25,42 @@ as '
          method=jdbcTest
          oneway=false
          instantiation=session
-' language 'pl/pgj';
+' language 'plj';
+
+create or replace function plpgj_test_lametest3()
+returns int
+as '
+	class=org.deadcat_enterprises.Businnes
+	method=testInt0
+	oneway=false
+	instantiation=session
+' language 'plj';
+
+create or replace function plpgj_test_lametest4(in int, in int)
+returns int
+as '
+	class=org.deadcat_enterprises.Businnes
+	method=testInt1
+	oneway=false
+	instantiation=session
+' language 'plj';
+
+create or replace function plpgj_test_lametest5(in int)
+returns int
+as '
+	class=org.deadcat_enterprises.Businnes
+	method=testInt2
+	oneway=false
+	instantiation=session
+' language 'plj';
+
+create or replace function plpgj_test_lametest6(in varchar)
+returns varchar
+as '
+	class=org.deadcat_enterprises.Businnes
+	method=testString0
+	oneway=false
+	instantiation=session
+' language 'plj';
+
 
