@@ -49,7 +49,13 @@ public class ErrorMessageFactory implements MessageFactory {
 				.getBytes();
 		stream.SendInteger(cname.length, 4);
 		stream.Send(cname);
-		byte[] cmsg = ((org.pgj.messages.Error) msg).getMessage().getBytes();
+		byte[] cmsg = null;
+		String mesg = ((org.pgj.messages.Error) msg).getMessage();
+		if(mesg == null ){
+			cmsg = new byte[0];
+		} else {
+			cmsg = mesg.getBytes();
+		}
 		stream.SendInteger(cmsg.length, 4);
 		stream.Send(cmsg);
 		stream.flush();
