@@ -24,6 +24,7 @@
 #include "access/xact.h"
 #include "pljelog.h"
 #include "plantable.h"
+#include "envstack.h"
 
 /*	*/
 
@@ -68,6 +69,8 @@ short		plpgj_tx_externalize_nested = 0;
 #define plpgj_tx_externalize		plj_get_configvalue_boolean("plpgj.tx.externalize")
 #define plpgj_tx_externalize_nested	plj_get_configvalue_boolean("plpgj.tx.externalize.nested")
 
+#define plpgj_return_cleanup		if(envstack_isempty()) { unreg_error_callback(); UnregisterEOXactCallback(plpgj_EOXactCallBack, NULL); elog(DEBUG1, "plpgj_return_cleanup: done"); }
+
 
 /*	*/
 
@@ -75,26 +78,10 @@ short		plpgj_tx_externalize_nested = 0;
 
 /*	*/
 
-Datum
-plpgj_call_hook(PG_FUNCTION_ARGS)
-{
-
-	message		req;
-	int			message_type;
-	ErrorContextCallback *mycallback;
-
-	if (!plpgj_channel_initialized())
-	{
-		pljelog(DEBUG1, "initing channel");
-		plpgj_channel_initialize();
-	}
-
-	/*
-	 * register event handlers
-	 */
-
+void reg_error_callback() {
 	if (!callbacks_init)
 	{
+	ErrorContextCallback *mycallback;
 		mycallback = SPI_palloc(sizeof(ErrorContextCallback));
 		mycallback->previous = error_context_stack;
 		pljelog(DEBUG1, "1");
@@ -106,11 +93,50 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		error_context_stack = mycallback;
 		pljelog(DEBUG1, "4");
 
-		if(plpgj_tx_externalize)
+	callbacks_init = 1;
+	}
+
+}
+
+void unreg_error_callback() {
+	if (callbacks_init) {
+		elog(DEBUG1, "unreg_error_callback: 1");
+		//XXX this will fuck up the env if someone else registers a callback in a reentrant sp.
+		if(error_context_stack -> callback == plpgj_ErrorContextCallback){
+			elog(DEBUG1, "unreg_error_callback: 2");
+			error_context_stack = error_context_stack -> previous;
+			elog(DEBUG1, "unreg_error_callback: 3");
+		}
+		elog(DEBUG1, "unreg_error_callback: 4");
+	}
+	callbacks_init = 0;
+}
+
+Datum
+plpgj_call_hook(PG_FUNCTION_ARGS)
+{
+
+	if(envstack_isempty())
+		reg_error_callback();
+
+	message		req;
+	int			message_type;
+
+	if (!plpgj_channel_initialized())
+	{
+		pljelog(DEBUG1, "initing channel");
+		plpgj_channel_initialize();
+	}
+
+	if(plpgj_tx_externalize && envstack_isempty())
 		RegisterEOXactCallback(plpgj_EOXactCallBack, NULL);
 		pljelog(DEBUG1, "5");
-		callbacks_init = 1;
-	}
+
+
+	/*
+	 * register event handlers
+	 */
+
 	/*
 	 * now do the real job
 	 */
@@ -151,6 +177,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			case MT_EXCEPTION:
 				pljelog(DEBUG1, "received: exception");
 				plpgj_exception_do((error_message) ansver);
+				plpgj_return_cleanup;
 				PG_RETURN_NULL();
 				break;
 			case MT_SQL:
@@ -207,9 +234,8 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				pljelog(DEBUG1, "result 2");
 				if (res->data[0][0].isnull == 1){
 					pljelog(DEBUG1, "result 2.1");
-//					if(error_context_stack != NULL)
-//						error_context_stack = error_context_stack->previous;
 					pljelog(DEBUG1, "result 3");
+					plpgj_return_cleanup;
 					PG_RETURN_NULL();
 				}
 
@@ -266,12 +292,14 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				MemoryContextSwitchTo(oldctx);
 
 				pljelog(DEBUG1,"return ret;");
+				plpgj_return_cleanup;
 				return ret;
 			}
 			else if (res->rows == 0)
 			{
 				pljelog(DEBUG1,"multirow not implemented.");
-				error_context_stack = error_context_stack->previous;
+				//error_context_stack = error_context_stack->previous;
+				plpgj_return_cleanup;
 				PG_RETURN_VOID();
 			}
 
@@ -371,8 +399,10 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 										 columns, datums, nulls);
 			}
 			pljelog(DEBUG1, "returning tuple");
+			plpgj_return_cleanup;
 			return PointerGetDatum(rettup);
 		}
+		pljelog(DEBUG1, "debug");
 		
 //		pljelog(ERROR, "no handler for message type: %d", message_type);
 
@@ -380,6 +410,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 	while (1);
 
 	pljelog(DEBUG1, "return null");
+	plpgj_return_cleanup;
 	PG_RETURN_NULL();
 
 }
@@ -413,8 +444,8 @@ plpgj_sql_do(sql_msg msg)
 				int planid;
 				plpgj_result res;
 
-				argtypes = prep -> ntypes == 0 ? NULL : SPI_palloc(prep -> ntypes * sizeof(Oid) );
 				prep = (sql_msg_prepapre) msg;
+				argtypes = prep -> ntypes == 0 ? NULL : SPI_palloc(prep -> ntypes * sizeof(Oid) );
 				for(i = 0; i < prep -> ntypes; i++) {
 					typnam = makeTypeName( prep -> types[i] );
 					argtypes[i] = LookupTypeName(typnam);
@@ -422,10 +453,11 @@ plpgj_sql_do(sql_msg msg)
 
 				elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
 				pljlogging_error = 1;
+				//THIS WILL FUCK YOUR SYSTEM IF YOU HAVE prepare
 				plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
-				planid = store_plantable(plan);
 				pljlogging_error = 0;
 				elog(DEBUG1, "SQL_TYPE_PREPARE done, leaving nolog area");
+				planid = store_plantable(plan);
 
 				//create result
 				res = SPI_palloc(sizeof(str_plpgj_result));
@@ -456,9 +488,10 @@ plpgj_sql_do(sql_msg msg)
 					d = OidFunctionCall1(int4typ -> typsend, UInt32GetDatum(planid));
 					res -> data[0] -> data = DatumGetPointer(d);
 				}
-				pljelog(DEBUG1,"action!");
+				pljelog(DEBUG1,"1");
+				pljloging = 0;
 				plpgj_channel_send((message)res);
-				
+				pljloging = 1;
 			}
 			break;
 		case SQL_TYPE_PEXECUTE:
@@ -517,9 +550,10 @@ plpgj_sql_do(sql_msg msg)
 				pljelog(DEBUG1,"executing.");
 				{
 				int ret;
+				pljlogging_error = 1;
 				ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
-				pljelog(DEBUG1, "ret: %d", ret);
-				pljelog(DEBUG1, "plantable entry is null: %d", (plantable[sql -> planid] == NULL));
+				pljlogging_error = 0;
+				pljelog(DEBUG1,"executed.");
 				switch (ret) {
 					case SPI_ERROR_ARGUMENT:
 						pljelog(DEBUG1, "SPI_ERROR_ARGUMENT");
@@ -532,7 +566,6 @@ plpgj_sql_do(sql_msg msg)
 						break;
 				}
 				}
-				pljelog(DEBUG1,"executed.");
 				//TODO: add logic here!!
 				switch (sql -> action){
 					case SQL_PEXEC_ACTION_EXECUTE:
@@ -664,9 +697,12 @@ plpgj_ErrorContextCallback(void *arg)
 {
 	bool reenable_loging;
 
-//	if (!pljlogging_error)
+	if (!pljlogging_error)
 		return;
-
+	pljlogging_error = 0;
+	
+	elog(DEBUG1, "AAAAAA!");
+	
 	reenable_loging = pljloging;
 
 	/*
@@ -683,7 +719,7 @@ plpgj_ErrorContextCallback(void *arg)
 	msg->length = sizeof(str_error_message);
 	msg->classname = "PostgreSQL statement";
 	msg->message = "No information (see your statement)";
-	msg->stacktrace = "holla aimgos!";
+	msg->stacktrace = "";
 //	pljelog(DEBUG1, "sending exception");
 	plpgj_channel_send((message) msg);
 
@@ -693,7 +729,6 @@ plpgj_ErrorContextCallback(void *arg)
 	/*
 	 * error_context_stack = error_context_stack -> previous;
 	 */
-	pljlogging_error = 0;
 
 	/*
 	 * re-enable loging
@@ -702,3 +737,36 @@ plpgj_ErrorContextCallback(void *arg)
 		pljloging = 1;
 
 }
+
+typedef struct plj_envstack_struct {
+	short logging;
+	short logging_error;
+	void	*next;
+} *plj_envstack;
+
+plj_envstack envstack = NULL;
+
+void envstack_push(void) {
+	plj_envstack nenv;
+	nenv = SPI_palloc(sizeof( struct plj_envstack_struct));
+	nenv -> logging = pljloging;
+	nenv -> logging_error = pljlogging_error;
+	nenv -> next = envstack;
+}
+
+void envstack_pop(void) {
+	if(envstack == NULL)
+		return;
+	pljloging = envstack -> logging;
+	pljlogging_error = envstack -> logging_error;
+	envstack = envstack -> next;
+}
+
+int envstack_isempty(void) {
+	return (envstack == NULL);
+}
+
+void envstack_clean(void) {
+	envstack = NULL;
+}
+
