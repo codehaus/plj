@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Build and install howto</title>
+		<author email="kocka at forgeahead.hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+			<section name="requirements">
+			<p>
+			You will need the following softwares installed:
+			<subsection name="softwares">
+				<table>
+					<tr>
+						<th>software name</th>
+						<th>optional</th>
+						<th>URL</th>
+						<th>reason</th>
+					</tr>
+					<tr>
+						<td>maven</td>
+						<td>Yes, you can use ant if you want instead.</td>
+						<td>http://maven.apache.org/</td>
+						<td>Build.</td>
+					</tr>
+					<tr>
+						<td>jakarta-ant</td>
+						<td>Yes, you can use maven instead.</td>
+						<td>http://ant.apache.org/</td>
+						<td>Build.</td>
+					</tr>
+					<tr>
+						<td>PostgreSQL 7.4.x source code</td>
+						<td>NO</td>
+						<td>http://www.posgresql.org/</td>
+						<td>To build th postgresql method call handler.</td>
+					</tr>
+					<tr>
+						<td>Java sdk 1.4</td>
+						<td>NO</td>
+						<td>http://java.sun.com/, http://www.ibm.com/</td>
+						<td>To compile java code</td>
+					</tr>
+				</table>
+			</subsection>
+			</p>
+			</section>
+	</body>
+</document>
+
