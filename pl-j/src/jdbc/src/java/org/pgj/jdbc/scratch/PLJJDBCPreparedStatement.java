@@ -1,6 +1,7 @@
 /*
  * Created on Aug 8, 2004
  */
+
 package org.pgj.jdbc.scratch;
 
 import java.io.InputStream;
@@ -23,17 +24,125 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Vector;
 
+import org.pgj.messages.Result;
 import org.pgj.messages.SQLPrepare;
+import org.pgj.typemapping.MappingException;
+import org.pgj.typemapping.TypeMapper;
 
 /**
+ * JDBC preparedstatement for the scratch driver.
+ * 
  * @author Laszlo Hornyak
  */
 public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	private PLJJDBCConnection conn = null;
 
-	private ArrayList args = new ArrayList();
+	private ArrayList args = new ArrayList(0);
+
+	/**
+	 * The statement to be prepared.
+	 */
+	private String statement = null;
+
+	private int paramcnt = 0;
+
+	/**
+	 * The statement to send to the RDBMS.
+	 */
+	private String dbstatement = null;
+
+	/**
+	 * Is the statement actualy prepared?
+	 */
+	boolean prepared = false;
+
+	/**
+	 * the plan ID, or -1 if not prepared.
+	 */
+	private int plan = -1;
+
+	/**
+	 * The parameters.
+	 */
+	private Vector params = new Vector(0);
+
+	/**
+	 * The classes of the parameters.
+	 */
+	private Vector paramClasses = new Vector(0);
+
+	private void mkPrepare() {
+		Class[] clazzes = new Class[paramClasses.size()];
+	}
+
+	private void parse() {
+		StringBuffer buf = new StringBuffer(statement);
+		paramcnt = 0;
+		int where = 0;
+		boolean instr = false;
+		for (where = 0; where < buf.length(); where++) {
+			switch (buf.charAt(where)) {
+				case '\'' :
+					instr = !instr;
+					break;
+				case '?' :
+					if (!instr) {
+						paramcnt++;
+						buf.replace(where, where + 1, "$" + paramcnt);
+					}
+					break;
+				default :
+			}
+		}
+		dbstatement = buf.toString();
+		System.out.println(dbstatement);
+	}
+
+	/**
+	 * 
+	 * @param statement
+	 * @param args
+	 * @throws SQLException
+	 */
+	private void doPrepare() throws SQLException {
+
+		Class[] args = new Class[paramClasses.size()];
+		for (int i = 0; i < args.length; i++) {
+			args[i] = (Class) paramClasses.get(i);
+		}
+
+		ArrayList lst;
+		int i = 0;
+		try {
+			TypeMapper tm = conn.client.getTypeMapper();
+			lst = new ArrayList();
+			for (i = 0; i < args.length; i++) {
+				lst.add(tm.getRDBMSTypeFor(args[i]));
+			}
+		} catch (MappingException e) {
+			//XXX log this!!
+			throw new SQLException("mapping exception:" + args[i].getName());
+		}
+
+		SQLPrepare prep = new SQLPrepare();
+		prep.setStatement(dbstatement);
+		prep.setClient(conn.client);
+		prep.setParamtypes(lst);
+		Result ans = null;
+		synchronized (conn.communicationChanell) {
+			conn.doSendMessage(prep);
+			ans = (Result) conn.doReceiveMessage();
+		}
+		try {
+			this.plan = ((Integer) ((Result) ans).get(0, 0).get(Integer.class))
+					.intValue();
+		} catch (MappingException e2) {
+			throw new SQLException("Result cannot be mapped to int");
+		}
+	}
 
 	/**
 	 *  
@@ -42,13 +151,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			throws SQLException {
 		super();
 		this.conn = conn;
-		SQLPrepare prep = new SQLPrepare();
-		prep.setStatement(statement);
-		prep.setClient(conn.client);
-		synchronized (conn.communicationChanell) {
-			conn.doSendMessage(prep);
-			conn.doReceiveMessage();
-		}
+		this.statement = statement;
+		parse();
 	}
 
 	/*
@@ -77,8 +181,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#clearParameters()
 	 */
 	public void clearParameters() throws SQLException {
-		// TODO Auto-generated method stub
-
+		paramClasses.clear();
+		params.clear();
 	}
 
 	/*
@@ -87,8 +191,17 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#execute()
 	 */
 	public boolean execute() throws SQLException {
-		// TODO Auto-generated method stub
+		doPrepare();
 		return false;
+	}
+
+	private void setParam(int parameterindex, Class clazz, Object obj) {
+		int i = parameterindex - 1;
+		if (i >= params.size()) {
+			params.setSize(i + 1);
+		}
+		params.set(i, obj);
+		paramClasses.add(i, clazz);
 	}
 
 	/*
@@ -97,8 +210,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setByte(int, byte)
 	 */
 	public void setByte(int parameterIndex, byte x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Byte.class, new Byte(x));
 	}
 
 	/*
@@ -107,8 +219,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setDouble(int, double)
 	 */
 	public void setDouble(int parameterIndex, double x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Double.class, new Double(x));
 	}
 
 	/*
@@ -117,8 +228,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setFloat(int, float)
 	 */
 	public void setFloat(int parameterIndex, float x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Float.class, new Float(x));
 	}
 
 	/*
@@ -127,8 +237,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setInt(int, int)
 	 */
 	public void setInt(int parameterIndex, int x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Integer.class, new Integer(x));
 	}
 
 	/*
@@ -137,8 +246,10 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setNull(int, int)
 	 */
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
-		// TODO Auto-generated method stub
+		params.set(parameterIndex - 1, null);
+		switch (sqlType) {
 
+		}
 	}
 
 	/*
@@ -147,8 +258,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setLong(int, long)
 	 */
 	public void setLong(int parameterIndex, long x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Long.class, new Long(x));
 	}
 
 	/*
@@ -157,8 +267,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setShort(int, short)
 	 */
 	public void setShort(int parameterIndex, short x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Short.class, new Short(x));
 	}
 
 	/*
@@ -167,8 +276,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setBoolean(int, boolean)
 	 */
 	public void setBoolean(int parameterIndex, boolean x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Boolean.class, x
+				? Boolean.TRUE
+				: Boolean.FALSE);
 	}
 
 	/*
@@ -279,8 +389,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setString(int, java.lang.String)
 	 */
 	public void setString(int parameterIndex, String x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, String.class, x);
 	}
 
 	/*
@@ -290,8 +399,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 */
 	public void setBigDecimal(int parameterIndex, BigDecimal x)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, BigDecimal.class, x);
 	}
 
 	/*
@@ -300,8 +408,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setURL(int, java.net.URL)
 	 */
 	public void setURL(int parameterIndex, URL x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, URL.class, x);
 	}
 
 	/*
@@ -310,8 +417,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setArray(int, java.sql.Array)
 	 */
 	public void setArray(int i, Array x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(i, Array.class, x);
 	}
 
 	/*
@@ -320,8 +426,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setBlob(int, java.sql.Blob)
 	 */
 	public void setBlob(int i, Blob x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(i, Blob.class, x);
 	}
 
 	/*
@@ -330,8 +435,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setClob(int, java.sql.Clob)
 	 */
 	public void setClob(int i, Clob x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(i, Clob.class, x);
 	}
 
 	/*
@@ -340,8 +444,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setDate(int, java.sql.Date)
 	 */
 	public void setDate(int parameterIndex, Date x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Date.class, x);
 	}
 
 	/*
@@ -390,8 +493,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setTime(int, java.sql.Time)
 	 */
 	public void setTime(int parameterIndex, Time x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Time.class, x);
 	}
 
 	/*
@@ -401,8 +503,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 */
 	public void setTimestamp(int parameterIndex, Timestamp x)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, Timestamp.class, x);
 	}
 
 	/*
@@ -750,8 +851,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.Statement#getConnection()
 	 */
 	public Connection getConnection() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.conn;
 	}
 
 	/*
