@@ -3,61 +3,13 @@
 <project default="jar:jar"
 	xmlns:maven="jelly:maven" >
 
-	<goal name="subprojects:compile">
-		<maven:reactor
-			basedir="${basedir}"
-			includes="src/blocks/**/**/project.xml"
-			excludes="project.xml"
-			goals="java:compile"
-			banner="Compiling"
-			ignoreFailures="true"
-			/>
-	</goal>
+	<preGoal name="multiproject:artifact">
+		<attainGoal name="jar:install"/>
+	</preGoal>
 
-	<goal name="subprojects:package">
-		<maven:reactor
-			basedir="${basedir}"
-			includes="src/blocks/**/**/project.xml"
-			excludes="project.xml"
-			goals="jar:jar"
-			banner="Compiling"
-			ignoreFailures="true"
-			/>
-	</goal>
-
-	<goal name="subprojects:docu">
-		<maven:reactor
-			basedir="${basedir}"
-			includes="src/blocks/**/**/project.xml"
-			excludes="project.xml"
-			goals="site:generate"
-			banner="Compiling"
-			ignoreFailures="true"
-			/>
-	</goal>
-
-	<goal name="subprojects:clean">
-		<maven:reactor
-			basedir="${basedir}"
-			includes="src/blocks/**/**/project.xml"
-			excludes="project.xml"
-			goals="clean"
-			banner="Compiling"
-			ignoreFailures="true"
-			/>
-	</goal>
-
-	<postGoal name="java:compile">
-		<attainGoal name="subprojects:compile"/>
-	</postGoal>
-
-	<postGoal name="java:jar-resources">
-		<attainGoal name="subprojects:package"/>
-	</postGoal>
-
-	<postGoal name="clean">
-		<attainGoal name="subprojects:clean"/>
-	</postGoal>
+	<preGoal name="multiproject:site">
+		<attainGoal name="jar:install"/>
+	</preGoal>
 
 	<preGoal name="multiproject:artifact">
 		<attainGoal name="jar:jar"/>
