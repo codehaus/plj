@@ -2,7 +2,7 @@
 include ../../Makefile.in
 include Makefile.in
 
-CFLAGS=-I../../include/ -I$(POSTGRES_SRC_HOME)/include/  -Wall -g
+CFLAGS=-I../../include/ -I$(POSTGRES_SRC_HOME)/include/  -Wall -g -DPOSTGRES_VERSION=$(POSTGRES_VERSION)
 
 all: module.a
 
