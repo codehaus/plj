@@ -3,7 +3,7 @@
     <pomVersion>3</pomVersion>
     <artifactId>pl-j-jdbc</artifactId>
     <name>pl-j-jdbc</name>
-    <groupId>pl-j-jdbc</groupId>
+    <groupId>pl-j</groupId>
     <inceptionYear>2004</inceptionYear>
     <description>JDBC code</description>
     <dependencies>
