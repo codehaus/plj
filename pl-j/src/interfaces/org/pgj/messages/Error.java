@@ -1,19 +1,19 @@
 package org.pgj.messages;
 
 /**
- * @author bitfakk
- *
- * I was too lazy to edit the comments.
+ * Represents an error of the Database or the stored procedure system.
+ * 
+ * @author Laszlo Hornyak
  */
-public class Exception extends Message {
+public class Error extends Message {
 
-	String message = null;
-	String stackTrace = null;
-	String exceptionClassName = null;
+	private String message = null;
+	private String stackTrace = null;
+	private String exceptionClassName = null;
 
-	public static Exception fromThrowable(Throwable t) {
+	public static Error fromThrowable(Throwable t) {
 
-		Exception exception = new Exception();
+		Error exception = new Error();
 		exception.setMessage(t.getMessage());
 		StackTraceElement[] trace = t.getStackTrace();
 		StringBuffer buff = new StringBuffer();
