@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -71,4 +72,21 @@ public class JDBCTests {
 		}
 	}
 
+	public void doPreparedTest1() throws SQLException{
+		Connection conn = null;
+		PreparedStatement sta = null;
+		try{
+			conn = DriverManager.getConnection("jdbc:default:connection");
+			sta = conn.prepareStatement("insert into plj_prepsta_xmpl(str, str_maynull) values (?, ?)");
+			sta.setString(1, String.valueOf(System.currentTimeMillis()));
+			sta.setString(2, "Greetings from Mirkwood!");
+			sta.execute();
+		} finally {
+			if(sta != null)
+				sta.close();
+			if(conn != null)
+				conn.close();
+		}
+	}
+	
 }
