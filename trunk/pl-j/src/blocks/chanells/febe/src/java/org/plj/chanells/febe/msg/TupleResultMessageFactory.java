@@ -1,29 +1,34 @@
 /*
  * Created on May 10, 2004
  */
+
 package org.plj.chanells.febe.msg;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
+import org.pgj.messages.TupleResult;
+import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
+import org.pgj.typemapping.Tuple;
 import org.plj.chanells.febe.core.Encoding;
 import org.plj.chanells.febe.core.PGStream;
 
 
 /**
+ * Sends back the TupleResult to the RDBMS.
  * @author Laszlo Hornyak
  */
-//TODO: edit comments for TupleResultMessageFactory
 public class TupleResultMessageFactory implements MessageFactory {
 
 	public static final int MESSAGE_HEADER_TUPLERESULT = 'U';
 
-	public TupleResultMessageFactory(){
-		
+	public TupleResultMessageFactory() {
+
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessageHeader()
 	 */
@@ -34,17 +39,44 @@ public class TupleResultMessageFactory implements MessageFactory {
 	/* (non-Javadoc)
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessage(org.plj.chanells.febe.core.PGStream, org.plj.chanells.febe.core.Encoding)
 	 */
-	public Message getMessage(PGStream stream, Encoding encoding) throws IOException, MappingException, CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+	public Message getMessage(PGStream stream, Encoding encoding)
+			throws IOException, MappingException, CommunicationException {
+		throw new CommunicationException("DB won`t send tupleresults!");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.plj.chanells.febe.msg.MessageFactory#sendMessage(org.pgj.messages.Message, org.plj.chanells.febe.core.PGStream)
 	 */
-	public void sendMessage(Message msg, PGStream stream) throws IOException, MappingException, CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void sendMessage(Message msg, PGStream stream) throws IOException,
+			MappingException, CommunicationException {
+		TupleResult res = (TupleResult) msg;
+		Tuple t = res.getTuple();
+		byte[] b = t.getRelationName().getBytes();
+		stream.SendInteger(b.length, 4);
+		stream.Send(b);
+
+		int cnt = t.getFieldMap().keySet().size();
+		stream.SendInteger(cnt, 4);
+		Iterator i = t.getFieldMap().keySet().iterator();
+		while (i.hasNext()) {
+			String key = (String) i.next();
+			Field fld = t.getField(key);
+			byte[] keyb = key.getBytes();
+			stream.SendInteger(keyb.length, 4);
+			stream.Send(keyb);
+			if (fld == null && fld.isNull()) {
+				stream.SendChar('n');
+			} else {
+				stream.SendChar('v');
+				byte[] typeb = fld.rdbmsType().getBytes();
+				stream.SendInteger(typeb.length, 4);
+				stream.Send(typeb);
+				byte[] datab = fld.get();
+				stream.SendInteger(datab.length, 4);
+				stream.Send(datab);
+			}
+		}
+		t.getFieldMap();
 	}
 
 	/* (non-Javadoc)
