@@ -7,6 +7,7 @@ int	remove_plantable_entry(unsigned int);
 void	init_plantable(void);
 
 #define free_plantable_entry(a)		plantalbe[a] = NULL;
+#define plantable_entry_valid(a)	(plantable[a] != NULL)
 
 #endif
 
