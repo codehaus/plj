@@ -3,7 +3,7 @@
     <artifactId>pl-j-javaexecutor</artifactId>
     <name>pl-j-javaexecutor</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.6</currentVersion>
+    <currentVersion>0.1.0</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <description>The java executor block. Executes a java method call using the reflection api.</description>
     <shortDescription>The java executor block.</shortDescription>
@@ -25,14 +25,14 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.6</version>
+            <version>0.1.0</version>
             <type>jar</type>
             <properties/>
         </dependency>
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-tools</artifactId>
-            <version>0.0.6</version>
+            <version>0.1.0</version>
             <type>jar</type>
             <properties/>
         </dependency>
