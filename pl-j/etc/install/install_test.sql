@@ -131,13 +131,40 @@ create or replace function plpgj_test_lametrigger1fn() returns trigger
 as '
 	class=org.deadcat_enterprises.PLJTriggers
 	method=testTableInsertTrigger
-	oneway=false
-	instantiation=static
 ' language 'plj';
 
 create trigger plpgj_test_lametrigger1 before insert on plj_testtable
 	for each row
 	execute procedure plpgj_test_lametrigger1fn();
+
+create table plj_testable2(
+	id	int primary key,
+	name	varchar;
+);
+
+create or replace function plpgj_test_t2_beforeinsert() returns trigger
+as
+'
+	class=org.deadcat_enterprises.PLJTriggers
+	method=beforeInsertRowTrigger
+' language 'plj';
+
+create trigger plj_testable2_beforeinsert_row before insert on plj_testable2
+	for each row
+	execute procedure plpgj_test_t2_beforeinsert();
+
+create or replace function plpgj_test_t2_afterinsert() returns trigger
+as
+'
+	class=org.deadcat_enterprises.PLJTriggers
+	method=afterInsertRowTrigger
+' language 'plj';
+
+create trigger plj_testable2_afterinsert_row after insert on plj_testable2
+	for each row
+	execute procedure plpgj_test_t2_afterinsert();
+
+
 
 -- JDBC tests
 
@@ -170,6 +197,29 @@ create function plpgj_test_int4_mul(int4, int4)
 returns int4 as
 '
 	class=org.deadcat.typetests.SmallIntTests
+	method=mul
+' language 'plj';
+
+-- int8 function
+
+create function plpgj_test_int8_add(int8, int8)
+returns int8 as
+'
+	class=org.deadcat.typetests.BigIntTests
+	method=add
+' language 'plj';
+
+create function plpgj_test_int8_sub(int8, int8)
+returns int8 as
+'
+	class=org.deadcat.typetests.BigIntTests
+	method=sub
+' language 'plj';
+
+create function plpgj_test_int8_mul(int8, int8)
+returns int8 as
+'
+	class=org.deadcat.typetests.BigIntTests
 	method=mul
 ' language 'plj';
 
