@@ -348,7 +348,9 @@ plpgj_sql_do(sql_msg msg)
 	switch (msg->sqltype)
 	{
 		case SQL_TYPE_STATEMENT:
+			pljlogging_error = 1;
 			SPI_exec(((sql_msg_statement) msg)->statement, 0);
+			pljlogging_error = 0;
 			break;
 		case SQL_TYPE_CURSOR_CLOSE:
 			{
@@ -358,6 +360,7 @@ plpgj_sql_do(sql_msg msg)
 				portal = GetPortalByName(sql_c_c->cursorname);
 				if (!PortalIsValid(portal))
 				{
+					pljlogging_error = 1;
 					pljelog(ERROR, "the portal %s does not exist!",
 							sql_c_c->cursorname);
 
@@ -437,8 +440,9 @@ plpgj_log_do(log_message log)
 void
 plpgj_EOXactCallBack(bool isCommit, void *arg)
 {
-	if (isCommit)
+	if (isCommit) {
 		pljelog(DEBUG1, "Transaction commit - plpgj");
+	}
 	else
 	{
 		pljelog(DEBUG1, "Transaction rollback - plpgj");
@@ -453,10 +457,8 @@ plpgj_ErrorContextCallback(void *arg)
 {
 
 
-	printf("aaa\n");
 	if (!pljlogging_error)
 		return;
-	printf("bbb\n");
 
 	/*
 	 * disable loging
@@ -485,7 +487,7 @@ plpgj_ErrorContextCallback(void *arg)
 	/*
 	 * error_context_stack = error_context_stack -> previous;
 	 */
-	pljelog(DEBUG1, "callback unregistered.");
+	pljlogging_error = 0;
 
 	/*
 	 * re-enable loging

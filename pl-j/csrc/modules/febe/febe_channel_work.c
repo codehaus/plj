@@ -1,3 +1,4 @@
+
 /**
  * file name:			febe_channel_work.c
  * description:			FEBE chanell implementation, central functions.
@@ -15,380 +16,433 @@
 #include <regex/regex.h>
 
 #include "executor/spi.h"
-#include "utils/elog.h"
+#include "pljelog.h"
 
 #include "libpq-mini-misc.h"
 #include "libpq-mini.h"
 
-extern PGconn_min* min_conn;
+extern PGconn_min *min_conn;
 
-int febe_receive_integer_4(void){
+int
+febe_receive_integer_4(void)
+{
 	unsigned char c[4];
-	int i;
-	for(i=0; i<4; i++){
-		pqGetc(c+i, min_conn);
-	}
-	i = c[3] + (c[2]*256) + (c[1]*256*256) + (c[0]*256*256*256);
+	int			i;
+
+	for (i = 0; i < 4; i++)
+		pqGetc(c + i, min_conn);
+	i = c[3] + (c[2] * 256) + (c[1] * 256 * 256) +
+		(c[0] * 256 * 256 * 256);
 	return i;
 }
 
-char* febe_receive_string(void){
-	//this is a hackaround, should work with pqGets
-	int cnt = 0;
-	char* tmp_chr;
-	//pqGetInt(&cnt, 4, min_conn);
+char *
+febe_receive_string(void)
+{
+	/*
+	 * this is a hackaround, should work with pqGets
+	 */
+	int			cnt = 0;
+	char	   *tmp_chr;
+
+	/*
+	 * pqGetInt(&cnt, 4, min_conn);
+	 */
 	cnt = febe_receive_integer_4();
-	tmp_chr = SPI_palloc(sizeof(char) * (cnt+2));
+	tmp_chr = SPI_palloc(sizeof(char) * (cnt + 2));
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	tmp_chr[cnt] = 0;
 	return tmp_chr;
 }
 
-void trigger_send_tuple(pparam* tuple, int colcount){
-	int i;
-	elog(DEBUG1, "send tuple");
-	
-	for(i = 0; i< colcount; i++){
-		pqPutInt(tuple[i] -> data.isnull != 0, 4, min_conn);
-		if(tuple[i] -> data.isnull){
-			
-		} else {
-			elog(DEBUG1,"1: %d", tuple[i] -> data.length);
-			pqPutInt(tuple[i] -> data.length, 4, min_conn);
-			elog(DEBUG1,"2");
-			pqPutnchar(tuple[i] -> data.data,tuple[i] -> data.length, min_conn);
-			elog(DEBUG1,"3: %s", tuple[i] -> type);
-			pqPuts(tuple[i] -> type, min_conn);
+void
+trigger_send_tuple(pparam * tuple, int colcount)
+{
+	int			i;
+
+	for (i = 0; i < colcount; i++)
+	{
+		pqPutInt(tuple[i]->data.isnull != 0, 4, min_conn);
+		if (tuple[i]->data.isnull)
+		{
+
+		}
+		else
+		{
+			pqPutInt(tuple[i]->data.length, 4, min_conn);
+			pqPutnchar(tuple[i]->data.data, tuple[i]->data.length,
+					   min_conn);
+			pqPuts(tuple[i]->type, min_conn);
 		}
 	}
-	elog(DEBUG1, "tuple sent");
 }
 
-int febe_send_trigger(trigger_callreq call){
-	int i;
-	
-	elog(DEBUG1, "sending trigger");
-	pqPutMsgStart(0,0,min_conn);
-	elog(DEBUG1, "tracepoint 1");
-	pqPutc('T',min_conn);
-	elog(DEBUG1, "tracepoint 2");
-	pqPutInt(call -> row, 4, min_conn);
-	elog(DEBUG1, "tracepoint 3");
-	pqPutInt(call -> reason, 4, min_conn);
-	pqPutInt(call -> actionorder, 4, min_conn);
-	pqPutInt(call -> row, 4, min_conn);
-	elog(DEBUG1, "tracepoint 4");
-	pqPuts(call -> tablename, min_conn);
-	elog(DEBUG1, "tracepoint 5");
-	pqPuts(call -> classname, min_conn);
-	elog(DEBUG1, "tracepoint 6");
-	pqPuts(call -> methodname, min_conn);
+int
+febe_send_trigger(trigger_callreq call)
+{
+	int			i;
 
-	elog(DEBUG1, "tracepoint 7");
-	pqPutInt(call -> colcount, 4, min_conn);
-	
-	elog(DEBUG1, "tracepoint 8");
-	for(i = 0; i < call -> colcount; i++){
-		pqPuts(call -> colnames[i], min_conn);
-		pqPuts(call -> coltypes[i], min_conn);
-		elog(DEBUG1, "tracepoint 8.1");
+	pqPutMsgStart(0, 0, min_conn);
+	pqPutc('T', min_conn);
+	pqPutInt(call->row, 4, min_conn);
+	pqPutInt(call->reason, 4, min_conn);
+	pqPutInt(call->actionorder, 4, min_conn);
+	pqPutInt(call->row, 4, min_conn);
+	pqPuts(call->tablename, min_conn);
+	pqPuts(call->classname, min_conn);
+	pqPuts(call->methodname, min_conn);
+
+	pqPutInt(call->colcount, 4, min_conn);
+
+	for (i = 0; i < call->colcount; i++)
+	{
+		pqPuts(call->colnames[i], min_conn);
+		pqPuts(call->coltypes[i], min_conn);
 	}
 
-	switch(call -> reason){
+	switch (call->reason)
+	{
 		case PLPGJ_TRIGGER_REASON_INSERT:
-			trigger_send_tuple(call -> _new, call -> colcount);
-		break;
+			trigger_send_tuple(call->_new, call->colcount);
+			break;
 		case PLPGJ_TRIGGER_REASON_UPDATE:
-			trigger_send_tuple(call -> _old, call -> colcount);
-			trigger_send_tuple(call -> _new, call -> colcount);
-		break;
+			trigger_send_tuple(call->_old, call->colcount);
+			trigger_send_tuple(call->_new, call->colcount);
+			break;
 		case PLPGJ_TRIGGER_REASON_DELETE:
-			trigger_send_tuple(call -> _old, call -> colcount);
-		break;
-	}	
+			trigger_send_tuple(call->_old, call->colcount);
+			break;
+	}
 
-	elog(DEBUG1,"trace point (before pqPutMsgEnd)");
-	pqPutMsgEnd(min_conn);
-	elog(DEBUG1,"trace point (before pqFlush)");
-	pqFlush(min_conn);
-	elog(DEBUG1,"trace point (last)");
 	return 0;
 }
 
-int febe_send_call(callreq call){
-	int i;
-	elog(DEBUG1, "sending call req. (test phase)");
-	pqPutMsgStart(0,0,min_conn);
-	elog(DEBUG1, "pqPutMsgStart");
-	pqPutc('C',min_conn);
-	elog(DEBUG1, "putc");
-	pqPuts((const char*)call -> classname, min_conn);
-	elog(DEBUG1, "puts 1");
-	pqPuts(call -> methodname, min_conn);
-	elog(DEBUG1, "puts 2");
-	pqPuts(call -> expect, min_conn);
-	elog(DEBUG1, "puts 3");
-	//TODO: hmm?
-	pqPutInt(call -> nrOfParams,  4, min_conn);
-	elog(DEBUG1, "number of params: %d", call -> nrOfParams);
-	for(i = 0; i < call -> nrOfParams; i++){
-		elog(DEBUG1, "sending param %d", i);
-		pqPuts(call -> parameters[i].type, min_conn);
-		elog(DEBUG1, "tp 1");
-		if(call -> parameters[i].data.isnull){
+int
+febe_send_call(callreq call)
+{
+	int			i;
+
+	pqPutMsgStart(0, 0, min_conn);
+	pqPutc('C', min_conn);
+	pqPuts((const char *) call->classname, min_conn);
+	pqPuts(call->methodname, min_conn);
+	pqPuts(call->expect, min_conn);
+	/*
+	 * TODO: hmm?
+	 */
+	pqPutInt(call->nrOfParams, 4, min_conn);
+	for (i = 0; i < call->nrOfParams; i++)
+	{
+		pqPuts(call->parameters[i].type, min_conn);
+		if (call->parameters[i].data.isnull)
 			pqPutc('N', min_conn);
-			elog(DEBUG1, "tp 2");
-		} else {
+		else
+		{
 			pqPutc('D', min_conn);
-			elog(DEBUG1, "tp 3");
-			pqPutInt(call -> parameters[i].data.length, 4, min_conn);
-			elog(DEBUG1, "tp 4");
-			pqPutnchar(call -> parameters[i].data.data, call -> parameters[i].data.length, min_conn);
-			elog(DEBUG1, "tp 5");
+			pqPutInt(call->parameters[i].data.length, 4, min_conn);
+			pqPutnchar(call->parameters[i].data.data,
+					   call->parameters[i].data.length, min_conn);
 		}
-		elog(DEBUG1, "sending param %d done", i);
 
-		
 	}
-	elog(DEBUG1, "putint 1");
-	pqPutMsgEnd(min_conn);
-	elog(DEBUG1, "message end");
-	pqFlush(min_conn);
-	elog(DEBUG1, "flush, done");
 	return 0;
 }
 
-int febe_send_result(plpgj_result res){
-	elog(DEBUG1, "sending result. (not impl)");
+int
+febe_send_result(plpgj_result res)
+{
+	pqPutMsgStart(0, 0, min_conn);
 	return 0;
 }
 
-int febe_send_exception(error_message err){
-	elog(DEBUG1, "sending exception. (not impl)");
+int
+febe_send_exception(error_message err)
+{
+	pqPutMsgStart(0, 0, min_conn);
+	pqPutc('E', min_conn);
+	pqPuts(err->classname, min_conn);
+	pqPuts(err->message, min_conn);
+	pqPuts(err->stacktrace, min_conn);
 	return 0;
 }
 
-int plpgj_channel_send(message msg){
-	switch(msg->msgtype){
+int
+plpgj_channel_send(message msg)
+{
+	int			ret;
+
+	switch (msg->msgtype)
+	{
 		case MT_TRIGREQ:
-			return febe_send_trigger((callreq)msg);
+			ret = febe_send_trigger((trigger_callreq) msg);
+			break;
 		case MT_CALLREQ:
-			return febe_send_call((trigger_callreq)msg);
+			ret = febe_send_call((callreq) msg);
+			break;
 		case MT_RESULT:
-			return febe_send_result((plpgj_result)msg);
+			ret = febe_send_result((plpgj_result) msg);
+			break;
 		case MT_EXCEPTION:
-			return febe_send_exception((error_message)msg);
+			ret = febe_send_exception((error_message) msg);
+			break;
 		default:
-		break;
+			pljlogging_error = 1;
+			elog(ERROR, "UNHANDLED MESSAGE");
+			return -1;
+			break;
 	}
+	pqPutMsgEnd(min_conn);
+	pqFlush(min_conn);
+	return ret;
 }
 
-void* febe_receive_exception(){
-	PQExpBuffer name, mesg;
-	int res;
+void *
+febe_receive_exception()
+{
+	PQExpBuffer name,
+				mesg;
 	error_message ret;
-
-	elog(DEBUG1, "febe_receive_exception");
 
 	name = createPQExpBuffer();
 	mesg = createPQExpBuffer();
 
-//	pqReadData(min_conn);
-
-	elog(DEBUG1, "febe_receive_exception tp 1");
-	//res = pqGets(name, min_conn);
-
-	//res = pqGets(mesg, min_conn);
-
-	elog(DEBUG1, "febe_receive_exception tp 2");
-
 	ret = SPI_palloc(sizeof(str_error_message));
-	if(ret == NULL){
-		elog(DEBUG1, "gebasz.");
-	}
 
-	//ret -> classname = name -> data;
-	//ret -> message = mesg -> data;
-	ret -> classname = febe_receive_string();
-	elog(DEBUG1, "febe_receive_exception tp 2.1");
-	ret -> message = febe_receive_string();
-	ret -> stacktrace = NULL;
+	ret->classname = febe_receive_string();
+	ret->message = febe_receive_string();
+	ret->stacktrace = NULL;
 
-	elog(DEBUG1, "febe_receive_exception tp 3");
 
-	ret -> msgtype = MT_EXCEPTION;
-	ret -> length = sizeof(error_message);
+	ret->msgtype = MT_EXCEPTION;
+	ret->length = sizeof(error_message);
 
-	if(min_conn -> Pfdebug)
-		fflush(min_conn -> Pfdebug);
+	if (min_conn->Pfdebug)
+		fflush(min_conn->Pfdebug);
 	return ret;
 }
 
-void* febe_receive_result() {
+void *
+febe_receive_result()
+{
 	plpgj_result ret;
-	int i,j;		//iterators
+	int			i,
+				j;				//iterators
 
 	ret = SPI_palloc(sizeof(str_plpgj_result));
-	ret -> msgtype = MT_RESULT;
-	ret -> length = sizeof(str_plpgj_result);
+	ret->msgtype = MT_RESULT;
+	ret->length = sizeof(str_plpgj_result);
 
-	ret -> rows = febe_receive_integer_4();
-	ret -> cols = febe_receive_integer_4();
+	ret->rows = febe_receive_integer_4();
+	ret->cols = febe_receive_integer_4();
 
-	if(ret -> rows > 0){
-		ret -> data = SPI_palloc( (ret -> rows) * sizeof(raw) );
-		ret -> types = SPI_palloc( ret -> rows * (sizeof(char*)) );
-	} else {
-		ret -> data = NULL;
-		ret -> types = NULL;
+	if (ret->rows > 0)
+	{
+		ret->data = SPI_palloc((ret->rows) * sizeof(raw));
+		ret->types = SPI_palloc(ret->rows * (sizeof(char *)));
+	}
+	else
+	{
+		ret->data = NULL;
+		ret->types = NULL;
 	}
 
-	for(i = 0; i < ret -> rows; i++) {
-		ret -> types[i] = NULL;
-	}
+	for (i = 0; i < ret->rows; i++)
+		ret->types[i] = NULL;
 
 
-	for(i = 0; i < ret -> rows; i++) {
-		if(ret -> cols > 0){
-			ret -> data[i] = SPI_palloc( (ret -> cols) * sizeof(raw) );
-		} else {
-			ret -> data[i] = NULL;
-		}
-		for(j = 0; j < ret -> cols; j++) {
-			char isn;
+	for (i = 0; i < ret->rows; i++)
+	{
+		if (ret->cols > 0)
+			ret->data[i] = SPI_palloc((ret->cols) * sizeof(raw));
+		else
+			ret->data[i] = NULL;
+		for (j = 0; j < ret->cols; j++)
+		{
+			char		isn;
+
 			pqGetc(&isn, min_conn);
-			if(isn == 'N'){
-				ret -> data[i][j].data = NULL;
-				ret -> data[i][j].length;
-				ret -> data[i][j].isnull = 1;
-			} else {
-				int len;
-				ret -> data[i][j].isnull = 0;
+			if (isn == 'N')
+			{
+				ret->data[i][j].data = NULL;
+				ret->data[i][j].length = 0;
+				ret->data[i][j].isnull = 1;
+			}
+			else
+			{
+				int			len;
+
+				ret->data[i][j].isnull = 0;
 				len = febe_receive_integer_4();
-				ret -> data[i][j].length = len;
-				ret -> data[i][j].data = 
-					SPI_palloc(len);
-				pqGetnchar(ret -> data[i][j].data, len, min_conn);
+				ret->data[i][j].length = len;
+				ret->data[i][j].data = SPI_palloc(len);
+				pqGetnchar(ret->data[i][j].data, len, min_conn);
 				{
-					//evil!
-					char buff[100];
-					int l;
+					/*
+					 * evil!
+					 */
+					char		buff[100];
+					int			l;
+
 					l = febe_receive_integer_4();
 					pqGetnchar(buff, l, min_conn);
 					buff[l] = 0;
-					if(ret -> types[j] == NULL){
-						ret -> types[j] = SPI_palloc(strlen(buff));
-						strcpy(ret -> types[j], buff);
+					if (ret->types[j] == NULL)
+					{
+						ret->types[j] = SPI_palloc(strlen(buff));
+						strcpy(ret->types[j], buff);
 					}
 				}
-					
+
 			}
 		}
 	}
 
-	if(min_conn -> Pfdebug)
-		fflush(min_conn -> Pfdebug);
+	if (min_conn->Pfdebug)
+		fflush(min_conn->Pfdebug);
 	return ret;
 }
 
-message febe_receive_log() {
+message
+febe_receive_log()
+{
 	log_message ret;
 
 	ret = SPI_palloc(sizeof(str_log_message));
-	ret -> msgtype = MT_LOG;
-	ret -> length = sizeof(str_log_message);
+	ret->msgtype = MT_LOG;
+	ret->length = sizeof(str_log_message);
 
-	ret -> level = febe_receive_integer_4();
-	ret -> category = febe_receive_string();
-	ret -> message = febe_receive_string();
+	ret->level = febe_receive_integer_4();
+	ret->category = febe_receive_string();
+	ret->message = febe_receive_string();
 
-	if(min_conn -> Pfdebug)
-		fflush(min_conn -> Pfdebug);
+	if (min_conn->Pfdebug)
+		fflush(min_conn->Pfdebug);
 
+	return (message) ret;
+}
+
+
+message
+febe_receive_tupres()
+{
+	trigger_tupleres res;
+	int			i;
+
+	res = SPI_palloc(sizeof(str_msg_trigger_tupleresult));
+	res->length = sizeof(str_msg_trigger_tupleresult);
+	res->msgtype = MT_TUPLRES;
+
+	res->tablename = febe_receive_string();
+	res->colcount = febe_receive_integer_4();
+	res->colnames =
+		res->colcount >
+		0 ? SPI_palloc(res->colcount * sizeof(char *)) : NULL;
+	if (res->colcount > 0)
+		res->_tuple = SPI_palloc(sizeof(pparam) * res->colcount);
+	else
+		res->_tuple = NULL;
+	for (i = 0; i < res->colcount; i++)
+	{
+		char	   *name;
+		char		isnull;
+
+		name = febe_receive_string();
+		res->colnames[i] = name;
+		res->_tuple[i] = SPI_palloc(sizeof(struct fnc_param));
+		pqGetc(&isnull, min_conn);
+		if (isnull == 'n')
+		{
+			/*
+			 * NULL
+			 */
+			res->_tuple[i]->type = NULL;
+			res->_tuple[i]->data.isnull = true;
+		}
+		else
+		{
+			/*
+			 * not null
+			 */
+			res->_tuple[i]->type = febe_receive_string();
+			res->_tuple[i]->data.isnull = false;
+			res->_tuple[i]->data.length = febe_receive_integer_4();
+			if (res->_tuple[i]->data.length > 0)
+			{
+				res->_tuple[i]->data.data =
+					SPI_palloc(res->_tuple[i]->data.length);
+			}
+			else
+				res->_tuple[i]->data.data = NULL;
+			pqGetnchar(res->_tuple[i]->data.data,
+					   res->_tuple[i]->data.length, min_conn);
+		}
+	}
+
+	return (message) res;
+}
+
+sql_msg_statement
+febe_receive_sql_statement(void)
+{
+	sql_msg_statement ret;
+
+	ret = (sql_msg_statement) SPI_palloc(sizeof(struct str_sql_statement));
+	ret->msgtype = MT_SQL;
+	ret->length = sizeof(struct str_sql_statement);
+	ret->sqltype = SQL_TYPE_STATEMENT;
+	ret->statement = febe_receive_string();
 	return ret;
 }
 
+sql_msg
+febe_receive_sql(void)
+{
+	int			typ;
 
-message febe_receive_tupres() {
-	trigger_tupleres res;
-	int i;
-	
-	elog(DEBUG1,"1");
-	res = SPI_palloc(sizeof(str_msg_trigger_tupleresult));
-	res -> length = sizeof(str_msg_trigger_tupleresult);
-	res -> msgtype = MT_TUPLRES;
-
-	res -> tablename = febe_receive_string();
-	res -> colcount = febe_receive_integer_4();
-	res -> colnames = res -> colcount > 0 ? SPI_palloc(res -> colcount * sizeof(char*) ) : NULL;
-	if(res -> colcount > 0){
-		res -> _tuple = SPI_palloc(sizeof(pparam) * res -> colcount);
-	} else {
-		res -> _tuple = NULL;
+	typ = febe_receive_integer_4();
+	switch (typ)
+	{
+		case SQL_TYPE_STATEMENT:
+			return (sql_msg) febe_receive_sql_statement();
+		default:
+			pljlogging_error = 1;
+			elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
 	}
-	elog(DEBUG1,"2");
-	for(i = 0; i< res -> colcount; i++){
-		char* name;
-		char isnull;
-		name = febe_receive_string();
-		res -> colnames[i] = name;
-		res -> _tuple[i] = SPI_palloc(sizeof(struct fnc_param));
-		pqGetc(&isnull, min_conn);
-		if(isnull == 'n'){
-			//NULL
-			res -> _tuple[i] -> type = NULL;
-			res -> _tuple[i] -> data.isnull = true;
-		} else {
-			//not null
-			res -> _tuple[i] -> type = febe_receive_string();
-			res -> _tuple[i] -> data.isnull = false;
-			res -> _tuple[i] -> data.length = febe_receive_integer_4();
-			if(res -> _tuple[i] -> data.length > 0) {
-				res -> _tuple[i] -> data.data = 
-					SPI_palloc(res -> _tuple[i] -> data.length);
-			} else {
-				res -> _tuple[i] -> data.data = NULL;
-			}
-			pqGetnchar(
-				res -> _tuple[i] -> data.data, 
-				res -> _tuple[i] -> data.length, 
-				min_conn);
-		}
-	}
-	elog(DEBUG1,"3");
-	
-	return res;
+	return NULL;				//which never happens, but syntax failure otherwise.
 }
-message plpgj_channel_receive(void){
-	int header;
-	char type;
-	int ret;
-	
-	//ret = pqGetInt(&header, 4, min_conn);
 
-	//elog(DEBUG1, "header: %d", header);
+message
+plpgj_channel_receive(void)
+{
+	char		type;
+	int			ret;
 
-	if(min_conn -> inCursor == min_conn -> inEnd){
-		elog(DEBUG1,"fetching data...");
+	if (min_conn->inCursor == min_conn->inEnd)
+	{
 		ret = pqReadData(min_conn);
-	switch(ret) {
-		case 1: elog(DEBUG1, "got data from the server"); 
-		break;
-		case 0: elog(DEBUG1, "no data, but still okay (who knows?)"); 
-		break;
-		case -1: elog(WARNING, "ERROR"); 
-		break;
-		default: elog(ERROR, "something is realy _very_ wrong");
-	}
+		switch (ret)
+		{
+			case 1:				
+				break;
+			case 0:	
+				elog(WARNING, "This should not ever happen.");
+				break;
+			case -1:
+			default:
+				pljlogging_error = 1;
+				elog(ERROR, "something is realy _very_ wrong");
+		}
 	}
 
 	ret = pqGetc(&type, min_conn);
 
-	if(ret == EOF){
-		elog(ERROR, "pqGetc returned EOF");
+	if (ret == EOF){
+		pljlogging_error = 1;
+		elog(ERROR, "Unexpected EOF from socket. PL-J server is gone?");
 	}
 
-	switch(type){
+	switch (type)
+	{
 		case 'R':
 			return (message) febe_receive_result();
 		case 'E':
@@ -397,11 +451,13 @@ message plpgj_channel_receive(void){
 			return (message) febe_receive_log();
 		case 'U':
 			return (message) febe_receive_tupres();
-	default:
+		case 'S':
+			return (message) febe_receive_sql();
+		default:
+			pljlogging_error = 1;
 			elog(ERROR, "message type unknown :%d", type);
 			return NULL;
 	}
 
 	return NULL;
 }
-

@@ -477,9 +477,10 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 	retTypetup =
 		SearchSysCache(TYPEOID, ObjectIdGetDatum(procstruct->prorettype),
 					   0, 0, 0);
-	if (!HeapTupleIsValid(retTypetup))
+	if (!HeapTupleIsValid(retTypetup)){
 		pljlogging_error = 1;
-	elog(ERROR, "return type is invalid?");
+		elog(ERROR, "return type is invalid?");
+	}
 	rettype = (Form_pg_type) GETSTRUCT(retTypetup);
 	ret->expect = (char *) rettype->typname.data;
 	ReleaseSysCache(retTypetup);
