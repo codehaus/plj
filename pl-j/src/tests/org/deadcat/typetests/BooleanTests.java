@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  */
 public class BooleanTests {
 
-	Logger logger = Logger.getLogger(BooleanTests.class);
+	private static Logger logger = Logger.getLogger(BooleanTests.class);
 
 	/**
 	 *  
@@ -21,26 +21,26 @@ public class BooleanTests {
 		super();
 	}
 
-	public void setBoolean(Boolean b) {
+	public static void setBoolean(Boolean b) {
 		logger.debug("setBoolean " + String.valueOf(b));
 	}
 
-	public Boolean getBoolean() {
+	public static Boolean getBoolean() {
 		logger.debug("getBoolean");
 		return Boolean.FALSE;
 	}
 
-	public Boolean doOR(Boolean a, Boolean b) {
+	public static Boolean doOR(Boolean a, Boolean b) {
 		return (a.booleanValue() || b.booleanValue()) ? Boolean.TRUE
 				: Boolean.FALSE;
 	}
 	
-	public Boolean doAND(Boolean a, Boolean b) {
+	public static Boolean doAND(Boolean a, Boolean b) {
 		return (a.booleanValue() && b.booleanValue()) ? Boolean.TRUE
 				: Boolean.FALSE;
 	}
 	
-	public Boolean doNOT(Boolean b){
+	public static Boolean doNOT(Boolean b){
 		return b.booleanValue() ? Boolean.FALSE : Boolean.TRUE;
 	}
 	

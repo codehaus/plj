@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -40,7 +41,7 @@ public class JDBCTests {
 	 * 
 	 * @return an integer (1)
 	 */
-	public int doTest1() throws SQLException {
+	public static int doTest1() throws SQLException {
 
 		Statement sta = null;
 		Connection conn = null;
@@ -72,16 +73,41 @@ public class JDBCTests {
 		}
 	}
 
-	public void doPreparedTest1() throws SQLException{
+	public static void doPreparedTest1() throws SQLException{
 		Connection conn = null;
 		PreparedStatement sta = null;
 		try{
 			conn = DriverManager.getConnection("jdbc:default:connection");
 			sta = conn.prepareStatement("insert into plj_prepsta_xmpl(str, str_maynull) values (?, ?)");
-			sta.setString(1, String.valueOf(System.currentTimeMillis()));
-			sta.setString(2, "Greetings from Mirkwood!");
-			sta.execute();
+			for(int i=0; i<1000; i++){
+				sta.setString(1, String.valueOf(System.currentTimeMillis()));
+				sta.setString(2, "Greetings from Mirkwood!");
+				sta.execute();
+			}
 		} finally {
+			if(sta != null)
+				sta.close();
+			if(conn != null)
+				conn.close();
+		}
+	}
+
+	public static void doPreparedQueryTest1(Integer i) throws SQLException{
+		Connection conn = null;
+		PreparedStatement sta = null;
+		ResultSet res = null;
+		try{
+			conn = DriverManager.getConnection("jdbc:default:connection");
+			sta = conn.prepareStatement("select id, str from plj_prepsta_xmpl where id = ?");
+			sta.setInt(1, i.intValue());
+			res = sta.executeQuery();
+			while(res.next()){
+				logger.debug("id: "+res.getInt(1));
+				logger.debug("str: "+res.getString(2));
+			}
+		} finally {
+			if(res != null)
+				res.close();
 			if(sta != null)
 				sta.close();
 			if(conn != null)

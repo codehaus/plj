@@ -34,4 +34,17 @@ public class PLJTriggers {
 		return _new;
 	}
 
+	public TestTableRecord beforeInsertRowTrigger(TestTableRecord _new) {
+		cat.warn("before insert trigger - testtable2: " + _new.getName() + " with id "+_new.getId());
+		_new.setName(_new.getName().concat("(before)"));
+		return _new;
+	}
+	
+	public TestTableRecord afterInsertRowTrigger(TestTableRecord _new) {
+		cat.warn("after insert trigger - testtable2: " + _new.getName() + " with id "+_new.getId());
+		_new.setName(_new.getName().concat("(before)"));
+		return _new;
+	}
+	
+	
 }
