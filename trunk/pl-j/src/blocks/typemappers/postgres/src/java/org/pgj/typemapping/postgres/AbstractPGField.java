@@ -5,8 +5,9 @@ import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 
 /**
+ * The functionality needed by most PostgreSQL data type.
+ * 
  * @author Laszlo Hornyak
- * The functionality needed by all PostgreSQL data type.
  */
 public abstract class AbstractPGField implements Field {
 

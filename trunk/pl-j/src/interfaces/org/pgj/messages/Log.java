@@ -12,9 +12,10 @@ package org.pgj.messages;
 public class Log extends Message {
 
 	public static final int LEVEL_DEBUG = 1;
-	public static final int LEVEL_WARN = 2;
-	public static final int LEVEL_ERROR = 3;
-	public static final int LEVEL_FATAL = 4;
+	public static final int LEVEL_INFO = 2;
+	public static final int LEVEL_WARN = 3;
+	public static final int LEVEL_ERROR = 4;
+	public static final int LEVEL_FATAL = 5;
 	private int level;
 	private String category = null;
 	private String message;
