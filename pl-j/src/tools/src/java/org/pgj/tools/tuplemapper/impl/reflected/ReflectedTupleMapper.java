@@ -18,6 +18,7 @@ import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.apache.commons.beanutils.BeanUtils;
+import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
@@ -35,10 +36,12 @@ public class ReflectedTupleMapper
 		implements
 			LogEnabled,
 			Configurable,
-			TupleMapper, Serviceable{
+			TupleMapper,
+			Serviceable {
 
 	Logger logger = null;
 	Map classmap = new HashMap();
+	PLJClassLoader classLoader = null;
 
 	/* (non-Javadoc)
 	 * @see org.apache.avalon.framework.logger.LogEnabled#enableLogging(org.apache.avalon.framework.logger.Logger)
@@ -54,8 +57,10 @@ public class ReflectedTupleMapper
 		try {
 			Configuration[] confs = arg0.getChildren("relation");
 			for (int i = 0; i < confs.length; i++) {
-				classmap.put(confs[i].getAttribute("name"), Class
-						.forName(confs[i].getAttribute("class")));
+				String name = confs[i].getAttribute("name");
+				Class cls = classLoader.load((confs[i].getAttribute("class")));
+				logger.debug("Assigning " + name + " to " + cls.getName());
+				classmap.put(name, cls);
 			}
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException("Class not found.", arg0, e);
@@ -67,8 +72,7 @@ public class ReflectedTupleMapper
 	 */
 	public Object mapTuple(Tuple tuple) throws MappingException {
 		try {
-			String classname = (String) classmap.get(tuple.getRelationName());
-			Class cls = Class.forName(classname);
+			Class cls = (Class) classmap.get(tuple.getRelationName());
 			Object obj = cls.newInstance();
 			Map fldMap = tuple.getFieldMap();
 			Iterator it = fldMap.keySet().iterator();
@@ -79,13 +83,11 @@ public class ReflectedTupleMapper
 				BeanUtils.setProperty(obj, fldName, fld.defaultGet());
 			}
 			return obj;
-		} catch (ClassNotFoundException e) {
-			throw new MappingException(e);
 		} catch (InstantiationException e) {
 			throw new MappingException(e);
 		} catch (IllegalAccessException e) {
 			throw new MappingException(e);
-		} catch (InvocationTargetException e){
+		} catch (InvocationTargetException e) {
 			throw new MappingException(e);
 		}
 	}
@@ -94,13 +96,31 @@ public class ReflectedTupleMapper
 	 * @see org.pgj.tools.tuplemapper.TupleMapper#getMappedClass(org.pgj.typemapping.Tuple)
 	 */
 	public Class getMappedClass(Tuple tuple) {
-		return (Class) classmap.get(tuple.getRelationName());
+		if (tuple == null) {
+			logger.debug("null tuple -> null class");
+			return null;
+		}
+		logger.debug(tuple.getRelationName());
+		Class ret = (Class) classmap.get(tuple.getRelationName());
+		logger.debug("class: " + ret);
+		return ret;
 	}
 
 	/**
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
+	 * 
+	 * @avalon.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
+		classLoader = (PLJClassLoader) arg0.lookup("classloader");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.tools.tuplemapper.TupleMapper#backMap(java.lang.Object)
+	 */
+	public Tuple backMap(Object obj) throws MappingException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
