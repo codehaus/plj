@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,9 +46,11 @@ public class PlanPool {
 		return pp;
 	}
 
-
 	/** The map of statement -> ArrayList of plans */
 	private HashMap map = new HashMap();
+	
+	/** All the plan pool entries */
+	private Collection allPlans = new HashSet();
 
 	/** The count of plans */
 	private int planCount = 0;
@@ -98,10 +101,14 @@ public class PlanPool {
 		Iterator i = a.iterator();
 		while (i.hasNext()) {
 
-			PlanPoolEntry e = null;
+			PlanPoolEntry e = (PlanPoolEntry) i.next();
+			if (!doMatch(e, params))
+				continue;
+
 			if (e == null)
 				return; //XXX should warn or something!
 			e.refCount--;
+			return;
 		}
 		planCount--;
 
@@ -109,12 +116,12 @@ public class PlanPool {
 
 	private int doGetPlan(String statement, Class[] params) {
 		Collection l = (Collection) map.get(statement);
-		if(l == null){
+		if (l == null) {
 			l = new ArrayList();
 			map.put(statement, l);
 		} else {
 			Iterator i = l.iterator();
-	
+
 			while (i.hasNext()) {
 				PlanPoolEntry e = (PlanPoolEntry) i.next();
 				if (doMatch(e, params))
@@ -135,38 +142,34 @@ public class PlanPool {
 		}
 	}
 
-	private void doPutPlan(String statement, Class[] params,
-			int planid, PLJJDBCConnection conn) {
-		if (map.keySet().size() > 512) {
-			//find a plan to free
+	private void doPutPlan(String statement, Class[] params, int planid,
+			PLJJDBCConnection conn) throws SQLException {
+		if (planCount > 256) {
+			
 			PlanPoolEntry worst = null;
-			String worstPlan = null;
-			Iterator i = map.keySet().iterator();
-			while (i.hasNext()) {
-				String planSta = (String) i.next();
-				ArrayList a = (ArrayList) map.get(worstPlan);
-				Iterator j = a.iterator();
-				while (j.hasNext()) {
-					PlanPoolEntry plan = (PlanPoolEntry) j.next();
-					if (worstPlan == null && worst == null) {
-						worstPlan = planSta;
-						worst = plan;
-						continue;
-					}
-					if (plan.requestCnt > worst.requestCnt) {
-						worstPlan = planSta;
-						worst = plan;
-					}
+			Iterator i = allPlans.iterator();
+			while(i.hasNext()){
+				PlanPoolEntry e = (PlanPoolEntry)i.next();
+				if(e.refCount!= 0)
+					continue;
+				if(worst == null){
+					worst = e;
+					continue;
 				}
+				if(e.requestCnt < worst.requestCnt)
+					worst = e;
 			}
-			//unprepare
-			SQLUnPrepare up = new SQLUnPrepare();
-			up.setPlanid(worst.plan);
-			conn.doSendMessage(up); //no need for ansver
+			
+			if(worst != null){
+				SQLUnPrepare up = new SQLUnPrepare();
+				up.setPlanid(worst.plan);
+				conn.doSendMessage(up); //no need for ansver
 
-			List l = (List) map.get(worstPlan);
-			l.remove(worst);
-
+				List l = (List) map.get(worst.statement);
+				l.remove(worst);
+				allPlans.remove(worst);
+				planCount--;
+			}
 		}
 
 		PlanPoolEntry ppe = new PlanPoolEntry();
@@ -179,6 +182,7 @@ public class PlanPool {
 			map.put(statement, a);
 		}
 		a.add(ppe);
+		allPlans.add(ppe);
 		planCount++;
 	}
 
