@@ -9,6 +9,7 @@
 #define SQL_TYPE_FETCH					3
 #define SQL_TYPE_CURSOR_OPEN			4
 #define SQL_TYPE_PREPARE			5
+#define SQL_TYPE_PEXECUTE			6
 
 typedef struct str_sql_msg
 {
@@ -30,6 +31,21 @@ typedef struct str_sql_prepare
 	int	ntypes;
 	char	**types;
 }	*sql_msg_prepapre;
+
+
+#define SQL_PEXEC_ACTION_EXECUTE	0
+#define SQL_PEXEC_ACTION_UPDATE		1
+#define SQL_PEXEC_ACTION_OPENCURSOR	2
+
+typedef struct str_sql_pexecute
+{
+	base_message_content;
+	sql_message_content;
+	int	planid;
+	int	nparams;
+	pparam	params;
+	int 	action;
+}	*sql_pexecute;
 
 /**
  * For opening and closing cursors.

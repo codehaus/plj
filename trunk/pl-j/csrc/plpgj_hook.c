@@ -56,8 +56,18 @@ void		plpgj_ErrorContextCallback(void *arg);
 
 int			callbacks_init = 0;
 
+/* 
+ This is how it WILL work
+
 short		plpgj_tx_externalize = 1;
 short		plpgj_tx_externalize_nested = 0;
+*/
+
+// This is how it works right now
+
+#define plpgj_tx_externalize		plj_get_configvalue_boolean("plpgj.tx.externalize")
+#define plpgj_tx_externalize_nested	plj_get_configvalue_boolean("plpgj.tx.externalize.nested")
+
 
 /*	*/
 
@@ -96,6 +106,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		error_context_stack = mycallback;
 		pljelog(DEBUG1, "4");
 
+		if(plpgj_tx_externalize)
 		RegisterEOXactCallback(plpgj_EOXactCallBack, NULL);
 		pljelog(DEBUG1, "5");
 		callbacks_init = 1;
@@ -126,9 +137,11 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 	{
 		void	   *ansver = NULL;
 
-		pljelog(DEBUG1, "send message");
+		pljelog(DEBUG1, "waiting ansver.");
 		ansver = plpgj_channel_receive();
+		pljelog(DEBUG1, "got %s", ansver == NULL ? "null" : "not null");
 		message_type = plpgj_message_type(ansver);
+		pljelog(DEBUG1, "ansver of type: %d", message_type);
 		switch (message_type)
 		{
 			case MT_RESULT:
@@ -179,6 +192,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			pljelog(DEBUG1, "result");
 			plpgj_result res = (plpgj_result) ansver;
 
+			pljelog(DEBUG1, "result 1");
 			if (res->rows == 1 && res->cols == 1)
 			{
 				Datum		ret;
@@ -190,8 +204,12 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				StringInfo	rawString;
 				MemoryContext oldctx;
 
+				pljelog(DEBUG1, "result 2");
 				if (res->data[0][0].isnull == 1){
-					error_context_stack = error_context_stack->previous;
+					pljelog(DEBUG1, "result 2.1");
+//					if(error_context_stack != NULL)
+//						error_context_stack = error_context_stack->previous;
+					pljelog(DEBUG1, "result 3");
 					PG_RETURN_NULL();
 				}
 
@@ -441,6 +459,89 @@ plpgj_sql_do(sql_msg msg)
 				pljelog(DEBUG1,"action!");
 				plpgj_channel_send((message)res);
 				
+			}
+			break;
+		case SQL_TYPE_PEXECUTE:
+			pljelog(DEBUG1,"pexec");
+			{
+				char* nulls;
+				Datum* values;
+				sql_pexecute sql;
+				int i;
+
+				sql = (sql_pexecute)msg;
+				nulls = SPI_palloc( sql -> nparams * sizeof(char)) + 1;
+				pljelog(DEBUG1, "nparams: %d", sql -> nparams);
+				if(sql -> nparams == 0){
+					values = NULL;
+				} else {
+					values = SPI_palloc( sql -> nparams * sizeof(Datum));
+				}
+				for(i = 0; i < sql -> nparams; i++) {
+					if(sql -> params[i].data.isnull){
+						nulls[i] = 'n';
+					} else {
+						TypeName* typnam;
+						HeapTuple typtup;
+						Form_pg_type typstr;
+						Oid typoid;
+						StringInfo rawString;
+						
+						pljelog(DEBUG1, "[%d]creating Datum: %s", i, sql -> params[i].type);
+						pljelog(DEBUG1, "[%d] type: %s", i, sql -> params[i].type);
+
+						nulls[i] = ' ';
+						pljelog(DEBUG1, "1");
+						typnam = makeTypeName(sql -> params[i].type );
+						pljelog(DEBUG1, "2");
+						typoid = LookupTypeName(typnam);
+						pljelog(DEBUG1, "3");
+						typtup = SearchSysCache(TYPEOID, typoid, 0, 0, 0);
+						pljelog(DEBUG1, "4");
+						typstr = (Form_pg_type)GETSTRUCT(typtup);
+						pljelog(DEBUG1, "5");
+						ReleaseSysCache(typtup);
+						
+						rawString = SPI_palloc(sizeof(StringInfoData));
+						initStringInfo(rawString);
+						pljelog(DEBUG1, "6: %d", sql -> params[i].data.length);
+						appendBinaryStringInfo(rawString, sql -> params[i].data.data, sql -> params[i].data.length);
+						pljelog(DEBUG1, "7");
+						values[i] = OidFunctionCall1(typstr -> typreceive, PointerGetDatum(rawString));
+						pljelog(DEBUG1, "8");
+						
+						
+					}
+				}
+				nulls[sql -> nparams + 1] = 0;
+				pljelog(DEBUG1,"executing.");
+				{
+				int ret;
+				ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
+				pljelog(DEBUG1, "ret: %d", ret);
+				pljelog(DEBUG1, "plantable entry is null: %d", (plantable[sql -> planid] == NULL));
+				switch (ret) {
+					case SPI_ERROR_ARGUMENT:
+						pljelog(DEBUG1, "SPI_ERROR_ARGUMENT");
+						break;
+					case SPI_ERROR_PARAM:
+						pljelog(DEBUG1, "SPI_ERROR_PARAM");
+						break;
+					default:
+						pljelog(DEBUG1,"success?");
+						break;
+				}
+				}
+				pljelog(DEBUG1,"executed.");
+				//TODO: add logic here!!
+				switch (sql -> action){
+					case SQL_PEXEC_ACTION_EXECUTE:
+					break;
+					case SQL_PEXEC_ACTION_UPDATE:
+					break;
+					case SQL_PEXEC_ACTION_OPENCURSOR:
+					break;
+				}
 			}
 			break;
 		case SQL_TYPE_CURSOR_CLOSE:
