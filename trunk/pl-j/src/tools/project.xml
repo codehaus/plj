@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+
+  <pomVersion>3</pomVersion>
+  <id>pl-j-tools</id>
+  <name>pl-j-tools</name>
+  <currentVersion>0.0.1</currentVersion>
+  
+  <extend>${basedir}/../project.xml</extend>
+
+  <inceptionYear>2004</inceptionYear>
+
+  <description>Tools and utilities for PL-J</description>
+  <shortDescription>
+  	This project includes some utility block for the PL-J system, such as logging
+  	utils, ant tasks and such things.
+  </shortDescription>
+
+	<dependencies>
+
+		<dependency>
+			<id>log4j</id>
+			<type>jar</type>
+			<artifactId>log4j</artifactId>
+			<version>1.2.8</version>
+		</dependency>
+		<dependency>
+			<id>avalon-framework</id>
+			<type>jar</type>
+			<artifactId>avalon-framework</artifactId>
+			<version>4.1.5</version>
+		</dependency>
+		<dependency>
+			<id>pl-j</id>
+			<type>jar</type>
+			<artifactId>pl-j-api</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+        <sourceDirectory>src/java</sourceDirectory>
+	</build>
+
+</project>
