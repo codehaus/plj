@@ -28,7 +28,7 @@ public class SQLMessageFactory implements MessageFactory {
 
 	/** SQL message id for febe */
 	public static final int MESSAGE_HEADER_SQL = 'S';
-	private final static Map map = new HashMap();
+	private final Map map = new HashMap();
 
 	Logger logger = null;
 
@@ -65,8 +65,11 @@ public class SQLMessageFactory implements MessageFactory {
 		SQL sql = (SQL) msg;
 		stream.SendChar(MESSAGE_HEADER_SQL);
 		String clname = msg.getClass().getName();
-		MessageFactory msgf = (MessageFactory) map.get(clname);
-		stream.SendChar(msgf.getMessageHeader());
+		AbstractSQLMessageFactory msgf = (AbstractSQLMessageFactory) map.get(clname);
+		if(msgf == null){
+			throw new CommunicationException("sender method not implemented for "+clname);
+		}
+		stream.SendIntegerR(msgf.getSQLType(), 4);
 		msgf.sendMessage(msg, stream);
 	}
 
