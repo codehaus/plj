@@ -12,23 +12,22 @@ public class Businnes {
 
 	}
 
-	public int test(Integer i) {
+	public String test(Integer i) {
 		System.out.println("Wow, i got a number:" + i);
 
-		return 1;
+		return "Halleluja, vazzeg!";
 	}
 
-
-	public int test() {
-		System.out.println("Yes, yes it works!!! Oh what a feeling !!!");
+	public String test() {
+		System.out.println("\nIf you see this, it means your stored procedure is running.\n");
 
 		System.out.println("Hello\n\n" + System.getProperty("java.version")
 				+ "\n\n");
 
-		return 1;
+		return "Haleluja, vazzeg!";
 	}
 
-	public int jdbcTest() throws SQLException {
+	public String jdbcTest() throws SQLException {
 		System.out.println("JDBC test started");
 
 		Connection conn = DriverManager.getConnection("jdbc:default:database");
@@ -54,7 +53,19 @@ public class Businnes {
 
 		conn.close();
 
-		return 1;
+		return "Haleluja, vazzeg!";
+	}
+
+	public int testInt0(){
+		return 1984;
+	}
+
+	public int testInt1(Integer i1, Integer i2){
+		return i1.intValue() + i2.intValue();
+	}
+
+	public int testInt2(Integer i1){
+		return i1.intValue();
 	}
 
 }
