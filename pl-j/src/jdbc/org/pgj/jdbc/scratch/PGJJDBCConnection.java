@@ -32,6 +32,12 @@ public class PGJJDBCConnection implements Connection {
 	/** We are communicating with the backend using this chanell. */
 	private Channel communicationChanell = null;
 
+	/** The client (must attach to each message) */
+	private Client client = null;
+
+	/** is it closed? */
+	private boolean closed = false;
+
 	/** helps keeping cursors unique */
 	private volatile long cursorId = 0;
 
@@ -48,6 +54,7 @@ public class PGJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#createStatement()
 	 */
 	public Statement createStatement() throws SQLException {
+		checkClosed();
 		return new PGJJDBCStatement(communicationChanell, this);
 	}
 
@@ -56,6 +63,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
 		log.error("not implemented: prepareStatement(String sql) ");
+		checkClosed();
 		return null;
 	}
 
@@ -64,6 +72,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public CallableStatement prepareCall(String sql) throws SQLException {
 		// TODO Auto-generated method stub
+		checkClosed();
 		return null;
 	}
 
@@ -73,6 +82,7 @@ public class PGJJDBCConnection implements Connection {
 	public String nativeSQL(String sql) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -80,16 +90,15 @@ public class PGJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#setAutoCommit(boolean)
 	 */
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		checkClosed();
+		throw new PGJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.Connection#getAutoCommit()
 	 */
 	public boolean getAutoCommit() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		checkClosed();
 		return false;
 	}
 
@@ -97,33 +106,31 @@ public class PGJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#commit()
 	 */
 	public void commit() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		checkClosed();
+		throw new PGJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.Connection#rollback()
 	 */
 	public void rollback() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		checkClosed();
+		throw new PGJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.Connection#close()
 	 */
 	public void close() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		checkClosed();
+		closed = true;
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.Connection#isClosed()
 	 */
 	public boolean isClosed() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
-		return false;
+		return closed;
 	}
 
 	/* (non-Javadoc)
@@ -132,6 +139,7 @@ public class PGJJDBCConnection implements Connection {
 	public DatabaseMetaData getMetaData() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -141,6 +149,7 @@ public class PGJJDBCConnection implements Connection {
 	public void setReadOnly(boolean readOnly) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 	}
 
 	/* (non-Javadoc)
@@ -149,6 +158,7 @@ public class PGJJDBCConnection implements Connection {
 	public boolean isReadOnly() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return false;
 	}
 
@@ -158,6 +168,7 @@ public class PGJJDBCConnection implements Connection {
 	public void setCatalog(String catalog) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 	}
 
 	/* (non-Javadoc)
@@ -166,6 +177,7 @@ public class PGJJDBCConnection implements Connection {
 	public String getCatalog() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -173,8 +185,8 @@ public class PGJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#setTransactionIsolation(int)
 	 */
 	public void setTransactionIsolation(int level) throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		checkClosed();
+		throw new PGJJDBCSQLException("transaction operations are unavailable");
 	}
 
 	/* (non-Javadoc)
@@ -183,6 +195,7 @@ public class PGJJDBCConnection implements Connection {
 	public int getTransactionIsolation() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return 0;
 	}
 
@@ -201,6 +214,7 @@ public class PGJJDBCConnection implements Connection {
 	public void clearWarnings() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 	}
 
 	/* (non-Javadoc)
@@ -210,6 +224,7 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -220,6 +235,7 @@ public class PGJJDBCConnection implements Connection {
 			int resultSetConcurrency) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -230,6 +246,7 @@ public class PGJJDBCConnection implements Connection {
 			int resultSetConcurrency) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -239,6 +256,7 @@ public class PGJJDBCConnection implements Connection {
 	public Map getTypeMap() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -247,6 +265,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public void setTypeMap(Map map) throws SQLException {
 		// TODO Auto-generated method stub
+		checkClosed();
 		log.error("not implemented");
 	}
 
@@ -255,6 +274,7 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public void setHoldability(int holdability) throws SQLException {
 		// TODO Auto-generated method stub
+		checkClosed();
 		log.error("not implemented");
 	}
 
@@ -264,6 +284,7 @@ public class PGJJDBCConnection implements Connection {
 	public int getHoldability() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return 0;
 	}
 
@@ -273,6 +294,7 @@ public class PGJJDBCConnection implements Connection {
 	public Savepoint setSavepoint() throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -282,6 +304,7 @@ public class PGJJDBCConnection implements Connection {
 	public Savepoint setSavepoint(String name) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -291,6 +314,7 @@ public class PGJJDBCConnection implements Connection {
 	public void rollback(Savepoint savepoint) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 	}
 
 	/* (non-Javadoc)
@@ -299,6 +323,7 @@ public class PGJJDBCConnection implements Connection {
 	public void releaseSavepoint(Savepoint savepoint) throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 	}
 
 	/* (non-Javadoc)
@@ -309,6 +334,7 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -320,6 +346,7 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -331,6 +358,7 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -341,6 +369,7 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -351,6 +380,7 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
@@ -361,11 +391,18 @@ public class PGJJDBCConnection implements Connection {
 			throws SQLException {
 		// TODO Auto-generated method stub
 		log.error("not implemented");
+		checkClosed();
 		return null;
 	}
 
-	public String getCursorName() {
+	public synchronized String getCursorName() {
 		return "pgj-cursor-" + cursorId++;
+	}
+
+	/** Check if closed, throw an exception if so. */
+	synchronized void checkClosed() throws SQLException {
+		if (closed)
+			throw new PGJJDBCSQLException("Connection closed");
 	}
 
 }
