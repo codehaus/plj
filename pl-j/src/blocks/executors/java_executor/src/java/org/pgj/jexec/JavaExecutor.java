@@ -27,9 +27,12 @@ import org.pgj.typemapping.TypeMapper;
  * @avalon.component name="java-executor"
  * @avalon.service type="org.pgj.Executor"
  */
-public class JavaExecutor
-	extends ClassLoader
-	implements Executor, Configurable, Serviceable, LogEnabled {
+public class JavaExecutor extends ClassLoader
+		implements
+			Executor,
+			Configurable,
+			Serviceable,
+			LogEnabled {
 
 	/** avalon logger object */
 	Logger logger = null;
@@ -75,8 +78,8 @@ public class JavaExecutor
 			// find a method
 			//---
 			Vector paramvector = c.getParams();
-			org.pgj.typemapping.Field[] params =
-				new org.pgj.typemapping.Field[paramvector.size()];
+			org.pgj.typemapping.Field[] params = new org.pgj.typemapping.Field[paramvector
+					.size()];
 
 			Class[] paramclasses = new Class[params.length];
 
@@ -97,7 +100,10 @@ public class JavaExecutor
 			//---
 			Object obj;
 			try {
+				Thread.currentThread().setContextClassLoader(
+						new PGJClassLoaderAdapter(this.classloader));
 				obj = callm.invoke(callobj, paramobjs);
+				Thread.currentThread().setContextClassLoader(null);
 			} catch (Throwable t) {
 				org.pgj.messages.Error exc = createException(t);
 				return exc;
@@ -106,15 +112,13 @@ public class JavaExecutor
 			logger.debug("<----creating result");
 			Result ret = typemapper.createResult(obj);
 			logger.debug("---->created result");
-			// TODO this shoul not be here!
-			ret.setSid(c.getSid());
 			ret.setClient(c.getClient());
 
 			return ret;
-		} catch (java.lang.Exception e){
+		} catch (java.lang.Exception e) {
 			org.pgj.messages.Error exc = createException(e);
 			return exc;
-			
+
 		} finally {
 			logger.debug("execution done.");
 		}
@@ -127,20 +131,14 @@ public class JavaExecutor
 
 		exc.setExceptionClassName(t.getClass().getName());
 		exc.setMessage(t.getMessage());
-		StringBuffer buf =
-			new StringBuffer("<---- java executor stack trace\n");
+		StringBuffer buf = new StringBuffer("<---- java executor stack trace\n");
 		StackTraceElement[] trace = t.getStackTrace();
 		for (int i = 0; i < trace.length; i++) {
 			StackTraceElement el = trace[i];
-			buf
-				.append(el.getClassName())
-				.append('.')
-				.append(el.getMethodName())
-				.append(" at ")
-				.append(el.getFileName())
-				.append(":")
-				.append(el.getLineNumber())
-				.append('\n');
+			buf.append(el.getClassName()).append('.')
+					.append(el.getMethodName()).append(" at ").append(
+							el.getFileName()).append(":").append(
+							el.getLineNumber()).append('\n');
 		}
 		buf.append("java executor stack trace --->\n");
 		exc.setStackTrace(buf.toString());
@@ -154,8 +152,7 @@ public class JavaExecutor
 	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
-		classloader =
-			(pgjClassLoader) arg0.lookup("classloader");
+		classloader = (pgjClassLoader) arg0.lookup("classloader");
 		typemapper = (TypeMapper) arg0.lookup("type-mapper");
 	}
 
