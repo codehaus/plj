@@ -64,4 +64,8 @@
 		<sourceDirectory>src/java</sourceDirectory>
 	</build>
 
+	<reports>
+		<report>maven-faq-plugin</report>
+	</reports>
+
 </project>
