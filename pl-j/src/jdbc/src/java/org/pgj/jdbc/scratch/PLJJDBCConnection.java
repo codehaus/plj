@@ -28,14 +28,14 @@ import org.pgj.messages.Message;
 import org.pgj.tools.utils.ClientUtils;
 
 /**
- * PGJ JDBC Connection.
+ * PLJ JDBC Connection.
  * 
  * @author Laszlo Hornyak
  */
 public class PLJJDBCConnection implements Connection {
 
 	PlanPool planPool = null;
-	
+
 	private final static Category log = Category
 			.getInstance(PLJJDBCConnection.class);
 
@@ -111,7 +111,7 @@ public class PLJJDBCConnection implements Connection {
 		client = ClientUtils.getClientforThread();
 		communicationChanell = client.getChannel();
 		conf = org.pgj.tools.utils.JDBCUtil.getConfiguration();
-		if(getBooleanFromConf("usePlanPool")){
+		if (getBooleanFromConf("usePlanPool")) {
 			planPool = PlanPool.getPlanPool();
 		}
 	}
@@ -133,7 +133,7 @@ public class PLJJDBCConnection implements Connection {
 	 */
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
 		checkClosed();
-		return new PLJJDBCPreparedStatement(this,sql);
+		return new PLJJDBCPreparedStatement(this, sql);
 	}
 
 	/*
@@ -551,7 +551,7 @@ public class PLJJDBCConnection implements Connection {
 	protected void doSendMessage(org.pgj.messages.Message msg)
 			throws ExecutionCancelException {
 		try {
-			synchronized(this.communicationChanell){
+			synchronized (this.communicationChanell) {
 				msg.setClient(client);
 				communicationChanell.sendToRDBMS(msg);
 			}
@@ -573,12 +573,12 @@ public class PLJJDBCConnection implements Connection {
 	protected org.pgj.messages.Message doReceiveMessage() throws SQLException,
 			ExecutionCancelException {
 		try {
-			synchronized(this.communicationChanell){
+			synchronized (this.communicationChanell) {
 				org.pgj.messages.Message msg = communicationChanell
 						.receiveFromRDBMS(client);
-				if (msg instanceof Error
-						&& getBooleanFromConf("isStatementErrorIrrecoverable"))
-					throw new ExecutionCancelException(((Error) msg).getMessage());
+				if (msg instanceof Error) {
+					throw new SQLException(((Error) msg).getMessage());
+				}
 				return msg;
 			}
 		} catch (CommunicationException e) {
@@ -586,11 +586,12 @@ public class PLJJDBCConnection implements Connection {
 		}
 	}
 
-	protected Message doSendReceive(Message msg) throws ExecutionCancelException, SQLException{
-		synchronized(this.communicationChanell){
+	protected Message doSendReceive(Message msg)
+			throws ExecutionCancelException, SQLException {
+		synchronized (this.communicationChanell) {
 			doSendMessage(msg);
 			return doReceiveMessage();
 		}
 	}
-	
+
 }
