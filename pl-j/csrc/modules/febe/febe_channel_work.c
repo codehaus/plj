@@ -49,7 +49,7 @@ febe_receive_string(void)
 	 * pqGetInt(&cnt, 4, min_conn);
 	 */
 	cnt = febe_receive_integer_4();
-	pljelog(DEBUG1,"string len: %d", cnt);
+//	pljelog(DEBUG1,"string len: %d", cnt);
 	tmp_chr = SPI_palloc(sizeof(char) * (cnt + 2));
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	tmp_chr[cnt] = 0;
@@ -205,8 +205,8 @@ plpgj_channel_send(message msg)
 			ret = febe_send_exception((error_message) msg);
 			break;
 		default:
-			pljlogging_error = 1;
-			elog(ERROR, "UNHANDLED MESSAGE");
+			//pljlogging_error = 1;
+//			elog(ERROR, "UNHANDLED MESSAGE");
 			return -1;
 			break;
 	}
@@ -430,10 +430,10 @@ sql_msg_prepapre febe_receive_sql_prepare(void){
 
 	for (i = 0; i < ret -> ntypes; i++) {
 		ret -> types[i] = febe_receive_string();
-		pljelog(DEBUG1, "ret -> types[%d] = %s", i, ret -> types[i]);
+//		pljelog(DEBUG1, "ret -> types[%d] = %s", i, ret -> types[i]);
 	}
 
-	pljelog(DEBUG1,"febe_receive_sql_prepare");
+//	pljelog(DEBUG1,"febe_receive_sql_prepare");
 	return ret;
 }
 
@@ -441,7 +441,7 @@ sql_pexecute febe_receive_sql_pexec(void){
 	sql_pexecute ret;
 	int i;
 
-	pljelog(DEBUG1,"febe_receive_sql_pexec");
+//	pljelog(DEBUG1,"febe_receive_sql_pexec");
 	ret = SPI_palloc(sizeof(struct str_sql_pexecute));
 	ret -> length = sizeof(struct str_sql_pexecute);
 	ret -> msgtype = MT_SQL;
@@ -473,10 +473,10 @@ sql_pexecute febe_receive_sql_pexec(void){
 			pqGetnchar(ret -> params[i].data.data, ret -> params[i].data.length, min_conn);
 		}
 	}
-	pljelog(DEBUG1,"febe_receive_sql_pexec end");
-	for(i = 0; i < ret -> nparams; i++) {
-		pljelog(DEBUG1, "[%d] type: %d", i, ret -> params[i].type);
-	}
+//	pljelog(DEBUG1,"febe_receive_sql_pexec end");
+//	for(i = 0; i < ret -> nparams; i++) {
+//		pljelog(DEBUG1, "[%d] type: %d", i, ret -> params[i].type);
+//	}
 	return ret;
 }
 
@@ -494,14 +494,15 @@ febe_receive_sql(void)
 			return (sql_msg) febe_receive_sql_prepare();
 		case SQL_TYPE_PEXECUTE:{
 			sql_msg msg;
-			pljelog(DEBUG1, "====");
+//			pljelog(DEBUG1, "====");
 			msg = (sql_msg) febe_receive_sql_pexec();
-			pljelog(DEBUG1, "====");
+//			pljelog(DEBUG1, "====");
 			return msg;
 			}
 		default:
-			pljlogging_error = 1;
-			elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
+			//pljlogging_error = 1;
+//			elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
+
 	}
 	return NULL;				//which never happens, but syntax failure otherwise.
 }
@@ -515,6 +516,7 @@ plpgj_channel_receive(void)
 	if (min_conn->inCursor == min_conn->inEnd)
 	{
 		ret = pqReadData(min_conn);
+/*
 		switch (ret)
 		{
 			case 1:				
@@ -524,15 +526,16 @@ plpgj_channel_receive(void)
 				break;
 			case -1:
 			default:
-				pljlogging_error = 1;
+				//pljlogging_error = 1;
 				elog(ERROR, "something is realy _very_ wrong");
 		}
+*/
 	}
 
 	ret = pqGetc(&type, min_conn);
 
 	if (ret == EOF){
-		pljlogging_error = 1;
+		//pljlogging_error = 0;
 		elog(ERROR, "Unexpected EOF from socket. PL-J server is gone?");
 	}
 
@@ -548,16 +551,17 @@ plpgj_channel_receive(void)
 			return (message) febe_receive_tupres();
 		case 'S':{
 			message msg;
-			pljelog(DEBUG1, "-----");
+//			pljelog(DEBUG1, "-----");
 			msg = (message) febe_receive_sql();
-			pljelog(DEBUG1, "-----");
+//			pljelog(DEBUG1, "-----");
 			return msg;
 			}
 		default:
-			pljlogging_error = 1;
-			elog(ERROR, "message type unknown :%d", type);
+			//pljlogging_error = 1;
+//			elog(ERROR, "message type unknown :%d", type);
 			return NULL;
 	}
 
 	return NULL;
 }
+

@@ -81,7 +81,7 @@ pq_min_connect()
 		goto error;
 	}
 
-	elog(DEBUG1, "host done: %d ", server->h_length);
+//	elog(DEBUG1, "host done: %d ", server->h_length);
 
 	conn->raddr.sin_family = AF_INET;
 	bcopy((char *) server->h_addr,
@@ -90,7 +90,7 @@ pq_min_connect()
 	 * elog(DEBUG1,"addr set");
 	 */
 	conn->raddr.sin_port = htons(conn->pgport);
-	elog(DEBUG1, "connect");
+//	elog(DEBUG1, "connect");
 	if (connect(conn->sock, &(conn->raddr), sizeof(struct sockaddr_in)) <
 		0)
 	{
@@ -104,10 +104,8 @@ pq_min_connect()
 	return conn;
 
   error:
-	pljlogging_error = 1;
+	//pljlogging_error = 1;
 	elog(ERROR, "Connection error: %s", sys_errlist[errno]);
-	if (conn != NULL)
-		free(conn);
 	return NULL;
 }
 
@@ -119,7 +117,7 @@ pq_min_finish(PGconn_min * conn)
 	 */
 	if (conn == NULL){
 		return;
-		pljelog(WARNING, "Connection is null, was it initialized at all?");
+//		pljelog(WARNING, "Connection is null, was it initialized at all?");
 	}
 	close(conn->sock);
 

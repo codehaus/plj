@@ -282,8 +282,8 @@ pqGetInt(int *result, size_t bytes, PGconn_min * conn)
 			 * TODO: handle this correctly
 			 */
 
-			pljlogging_error = 1;
-			pljelog(DEBUG1, "Unhandled integer size (should be 2 or 4)");
+			//pljlogging_error = 1;
+//			pljelog(DEBUG1, "Unhandled integer size (should be 2 or 4)");
 
 			return EOF;// control won't reach here.
 	}
@@ -325,8 +325,8 @@ pqPutInt(int value, size_t bytes, PGconn_min * conn)
 			 * Is it really the right solution? Sending error 
 			 * from here? (this can't happen, anyway)
 			 */
-			pljlogging_error = 1;
-			pljelog(ERROR, "Cant send integer of size %d", bytes);
+			//pljlogging_error = 1;
+//			pljelog(ERROR, "Cant send integer of size %d", bytes);
 			return EOF;
 	}
 
@@ -405,8 +405,8 @@ pqCheckOutBufferSpace(int bytes_needed, PGconn_min * conn)
 	 * ansver.
 	 */
 
-	pljlogging_error = 1;
-	pljelog(FATAL, "Out of outbuffer.");
+	//pljlogging_error = 1;
+//	pljelog(FATAL, "Out of outbuffer.");
 
 	return EOF; //this won't get the control
 }
@@ -481,8 +481,8 @@ pqCheckInBufferSpace(int bytes_needed, PGconn_min * conn)
 	 * TODO: handle correctly
 	 */
 
-	pljlogging_error = 1;
-	pljelog(FATAL, "Out of inbuffer.");
+	//pljlogging_error = 1;
+//	pljelog(FATAL, "Out of inbuffer.");
 	
 	return EOF; //this won't get control
 }
@@ -698,8 +698,8 @@ pqReadData(PGconn_min *conn)
 		 * TODO: handle correctly
 		 */
 
-		pljlogging_error = 1;
-		pljelog(DEBUG1, "Cant receive data from PL-J server.");
+		//pljlogging_error = 1;
+//		pljelog(DEBUG1, "Cant receive data from PL-J server.");
 
 		return -1;
 	}

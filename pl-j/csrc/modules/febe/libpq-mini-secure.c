@@ -180,7 +180,7 @@ pqsecure_read(PGconn_min * conn, void *ptr, size_t len)
 {
 	ssize_t		n = 0;
 
-	pljelog(DEBUG1, "pqsecure_read");
+//	pljelog(DEBUG1, "pqsecure_read");
 	n = recv(conn->sock, ptr, len, 0);
 	return n;
 }
