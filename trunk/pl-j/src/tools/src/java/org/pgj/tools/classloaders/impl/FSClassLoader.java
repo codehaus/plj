@@ -3,9 +3,11 @@ package org.pgj.tools.classloaders.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,7 +73,24 @@ public class FSClassLoader extends SecureClassLoader
 		if (cl != null)
 			return cl;
 
-		String filename = root + fqn.replace('.', '/').trim() + ".class";
+		String[] repoJars = new File(root).list();
+		String filename = null;
+		for (int i = 0; i < repoJars.length; i++) {
+			String tmpFilename = root + File.separatorChar + repoJars[i]
+					+ File.separatorChar
+					+ fqn.replace('.', File.separatorChar).trim() + ".class";
+			File file = new File(tmpFilename);
+			if (file.exists() || file.isFile()) {
+				filename = tmpFilename;
+				break;
+			}
+		}
+
+		if (filename == null) {
+			throw new ClassNotFoundException("there are no jars containing "
+					+ fqn);
+		}
+
 		logger.debug("loading class file:" + filename);
 
 		try {
@@ -111,32 +130,6 @@ public class FSClassLoader extends SecureClassLoader
 			logger.fatalError("Can not happen.", ex);
 		}
 		return cs;
-	}
-
-	/**
-	 * @see PLJClassLoader#store(byte[])
-	 */
-	public void store(String name, byte[] raw) {
-		try {
-
-			//verifying class format
-			Class cl = this.defineClass(name, raw, 0, raw.length);
-
-			//create file name
-			String filename = name.replace('.', '/') + ".class";
-
-			//create file, write
-			File file = new File(filename);
-			if (file.exists()) {
-				logger.warn("file already exists: " + filename);
-			}
-
-			FileOutputStream stream = new FileOutputStream(file);
-			stream.write(raw);
-
-		} catch (Throwable t) {
-			logger.error("colud not store", t);
-		}
 	}
 
 	/**
@@ -314,24 +307,72 @@ public class FSClassLoader extends SecureClassLoader
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#removeClass(java.lang.String)
 	 */
 	public void removeClass(String name) throws ClassNotFoundException {
-		// TODO Auto-generated method stub
-
+		File repo = new File(root);
+		String[] list = repo.list();
+		for (int i = 0; i < list.length; i++) {
+			File f = new File(this.root + File.separatorChar + list[i]
+					+ File.separatorChar
+					+ name.replace('.', File.separatorChar));
+			if (f.exists()) {
+				f.delete();
+			} else {
+				throw new ClassNotFoundException("not found: " + name);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#store(java.lang.String, byte[], java.lang.String)
 	 */
 	public void store(String name, byte[] raw, String jar) {
-		// TODO Auto-generated method stub
+		File f = new File(this.root + jar + File.separatorChar
+				+ name.replace('.', File.separatorChar) + ".class");
+		int lastDot = name.lastIndexOf('.');
+		try {
+			if (lastDot != 0) {
+				File dir = new File(this.root
+						+ jar
+						+ File.separatorChar
+						+ File.separatorChar
+						+ name.substring(0, lastDot).replace('.',
+								File.separatorChar));
+				dir.mkdirs();
+			}
 
+			f.createNewFile();
+			OutputStream o = new FileOutputStream(f);
+			o.write(raw);
+			o.flush();
+			o.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#removeJar(java.lang.String)
 	 */
 	public void removeJar(String name) {
-		// TODO Auto-generated method stub
+		File f = new File(root + File.separatorChar + name);
+		deleteRecursively(f);
+	}
 
+	private void deleteRecursively(File f) {
+		if (f.isFile()) {
+			f.delete();
+		} else {
+			String[] files = f.list();
+			if (files != null)
+				for (int i = 0; i < files.length; i++) {
+					deleteRecursively(new File(f.getPath() + File.separatorChar
+							+ files[i]));
+				}
+			f.delete();
+		}
 	}
 
 }
