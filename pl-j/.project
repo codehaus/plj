@@ -3,6 +3,7 @@
 	<name>pl-j</name>
 	<comment></comment>
 	<projects>
+		<project>postgresql-7.4</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -74,6 +75,11 @@
 					<key>org.eclipse.cdt.make.core.ScannerConfigDiscoveryEnabled</key>
 					<value>false</value>
 				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.wst.sse.core.structuredbuilder</name>
+			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
