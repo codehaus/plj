@@ -15,6 +15,7 @@
 #include "lib/stringinfo.h"
 #include "nodes/makefuncs.h"
 #include "parser/parse_type.h"
+#include "module_config.h"
 
 //
 //proto
@@ -40,7 +41,7 @@ void plpgj_log_do(log_message);
 
 Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 	
-	callreq req;
+	message req;
 	int message_type;
 	
 	if(!plpgj_channel_initialized()){
@@ -50,8 +51,14 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 
 	elog(DEBUG1, "entering hook");
 	
-		
-	req = plpgj_create_call(fcinfo);
+	
+	if(CALLED_AS_TRIGGER(fcinfo) && plj_get_configvalue_boolean("plpgj.core.usetriggers")){
+		req = (message)plpgj_create_trigger_call(fcinfo);
+		elog(DEBUG1,"run as trigger");
+	} else {
+		req = (message)plpgj_create_call(fcinfo);
+	}
+	
 	plpgj_channel_send((message)req);
 	free_message(req);
 	
@@ -106,22 +113,16 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 				Datum rawDatum;
 				StringInfo rawString;
 				
-				elog(DEBUG1,"hello");
 				if(res -> data[0][0].isnull == 1)
 					PG_RETURN_NULL();
-				elog(DEBUG1,"tp 0");
 
 				typeName = makeTypeName(res -> types[0]);
-				elog(DEBUG1,"tp 0.1 %s",res -> types[0]);
 				typeOid = typenameTypeId(typeName);
-				elog(DEBUG1,"tp 0.2");
 				typetup = SearchSysCache(TYPEOID, typeOid, 0, 0, 0);
-				elog(DEBUG1, "trace point 1");
 				if (!HeapTupleIsValid(typetup))
 					elog(ERROR, "returned unknown data type %s", res -> types[0]);
 				
 				type = (Form_pg_type) GETSTRUCT(typetup);
-				elog(DEBUG1, "trace point 2");
 				rawString = makeStringInfo();
 				initStringInfo(rawString);
 				elog(DEBUG1, "%d", res->data[0][0].length);
@@ -134,12 +135,9 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 				appendBinaryStringInfo(rawString, res->data[0][0].data, res->data[0][0].length);
 				elog(DEBUG1,"%d", rawString -> len);
 				rawDatum = PointerGetDatum(rawString);
-				elog(DEBUG1, "trace point 3");
 				ret = OidFunctionCall1(type -> typreceive, rawDatum);
 				//ret = rawDatum;
-				elog(DEBUG1, "trace point 4");
 				ReleaseSysCache(typetup);
-				elog(DEBUG1, "trace point 5");
 				
 				return ret;
 
