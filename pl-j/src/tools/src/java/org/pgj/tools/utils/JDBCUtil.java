@@ -1,20 +1,16 @@
 /*
- * Created on Jul 22, 2004
+ * Created on Aug 8, 2004
  */
-
-package org.pgj.tools.jdbc;
+package org.pgj.tools.utils;
 
 import org.apache.avalon.framework.configuration.Configuration;
 
-
 /**
- * Utility class for geting JDBC configuration.
- * 
  * @author Laszlo Hornyak
  */
 public class JDBCUtil {
 
-	private static final InheritableThreadLocal tl = new InheritableThreadLocal();
+	private final static InheritableThreadLocal tl = new InheritableThreadLocal();
 
 	public static Configuration getConfiguration() {
 		return (Configuration) tl.get();
@@ -23,4 +19,5 @@ public class JDBCUtil {
 	public static void setConfiguration(Configuration conf) {
 		tl.set(conf);
 	}
+
 }
