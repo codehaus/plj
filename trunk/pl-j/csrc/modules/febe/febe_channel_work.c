@@ -26,10 +26,8 @@ int febe_receive_integer_4(void){
 	int i;
 	for(i=0; i<4; i++){
 		pqGetc(c+i, min_conn);
-		elog(DEBUG1, "febe_receive_integer_4 [%d]: %d", i, c[i]);
 	}
 	i = c[3] + (c[2]*256) + (c[1]*256*256) + (c[0]*256*256*256);
-	elog(DEBUG1, "febe_receive_integer_4: %d", i);
 	return i;
 }
 
@@ -39,16 +37,34 @@ char* febe_receive_string(void){
 	char* tmp_chr;
 	//pqGetInt(&cnt, 4, min_conn);
 	cnt = febe_receive_integer_4();
-	elog(DEBUG1, "febe_receive_string: geting %d bytes as string", cnt);
 	tmp_chr = SPI_palloc(sizeof(char) * (cnt+2));
-	elog(DEBUG1, "febe_receive_string: 1");
 	pqGetnchar(tmp_chr, cnt, min_conn);
-	elog(DEBUG1, "febe_receive_string: 2");
 	tmp_chr[cnt] = 0;
 	return tmp_chr;
 }
 
-
+int febe_send_trigger(trigger_callreq call){
+	elog(DEBUG1, "sending trigger");
+	pqPutMsgStart(0,0,min_conn);
+	elog(DEBUG1, "tracepoint 1");
+	pqPutc('T',min_conn);
+	elog(DEBUG1, "tracepoint 2");
+	pqPutInt(call -> row, 4, min_conn);
+	elog(DEBUG1, "tracepoint 3");
+	pqPutInt(call -> reason, 4, min_conn);
+	elog(DEBUG1, "tracepoint 4");
+	pqPuts(call -> tablename, min_conn);
+	elog(DEBUG1, "tracepoint 5");
+	pqPuts(call -> classname, min_conn);
+	elog(DEBUG1, "tracepoint 6");
+	pqPuts(call -> methodname, min_conn);
+	elog(DEBUG1,"trace point (before pqPutMsgEnd)");
+	pqPutMsgEnd(min_conn);
+	elog(DEBUG1,"trace point (before pqFlush)");
+	pqFlush(min_conn);
+	elog(DEBUG1,"trace point (last)");
+	return 0;
+}
 
 int febe_send_call(callreq call){
 	int i;
@@ -105,8 +121,10 @@ int febe_send_exception(error_message err){
 
 int plpgj_channel_send(message msg){
 	switch(msg->msgtype){
+		case MT_TRIGREQ:
+			return febe_send_trigger((callreq)msg);
 		case MT_CALLREQ:
-			return febe_send_call((callreq)msg);
+			return febe_send_call((trigger_callreq)msg);
 		case MT_RESULT:
 			return febe_send_result((plpgj_result)msg);
 		case MT_EXCEPTION:
@@ -167,15 +185,26 @@ void* febe_receive_result() {
 
 	ret -> rows = febe_receive_integer_4();
 	ret -> cols = febe_receive_integer_4();
-	ret -> types = SPI_palloc( ret -> rows * (sizeof(char*)) );
+
+	if(ret -> rows > 0){
+		ret -> data = SPI_palloc( (ret -> rows) * sizeof(raw) );
+		ret -> types = SPI_palloc( ret -> rows * (sizeof(char*)) );
+	} else {
+		ret -> data = NULL;
+		ret -> types = NULL;
+	}
+
 	for(i = 0; i < ret -> rows; i++) {
 		ret -> types[i] = NULL;
 	}
 
-	ret -> data = SPI_palloc( (ret -> rows) * sizeof(raw) );
 
 	for(i = 0; i < ret -> rows; i++) {
-		ret -> data[i] = SPI_palloc( (ret -> cols) * sizeof(raw) );
+		if(ret -> cols > 0){
+			ret -> data[i] = SPI_palloc( (ret -> cols) * sizeof(raw) );
+		} else {
+			ret -> data[i] = NULL;
+		}
 		for(j = 0; j < ret -> cols; j++) {
 			char isn;
 			pqGetc(&isn, min_conn);
