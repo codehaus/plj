@@ -22,7 +22,7 @@ public class ResultMessageFactory implements MessageFactory {
 
 	org.apache.avalon.framework.logger.Logger logger = null;
 	TypeMapper mapper = null;
-	public static final int MESSAGE_HEADER_RESULT = 'E';
+	public static final int MESSAGE_HEADER_RESULT = 'R';
 
 	public ResultMessageFactory(
 			org.apache.avalon.framework.logger.Logger logger, TypeMapper mapper) {
