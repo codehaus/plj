@@ -43,4 +43,11 @@ public class ErrorMessageFactory implements MessageFactory {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.plj.chanells.febe.msg.MessageFactory#getHandledClassname()
+	 */
+	public String getHandledClassname() {
+		return org.pgj.messages.Exception.class.getName();
+	}
+
 }
