@@ -26,21 +26,22 @@
 	
 	<goal name="merlin-2-loom">
 		${systemScope.setProperty('javax.xml.transform.TransformerFactory','org.apache.xalan.processor.TransformerFactoryImpl')} 
+		<mkdir dir="${maven.build.dir}/loom/"/>
 		<style 
 			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
-			out="${maven.build.dest}/assembly.xml" 
+			out="${maven.build.dir}/loom/assembly.xml" 
 			style="${basedir}/etc/loom/assembly.xslt" 
 			processor="trax"
 			force="true"/>
 		<style 
 			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
-			out="${maven.build.dest}/config.xml" 
+			out="${maven.build.dir}/loom/config.xml" 
 			style="${basedir}/etc/loom/config.xslt" 
 			processor="trax"
 			force="true"/>
 		<style 
 			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
-			out="${maven.build.dest}/includeclasses.xml"
+			out="${maven.build.dir}/loom/includeclasses.xml"
 			style="${basedir}/etc/loom/include-classes.xslt" 
 			processor="trax"
 			force="true"/>
@@ -58,5 +59,16 @@
 		</copy>
 		<echo message="${maven.loom.lib.include}, ${maven.repo.local}"/>
 	</preGoal>
+
+	<goal name="dbunit-tests">
+		<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask"/>
+		<dbunit driver=" org.gjt.mm.mysql.Driver "
+		url=" jdbc:postgresql:plj"
+		userid="postgres74"
+		password="postgres">
+    <operation type="INSERT" 
+            src="seedFile.xml"/>
+</dbunit>
+	</goal>
 
 </project>
