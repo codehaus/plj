@@ -14,8 +14,11 @@ import java.sql.Statement;
 import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.CommunicationException;
+import org.pgj.messages.Result;
 import org.pgj.messages.SQLCursorOpenWithSQL;
 import org.pgj.messages.SimpleSQL;
+import org.pgj.typemapping.Field;
+import org.pgj.typemapping.MappingException;
 
 /**
  * @author Laszlo Hornyak
@@ -26,22 +29,24 @@ public class PLJJDBCStatement implements Statement {
 	/**
 	 * Communication Channel to RDBMS.
 	 */
-	private Channel channel = null;
+	Channel channel = null;
 
 	/**
 	 * The client of the session.
 	 */
-	private Client client = null;
+	Client client = null;
 
 	/**
 	 * The connection this statement is operating on.
 	 */
-	private PLJJDBCConnection connection = null;
+	PLJJDBCConnection connection = null;
 
-	private ResultSet lastActionResultSet = null;
+	ResultSet lastActionResultSet = null;
 
-	private int lastUpdateCount = -1;
+	int lastUpdateCount = -1;
 
+	String cursorName = null;
+	
 	/**
 	 * Constructor: set client and connection.
 	 */
@@ -66,19 +71,19 @@ public class PLJJDBCStatement implements Statement {
 
 			zeroLastResources();
 			checkIfClosed();
-			String cursorName = connection.getCursorName();
+			if(cursorName == null)
+				cursorName = connection.getCursorName();
 
 			SQLCursorOpenWithSQL msg = new SQLCursorOpenWithSQL();
 			//msg.setClient(channel.)
 			msg.setCursorName(cursorName);
 			msg.setQuery(sql);
 
+			Result r = (Result) connection.doSendReceive(msg);
 			try {
-				channel.sendToRDBMS(msg);
-				connection.doReceiveMessage();
-			} catch (CommunicationException e) {
-				throw new SQLException("Comminication exception. root reason:"
-						+ e.getMessage());
+				cursorName = (String) ((Field)r.get(0,0)).get(String.class);
+			} catch (MappingException e) {
+				throw new SQLException(e.getMessage());
 			}
 
 			// TODO this method needs testing
@@ -139,6 +144,8 @@ public class PLJJDBCStatement implements Statement {
 
 	}
 
+	int maxRows = 0;
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -149,7 +156,7 @@ public class PLJJDBCStatement implements Statement {
 		checkIfClosed();
 		connection.checkClosed();
 		// TODO Auto-generated method stub
-		return 0;
+		return maxRows;
 	}
 
 	/*
@@ -161,7 +168,7 @@ public class PLJJDBCStatement implements Statement {
 
 		checkIfClosed();
 		connection.checkClosed();
-		// TODO Auto-generated method stub
+		maxRows = max;
 
 	}
 
@@ -251,7 +258,7 @@ public class PLJJDBCStatement implements Statement {
 
 		checkIfClosed();
 		connection.checkClosed();
-		// TODO Auto-generated method stub
+		cursorName = name;
 
 	}
 

@@ -40,7 +40,7 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @author Laszlo Hornyak
  */
-public class PLJJDBCPreparedStatement implements PreparedStatement {
+public class PLJJDBCPreparedStatement extends PLJJDBCStatement implements PreparedStatement {
 
 	private PLJJDBCConnection conn = null;
 
@@ -134,9 +134,10 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 		if(conn.planPool != null)
 		synchronized (conn.planPool) {
-			int pplan = conn.planPool.getPlan(dbstatement, conn);
+			int pplan = conn.planPool.getPlan(dbstatement, args, conn);
 			if (pplan != -1) {
 				this.plan = pplan;
+				prepared = true;
 				return;
 			}
 		}
@@ -159,7 +160,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		}
 		if(conn.planPool != null)
 		synchronized(conn.planPool){
-			conn.planPool.putPlan(dbstatement, plan, conn);
+			conn.planPool.putPlan(dbstatement, args, plan, conn);
 		}
 	}
 
@@ -186,7 +187,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 */
 	PLJJDBCPreparedStatement(PLJJDBCConnection conn, String statement)
 			throws SQLException {
-		super();
+		super(conn.client, conn);
 		this.conn = conn;
 		this.statement = statement;
 		parse();
@@ -712,17 +713,6 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	private int maxRows = 0;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#getMaxRows()
-	 */
-	public int getMaxRows() throws SQLException {
-		return maxRows;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -861,15 +851,6 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	public void setMaxFieldSize(int max) throws SQLException {
 		// TODO Auto-generated method stub
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#setMaxRows(int)
-	 */
-	public void setMaxRows(int max) throws SQLException {
-		maxRows = max;
 	}
 
 	/*
