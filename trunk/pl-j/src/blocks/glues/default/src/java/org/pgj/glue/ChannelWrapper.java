@@ -14,6 +14,7 @@ import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.TXOperation;
 import org.pgj.messages.TriggerCallRequest;
+import org.pgj.tools.transactions.JTAAdapter;
 
 /**
  * Wraps Channel to add some additional logic.
@@ -36,6 +37,11 @@ public class ChannelWrapper implements Channel {
 	 * Executor to run calls on if call msg is received.
 	 */
 	private Executor executor = null;
+
+	/**
+	 * The JTA adapter.
+	 */
+	private JTAAdapter jtaadapter = null;
 
 	/**
 	 *  

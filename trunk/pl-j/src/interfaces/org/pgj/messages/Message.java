@@ -1,6 +1,6 @@
 package org.pgj.messages;
 
-import org.pgj.*;
+import org.pgj.Client;
 
 /**
  * Represents a <i>message</i> from or to the database.

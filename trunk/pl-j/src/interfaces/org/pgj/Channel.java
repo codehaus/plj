@@ -1,6 +1,6 @@
 package org.pgj;
 
-import org.pgj.messages.*;
+import org.pgj.messages.Message;
 
 /**
  * A communication channel with the RDBMS.

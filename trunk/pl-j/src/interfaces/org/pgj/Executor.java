@@ -1,6 +1,7 @@
 package org.pgj;
 
-import org.pgj.messages.*;
+import org.pgj.messages.CallRequest;
+import org.pgj.messages.Message;
 
 /**
  * An interface for call executors.

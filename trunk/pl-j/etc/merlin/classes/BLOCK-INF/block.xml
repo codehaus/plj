@@ -88,10 +88,12 @@
 			<map>
 				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
+				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
 			</map>
 			<backmap>
 				<type class="java.lang.Integer" type="int4"/>
 				<type class="java.lang.String" type="varchar"/>
+				<type class="java.lang.Boolean" type="bool"/>
 			</backmap>
 			
 		</configuration>
@@ -166,6 +168,10 @@
 		</categories>
 	</component>
 
+	<component 
+		name="jta-adapter"
+		class="org.pgj.tools.transactions.impl.FakeJTAAdapter"/>
+
 	<component
 		name="glue"
 		class="org.pgj.glue.Glue">
@@ -173,6 +179,7 @@
 			<dependency key="channel" source="channel"/>
 			<dependency key="executor" source="executor"/>
 			<dependency key="jdbc-configurator" source="jdbc-configurator"/>
+			<dependency key="jta-adapter" source="jta-adapter"/>
 		</dependencies>
 		<categories priority="DEBUG">
 			<category name="/glue"/>
@@ -190,6 +197,47 @@
 		</categories>
 		<configuration>
 			<class>org.pgj.jdbc.scratch.PLJJDBCDriver</class>
+			<!--
+				JDBC Connection configuration, including metadata and 
+				behavioral properties
+				-->
+			<jdbc-config>
+				<!--
+					==== Behavioral properties ====
+					-->
+				<!--
+					Throw an ExecutionCancelException is receiveing error message
+					from the client. Should be true for PostgreSQL always.
+					-->
+				<isStatementErrorIrrecoverable>
+					true</isStatementErrorIrrecoverable>
+				<!--
+					===== DatabaseMetadata =====
+					-->
+				<!--
+					Major and minor version, it has no real impotance, excepti if
+					your stored procedures use it, so configure whatever you like
+					-->
+				<DatabaseMajorVersion>7</DatabaseMajorVersion>
+				<DatabaseMinorVersion>4</DatabaseMinorVersion>
+				<!--
+					TRANSACTION_NONE = 0
+					TRANSACTION_READ_UNCOMMITTED = 1
+					TRANSACTION_READ_COMMITTED = 2
+					TRANSACTION_REPEATABLE_READ = 4
+					TRANSACTION_SERIALIZABLE = 8
+					TRANSACTION_SERIALIZABLE with PostgreSQL, but should be the
+					isolation level called when fireing up the UDF.
+					-->
+				<DefaultTransactionIsolation>8</DefaultTransactionIsolation>
+				<!--
+					-->
+				<DriverMajorVersion>0</DriverMajorVersion>
+				<DriverMinorVersion>1</DriverMinorVersion>
+				<!--
+					And so on...
+					-->
+			</jdbc-config>
 		</configuration>
 	</component>
 

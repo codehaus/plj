@@ -7,7 +7,7 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/blocks/chanells/febe/src/java/org/plj/chanells/febe/core/PGStream.java,v 1.2 2004-03-09 22:43:52 lazlo Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/blocks/chanells/febe/src/java/org/plj/chanells/febe/core/PGStream.java,v 1.3 2004-08-29 22:18:09 kocka Exp $
  *
  *-------------------------------------------------------------------------
  */
@@ -66,12 +66,13 @@ public class PGStream {
 		pg_output.write((byte) val);
 	}
 
-	/*
+	/**
 	 * Sends an integer to the back end
 	 *
 	 * @param val the integer to be sent
 	 * @param siz the length of the integer in bytes (size of structure)
 	 * @exception IOException if an I/O error occurs
+	 * @deprecated Auf Wiedershen!
 	 */
 	public void SendInteger(int val, int siz) throws IOException {
 		byte[] buf = new byte[siz];
@@ -167,12 +168,13 @@ public class PGStream {
 		return c;
 	}
 
-	/*
+	/**
 	 * Receives an integer from the backend
 	 *
 	 * @param siz length of the integer in bytes
 	 * @return the integer received from the backend
 	 * @exception IOException if an I/O error occurs
+	 * @deprecated good bye! 
 	 */
 	public int ReceiveInteger(int siz) throws IOException {
 		int n = 0;

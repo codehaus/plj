@@ -56,6 +56,20 @@
 			<version>0.0.2</version>
 		</dependency>
 
+		<dependency>
+			<id>pl-j</id>
+			<artifactId>pl-j-tools</artifactId>
+			<type>jar</type>
+			<version>0.0.2</version>
+		</dependency>
+
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>jboss-j2ee</artifactId>
+            <version>3.2.3</version>
+            <type>jar</type>
+        </dependency>
+
 	</dependencies>
 
 	<build>
