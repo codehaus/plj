@@ -29,12 +29,6 @@
  *-------------------------------------------------------------------------
  */
 
-/*
- ... And after some bottle of bier, everybody will forget:
- Nobody wanted it to be like this.
- (raw translation from the lyrics of Kispal SA Borz)
-*/
-
 /* #include "postgres_fe.h" */
 
 #ifndef LIBPQ_MIN_MISC_H

@@ -18,15 +18,6 @@
 PGconn_min *
 pq_min_connect()
 {
-	/*
-	 * believe me, it was not my failure
-	 */
-	/*
-	 * I was left here by that goddamin stork
-	 */
-	/*
-	 * (raw translation from tank trap - the spring of rock n roll)
-	 */
 
 	PGconn_min *conn;
 	struct hostent *server;

@@ -3,7 +3,6 @@
  * file name:			plpgj_message_result.h
  * description:			Result message structure definition.
  * author:				Laszlo Hornyak
- * TODO:				Ezt az egesz hanyast szepen gatyaba razni!
  */
 
 #ifndef PLPGJ_MESSAGE_RESULT_H
