@@ -35,6 +35,8 @@ int data_free(void* data);
 
 callreq plpgj_create_call(PG_FUNCTION_ARGS);
 
+trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS);
+
 #define plpgj_message_type(msg) ((message)(msg))->msgtype
 
 #ifdef __cplusplus
