@@ -19,7 +19,7 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @author Laszlo Hornyak
  * 
- * @avalon.component name="postgre-typemapper"
+ * @avalon.component name="postgre-typemapper" lifestyle="singleton"
  * @avalon.service type="org.pgj.typemapping.TypeMapper"
  */
 public class PostgresTypeMapper
