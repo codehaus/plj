@@ -18,10 +18,11 @@ import org.pgj.classloaders.pgjClassLoader;
 //TODO test this classLoader!
 
 /**
- * @author Laszlo Hornyak
- *
  * JDBC class loader component.
- *
+ * @author Laszlo Hornyak
+ * 
+ * @avalon.component name="jdbc-classloader"
+ * @avalon.service type="org.pgj.classloaders.pgjClassLoader"
  */
 public class JDBCClassLoader
 	extends ClassLoader
@@ -154,6 +155,7 @@ public class JDBCClassLoader
 	 * @see org.pgj.classloaders.pgjClassLoader#hasClass(String)
 	 */
 	public boolean hasClass(String fqn) {
+		//TODO: blank implementation
 		return false;
 	}
 

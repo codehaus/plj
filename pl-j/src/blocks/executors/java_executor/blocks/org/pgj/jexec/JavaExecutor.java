@@ -159,11 +159,13 @@ public class JavaExecutor
 
 	/**
 	 * @see Serviceable#service(ServiceManager)
+	 * @avalon.dependency key="classloader" type="org.pgj.classloaders.pgjClassLoader"
+	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classloader =
-			(pgjClassLoader) arg0.lookup("org.pgj.classloaders.pgjClassLoader");
-		typemapper = (TypeMapper) arg0.lookup("org.pgj.typemapping.TypeMapper");
+			(pgjClassLoader) arg0.lookup("classloader");
+		typemapper = (TypeMapper) arg0.lookup("type-mapper");
 	}
 
 	private String compile(String text) {

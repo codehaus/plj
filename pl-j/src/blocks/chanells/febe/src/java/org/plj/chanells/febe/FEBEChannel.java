@@ -53,8 +53,6 @@ public class FEBEChannel
 
 	private Map messageFactoryMap = new HashMap();
 
-	//private ErrorMessageFactory errorMessageFactory = new ErrorMessageFactory();
-
 	/* (non-Javadoc)
 	 * @see org.pgj.Channel#getConnection(int)
 	 */
@@ -130,8 +128,11 @@ public class FEBEChannel
 	}
 
 	private ServerSocketFactory serverSocketFactory;
-	/* (non-Javadoc)
+
+	/**
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
+	 * @avalon.dependency key="serversocket-factory" type="org.apache.avalon.cornerstone.services.sockets.ServerSocketFactory"
+	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		
