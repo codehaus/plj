@@ -9,7 +9,10 @@ import org.pgj.typemapping.MappingException;
  */
 public class PGBool extends AbstractPGField {
 
-	static final Class[] classes = {Boolean.class};
+	static final Class[] classes = { Boolean.class };
+	{
+		this.raw = new byte[5];
+	}
 
 	/**
 	 * Constructor for PGBool.
@@ -29,7 +32,7 @@ public class PGBool extends AbstractPGField {
 	 * @see Field#getPreferredClass()
 	 */
 	public Class getPreferredClass() {
-		return null;
+		return Boolean.class;
 	}
 
 	/**
@@ -38,9 +41,9 @@ public class PGBool extends AbstractPGField {
 	public Object get(Class clazz) throws MappingException {
 		if (!clazz.equals(Boolean.class))
 			throw new MappingException("Data type not supperted");
-		if (raw.length != 1)
+		if (raw.length != 5)
 			throw new MappingException("Illegal data length");
-		return new Boolean(raw[0] != 0);
+		return new Boolean(raw[4] != 0);
 	}
 
 	/**
@@ -54,6 +57,10 @@ public class PGBool extends AbstractPGField {
 	 * @see AbstractPGField#backMap(Object)
 	 */
 	protected void backMap(Object obj) throws MappingException {
+		if (!(obj instanceof Boolean))
+			throw new MappingException("Only Boolean can be mapped back.");
+		raw = new byte[1];
+		raw[0] = (byte) (((Boolean) obj).booleanValue() ? 1 : 0);
 	}
 
 	/**
@@ -63,7 +70,9 @@ public class PGBool extends AbstractPGField {
 		super.setObject(obj);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.pgj.typemapping.Field#rdbmsType()
 	 */
 	public String rdbmsType() {

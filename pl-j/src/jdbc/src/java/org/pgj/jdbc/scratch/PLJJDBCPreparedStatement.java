@@ -21,25 +21,39 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+
+import org.pgj.messages.SQLPrepare;
 
 /**
  * @author Laszlo Hornyak
  */
-//TODO: edit comments for PLJJDBCPreparedStatement
 public class PLJJDBCPreparedStatement implements PreparedStatement {
 
-	PLJJDBCConnection conn = null;
-	
+	private PLJJDBCConnection conn = null;
+
+	private ArrayList args = new ArrayList();
+
 	/**
-	 * 
+	 *  
 	 */
-	protected PLJJDBCPreparedStatement(PLJJDBCConnection conn) {
+	protected PLJJDBCPreparedStatement(PLJJDBCConnection conn, String statement)
+			throws SQLException {
 		super();
 		this.conn = conn;
+		SQLPrepare prep = new SQLPrepare();
+		prep.setStatement(statement);
+		prep.setClient(conn.client);
+		synchronized (conn.communicationChanell) {
+			conn.doSendMessage(prep);
+			conn.doReceiveMessage();
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#executeUpdate()
 	 */
 	public int executeUpdate() throws SQLException {
@@ -47,7 +61,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#addBatch()
 	 */
 	public void addBatch() throws SQLException {
@@ -55,7 +71,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#clearParameters()
 	 */
 	public void clearParameters() throws SQLException {
@@ -63,7 +81,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#execute()
 	 */
 	public boolean execute() throws SQLException {
@@ -71,7 +91,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setByte(int, byte)
 	 */
 	public void setByte(int parameterIndex, byte x) throws SQLException {
@@ -79,7 +101,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setDouble(int, double)
 	 */
 	public void setDouble(int parameterIndex, double x) throws SQLException {
@@ -87,7 +111,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setFloat(int, float)
 	 */
 	public void setFloat(int parameterIndex, float x) throws SQLException {
@@ -95,7 +121,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setInt(int, int)
 	 */
 	public void setInt(int parameterIndex, int x) throws SQLException {
@@ -103,7 +131,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setNull(int, int)
 	 */
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
@@ -111,7 +141,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setLong(int, long)
 	 */
 	public void setLong(int parameterIndex, long x) throws SQLException {
@@ -119,7 +151,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setShort(int, short)
 	 */
 	public void setShort(int parameterIndex, short x) throws SQLException {
@@ -127,7 +161,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setBoolean(int, boolean)
 	 */
 	public void setBoolean(int parameterIndex, boolean x) throws SQLException {
@@ -135,7 +171,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setBytes(int, byte[])
 	 */
 	public void setBytes(int parameterIndex, byte[] x) throws SQLException {
@@ -143,8 +181,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setAsciiStream(int, java.io.InputStream, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setAsciiStream(int, java.io.InputStream,
+	 *      int)
 	 */
 	public void setAsciiStream(int parameterIndex, InputStream x, int length)
 			throws SQLException {
@@ -152,8 +193,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setBinaryStream(int, java.io.InputStream, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setBinaryStream(int, java.io.InputStream,
+	 *      int)
 	 */
 	public void setBinaryStream(int parameterIndex, InputStream x, int length)
 			throws SQLException {
@@ -161,8 +205,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setUnicodeStream(int, java.io.InputStream, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setUnicodeStream(int,
+	 *      java.io.InputStream, int)
 	 */
 	public void setUnicodeStream(int parameterIndex, InputStream x, int length)
 			throws SQLException {
@@ -170,8 +217,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setCharacterStream(int, java.io.Reader, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setCharacterStream(int, java.io.Reader,
+	 *      int)
 	 */
 	public void setCharacterStream(int parameterIndex, Reader reader, int length)
 			throws SQLException {
@@ -179,7 +229,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setObject(int, java.lang.Object)
 	 */
 	public void setObject(int parameterIndex, Object x) throws SQLException {
@@ -187,7 +239,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int)
 	 */
 	public void setObject(int parameterIndex, Object x, int targetSqlType)
@@ -196,8 +250,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int,
+	 *      int)
 	 */
 	public void setObject(int parameterIndex, Object x, int targetSqlType,
 			int scale) throws SQLException {
@@ -205,7 +262,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setNull(int, int, java.lang.String)
 	 */
 	public void setNull(int paramIndex, int sqlType, String typeName)
@@ -214,7 +273,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setString(int, java.lang.String)
 	 */
 	public void setString(int parameterIndex, String x) throws SQLException {
@@ -222,7 +283,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setBigDecimal(int, java.math.BigDecimal)
 	 */
 	public void setBigDecimal(int parameterIndex, BigDecimal x)
@@ -231,7 +294,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setURL(int, java.net.URL)
 	 */
 	public void setURL(int parameterIndex, URL x) throws SQLException {
@@ -239,7 +304,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setArray(int, java.sql.Array)
 	 */
 	public void setArray(int i, Array x) throws SQLException {
@@ -247,7 +314,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setBlob(int, java.sql.Blob)
 	 */
 	public void setBlob(int i, Blob x) throws SQLException {
@@ -255,7 +324,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setClob(int, java.sql.Clob)
 	 */
 	public void setClob(int i, Clob x) throws SQLException {
@@ -263,7 +334,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setDate(int, java.sql.Date)
 	 */
 	public void setDate(int parameterIndex, Date x) throws SQLException {
@@ -271,7 +344,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#getParameterMetaData()
 	 */
 	public ParameterMetaData getParameterMetaData() throws SQLException {
@@ -279,7 +354,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setRef(int, java.sql.Ref)
 	 */
 	public void setRef(int i, Ref x) throws SQLException {
@@ -287,7 +364,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#executeQuery()
 	 */
 	public ResultSet executeQuery() throws SQLException {
@@ -295,7 +374,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#getMetaData()
 	 */
 	public ResultSetMetaData getMetaData() throws SQLException {
@@ -303,7 +384,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setTime(int, java.sql.Time)
 	 */
 	public void setTime(int parameterIndex, Time x) throws SQLException {
@@ -311,7 +394,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp)
 	 */
 	public void setTimestamp(int parameterIndex, Timestamp x)
@@ -320,8 +405,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setDate(int, java.sql.Date, java.util.Calendar)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setDate(int, java.sql.Date,
+	 *      java.util.Calendar)
 	 */
 	public void setDate(int parameterIndex, Date x, Calendar cal)
 			throws SQLException {
@@ -329,8 +417,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setTime(int, java.sql.Time, java.util.Calendar)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setTime(int, java.sql.Time,
+	 *      java.util.Calendar)
 	 */
 	public void setTime(int parameterIndex, Time x, Calendar cal)
 			throws SQLException {
@@ -338,8 +429,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp, java.util.Calendar)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp,
+	 *      java.util.Calendar)
 	 */
 	public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal)
 			throws SQLException {
@@ -347,7 +441,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getFetchDirection()
 	 */
 	public int getFetchDirection() throws SQLException {
@@ -355,7 +451,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getFetchSize()
 	 */
 	public int getFetchSize() throws SQLException {
@@ -363,7 +461,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getMaxFieldSize()
 	 */
 	public int getMaxFieldSize() throws SQLException {
@@ -371,7 +471,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getMaxRows()
 	 */
 	public int getMaxRows() throws SQLException {
@@ -379,7 +481,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getQueryTimeout()
 	 */
 	public int getQueryTimeout() throws SQLException {
@@ -387,7 +491,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getResultSetConcurrency()
 	 */
 	public int getResultSetConcurrency() throws SQLException {
@@ -395,7 +501,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getResultSetHoldability()
 	 */
 	public int getResultSetHoldability() throws SQLException {
@@ -403,7 +511,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getResultSetType()
 	 */
 	public int getResultSetType() throws SQLException {
@@ -411,7 +521,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getUpdateCount()
 	 */
 	public int getUpdateCount() throws SQLException {
@@ -419,7 +531,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#cancel()
 	 */
 	public void cancel() throws SQLException {
@@ -427,7 +541,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#clearBatch()
 	 */
 	public void clearBatch() throws SQLException {
@@ -435,7 +551,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#clearWarnings()
 	 */
 	public void clearWarnings() throws SQLException {
@@ -443,7 +561,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#close()
 	 */
 	public void close() throws SQLException {
@@ -451,7 +571,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getMoreResults()
 	 */
 	public boolean getMoreResults() throws SQLException {
@@ -459,7 +581,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#executeBatch()
 	 */
 	public int[] executeBatch() throws SQLException {
@@ -467,7 +591,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setFetchDirection(int)
 	 */
 	public void setFetchDirection(int direction) throws SQLException {
@@ -475,7 +601,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setFetchSize(int)
 	 */
 	public void setFetchSize(int rows) throws SQLException {
@@ -483,7 +611,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setMaxFieldSize(int)
 	 */
 	public void setMaxFieldSize(int max) throws SQLException {
@@ -491,7 +621,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setMaxRows(int)
 	 */
 	public void setMaxRows(int max) throws SQLException {
@@ -499,7 +631,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setQueryTimeout(int)
 	 */
 	public void setQueryTimeout(int seconds) throws SQLException {
@@ -507,7 +641,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getMoreResults(int)
 	 */
 	public boolean getMoreResults(int current) throws SQLException {
@@ -515,7 +651,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setEscapeProcessing(boolean)
 	 */
 	public void setEscapeProcessing(boolean enable) throws SQLException {
@@ -523,7 +661,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#executeUpdate(java.lang.String)
 	 */
 	public int executeUpdate(String sql) throws SQLException {
@@ -531,7 +671,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#addBatch(java.lang.String)
 	 */
 	public void addBatch(String sql) throws SQLException {
@@ -539,7 +681,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#setCursorName(java.lang.String)
 	 */
 	public void setCursorName(String name) throws SQLException {
@@ -547,7 +691,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#execute(java.lang.String)
 	 */
 	public boolean execute(String sql) throws SQLException {
@@ -555,7 +701,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#executeUpdate(java.lang.String, int)
 	 */
 	public int executeUpdate(String sql, int autoGeneratedKeys)
@@ -564,7 +712,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#execute(java.lang.String, int)
 	 */
 	public boolean execute(String sql, int autoGeneratedKeys)
@@ -573,7 +723,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#executeUpdate(java.lang.String, int[])
 	 */
 	public int executeUpdate(String sql, int[] columnIndexes)
@@ -582,7 +734,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#execute(java.lang.String, int[])
 	 */
 	public boolean execute(String sql, int[] columnIndexes) throws SQLException {
@@ -590,7 +744,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getConnection()
 	 */
 	public Connection getConnection() throws SQLException {
@@ -598,7 +754,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getGeneratedKeys()
 	 */
 	public ResultSet getGeneratedKeys() throws SQLException {
@@ -606,7 +764,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getResultSet()
 	 */
 	public ResultSet getResultSet() throws SQLException {
@@ -614,7 +774,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#getWarnings()
 	 */
 	public SQLWarning getWarnings() throws SQLException {
@@ -622,8 +784,11 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.Statement#executeUpdate(java.lang.String, java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.sql.Statement#executeUpdate(java.lang.String,
+	 *      java.lang.String[])
 	 */
 	public int executeUpdate(String sql, String[] columnNames)
 			throws SQLException {
@@ -631,7 +796,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#execute(java.lang.String, java.lang.String[])
 	 */
 	public boolean execute(String sql, String[] columnNames)
@@ -640,7 +807,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.sql.Statement#executeQuery(java.lang.String)
 	 */
 	public ResultSet executeQuery(String sql) throws SQLException {

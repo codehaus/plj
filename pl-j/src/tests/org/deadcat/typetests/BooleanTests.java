@@ -21,13 +21,27 @@ public class BooleanTests {
 		super();
 	}
 
-	void setBoolean(Boolean b) {
+	public void setBoolean(Boolean b) {
 		logger.debug("setBoolean " + String.valueOf(b));
 	}
 
-	Boolean getBoolean() {
+	public Boolean getBoolean() {
 		logger.debug("getBoolean");
-		return Boolean.TRUE;
+		return Boolean.FALSE;
 	}
 
+	public Boolean doOR(Boolean a, Boolean b) {
+		return (a.booleanValue() || b.booleanValue()) ? Boolean.TRUE
+				: Boolean.FALSE;
+	}
+	
+	public Boolean doAND(Boolean a, Boolean b) {
+		return (a.booleanValue() && b.booleanValue()) ? Boolean.TRUE
+				: Boolean.FALSE;
+	}
+	
+	public Boolean doNOT(Boolean b){
+		return b.booleanValue() ? Boolean.FALSE : Boolean.TRUE;
+	}
+	
 }

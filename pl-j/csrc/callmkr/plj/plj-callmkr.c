@@ -229,11 +229,13 @@ plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc)
 			ret[i]->data.data = DatumGetPointer(binval);
 			ret[i]->data.isnull = isnull;
 			ret[i]->data.length = datumGetSize(binval, typbyval, typlen);
+			pljelog(DEBUG1, "ret[%d]->data.length = %d", i, ret[i]->data.length);
 
 			ret[i]->type = SPI_gettype(desc, i + 1);
+			pljelog(DEBUG1, "ret[%d]->type = %s", i, ret[i]->type);
 		}
 		else
-			elog(WARNING, "tupl is null");
+			pljelog(WARNING, "tupl is null");
 		/*
 		 * if(isnull){
 		 * elog(DEBUG1,"null");
@@ -449,23 +451,21 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 		else
 		{
 			Datum		sendDatum;
+			int		x;
 
 			sendDatum =
 				OidFunctionCall1(paramtype->typsend, fcinfo->arg[i]);
 			ret->parameters[i].data.isnull = 0;
 			ret->parameters[i].data.data = DatumGetPointer(sendDatum);
-			/*
-			 * elog(DEBUG1,"alive");
-			 */
+			pljelog(DEBUG1, "paramtype->typbyval = %d", paramtype->typbyval);
 			ret->parameters[i].data.length =
-				datumGetSize(fcinfo->arg[i], paramtype->typbyval,
-							 paramtype->typlen);
-			/*
-			 * elog(DEBUG1,"alive");
-			 */
-			/*
-			 * if param is not null, get it from
-			 */
+				datumGetSize(sendDatum, false,
+							 paramtype->typlen)
+				+ (paramtype->typbyval ? 4 : 0 );
+			pljelog(DEBUG1, "ret->parameters[%d].data.length = %d", i, ret->parameters[i].data.length );
+			for(x = 0; x < ret->parameters[i].data.length; x++){
+				pljelog(DEBUG1,"data(%d): %d",x, ((char*)(ret->parameters[i].data.data))[x] );
+			}
 		}
 
 		ret->parameters[i].type = paramtype->typname.data;
