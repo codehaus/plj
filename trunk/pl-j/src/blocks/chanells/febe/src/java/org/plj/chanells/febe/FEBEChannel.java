@@ -80,6 +80,7 @@ public class FEBEChannel
 			client = new FEBEClient();
 			PGStream stream = new PGStream(sock, logger);
 			client.setStream(stream);
+			client.setChannel(this);
 			return client;
 		} catch (IOException e) {
 			logger.fatalError("GetConnection, accept", e);
