@@ -25,6 +25,9 @@ import java.util.Calendar;
 import java.util.Map;
 
 import org.pgj.Channel;
+import org.pgj.messages.Result;
+import org.pgj.messages.SQLCursorClose;
+import org.pgj.messages.SQLFetch;
 import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 
@@ -33,35 +36,39 @@ import org.pgj.typemapping.MappingException;
  */
 public class PLJJDBCResultSet implements ResultSet {
 
-	/**  */
+	/** Our little connection object */
 	private PLJJDBCConnection conn = null;
 
-	/** We can communicate with the RDBMS across this chanell. */
-	private Channel chanell = null;
-	/** fetch size */
-	private int fetchsize = 50;
+	/** Fetch size */
+	private int fetchSize = 0;
 
 	/** the names of the columns */
-	private String[] column_names;
+	private String[] columnNames;
 
+	/** Rows kept here. */
 	private ArrayList rows = null;
 
 	/** the index of the first row that the rows array contains from the total result set. */
-	private int rows_from = 0;
+	private int rowsFrom = 0;
+
 	/** the current rows`s index relative to the first stored in rows array */
-	private int current_row_index_in = 0;
+	private int relRowIdx = 0;
+
 	/** The current row */
 	private Field[] fields = null;
 
 	/** the name of the cursor we can fetch from. */
 	private String cursorName = null;
 
+	/** Fetch direction */
+	private int fetchDirection = ResultSet.FETCH_FORWARD;
+
 	/**
 	 * 
 	 */
-	public PLJJDBCResultSet(Channel chanell, String cursorName) {
+	protected PLJJDBCResultSet(PLJJDBCConnection conn, String cursorName) {
 		super();
-		this.chanell = chanell;
+		this.conn = conn;
 		this.cursorName = cursorName;
 	}
 
@@ -73,11 +80,43 @@ public class PLJJDBCResultSet implements ResultSet {
 		checkIfClosed();
 
 
-		if (current_row_index_in >= rows.size()) {
+		if (rows == null || relRowIdx >= rows.size() + rowsFrom) {
 
+			//needs fetch
+			SQLFetch fetch = new SQLFetch();
+			fetch.setCount(fetchSize);
+			fetch.setCursorName(cursorName);
+			switch (fetchDirection) {
+				case ResultSet.FETCH_FORWARD :
+					fetch.setDirection(SQLFetch.FETCH_FORWARD);
+					break;
+				case ResultSet.FETCH_REVERSE :
+					fetch.setDirection(SQLFetch.FETCH_BACKWARD);
+					break;
+				default :
+					throw new SQLException("Fetch direction unknown");
+			}
+			Result res = (Result) conn.doSendReceive(fetch);
+			int rowCnt = res.getRows();
+			int colCnt = res.getColumns();
+			if (colCnt == 0)
+				return false;
+			if(rows == null)
+				rows = new ArrayList(rowCnt);
+			for (int i = 0; i < rowCnt; i++) {
+				Field[] fld = new Field[colCnt];
+				for (int j = 0; j < colCnt; j++)
+					fld[i] = res.get(i, j);
+				int addto = this.rowsFrom + this.rows.size() + i;
+				rows.add(addto, fld);
+			}
+
+		} else {
+			relRowIdx++;
 		}
+		fields = (Field[]) rows.get(rowsFrom - relRowIdx);
 
-		return false;
+		return fields != null;
 	}
 
 	/* (non-Javadoc)
@@ -87,12 +126,16 @@ public class PLJJDBCResultSet implements ResultSet {
 
 		checkIfClosed();
 
+		SQLCursorClose cl = new SQLCursorClose();
+		cl.setCursorName(cursorName);
+		Result ans = (Result) conn.doSendReceive(cl);
+
 		//let the garbage collector work
 		rows = null;
 		this.fields = null;
 		this.cursorName = null;
-		//if chanell is null, it is closed.
-		this.chanell = null;
+		//if conn is null, it is closed.
+		this.conn = null;
 	}
 
 	/* (non-Javadoc)
@@ -108,14 +151,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public String getString(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return (String) fld.get(String.class);
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return null;
-		}
+		return (String) getFieldAs(String.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
@@ -123,14 +159,8 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public boolean getBoolean(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Boolean) fld.get(Boolean.class)).booleanValue();
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return false;
-		}
+		return ((Boolean) getFieldAs(Timestamp.class, columnIndex, true))
+				.booleanValue();
 	}
 
 	/* (non-Javadoc)
@@ -138,14 +168,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public byte getByte(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Byte) fld.get(Byte.class)).byteValue();
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return 0;
-		}
+		return ((Byte) getFieldAs(Byte.class, columnIndex, true)).byteValue();
 	}
 
 	/* (non-Javadoc)
@@ -153,14 +176,8 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public short getShort(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Short) fld.get(Short.class)).shortValue();
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return 0;
-		}
+		return ((Short) getFieldAs(Short.class, columnIndex, true))
+				.shortValue();
 	}
 
 	/* (non-Javadoc)
@@ -168,14 +185,8 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public int getInt(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Integer) fld.get(Integer.class)).intValue();
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return 0;
-		}
+		return ((Integer) getFieldAs(Integer.class, columnIndex, true))
+				.byteValue();
 	}
 
 	/* (non-Javadoc)
@@ -183,14 +194,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public long getLong(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Long) fld.get(Long.class)).longValue();
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return 0;
-		}
+		return ((Long) getFieldAs(Long.class, columnIndex, true)).byteValue();
 	}
 
 	/* (non-Javadoc)
@@ -198,14 +202,8 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public float getFloat(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Float) fld.get(Float.class)).floatValue();
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return 0;
-		}
+		return ((Float) getFieldAs(Float.class, columnIndex, true))
+				.floatValue();
 	}
 
 	/* (non-Javadoc)
@@ -213,14 +211,8 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public double getDouble(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return ((Double) fld.get(Double.class)).doubleValue();
-		} catch (MappingException e) {
-			doTypeException(Double.class, e);
-			//this will never run.
-			return 0;
-		}
+		return ((Double) getFieldAs(Double.class, columnIndex, true))
+				.doubleValue();
 	}
 
 	/* (non-Javadoc)
@@ -229,22 +221,14 @@ public class PLJJDBCResultSet implements ResultSet {
 	public BigDecimal getBigDecimal(int columnIndex, int scale)
 			throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return (BigDecimal) fld.get(BigDecimal.class);
-		} catch (MappingException e) {
-			doTypeException(String.class, e);
-			//this will never run.
-			return null;
-		}
+		return ((BigDecimal) getFieldAs(BigDecimal.class, columnIndex, false));
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getBytes(int)
 	 */
 	public byte[] getBytes(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (byte[]) getFieldAs(byte[].class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
@@ -252,14 +236,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public Date getDate(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return (Date) fld.get(Date.class);
-		} catch (MappingException e) {
-			doTypeException(Date.class, e);
-			//this will never run.
-			return null;
-		}
+		return (Date) getFieldAs(Date.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
@@ -267,14 +244,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public Time getTime(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return (Time) fld.get(Time.class);
-		} catch (MappingException e) {
-			doTypeException(Time.class, e);
-			//this will never run.
-			return null;
-		}
+		return (Time) getFieldAs(Time.class, columnIndex, true);
 	}
 
 	/* (non-Javadoc)
@@ -282,28 +252,15 @@ public class PLJJDBCResultSet implements ResultSet {
 	 */
 	public Timestamp getTimestamp(int columnIndex) throws SQLException {
 		checkIfClosed();
-		try {
-			Field fld = fields[columnIndex - 1];
-			return (Timestamp) fld.get(Timestamp.class);
-		} catch (MappingException e) {
-			doTypeException(Timestamp.class, e);
-			//this will never run.
-			return null;
-		}
+		return (Timestamp) getFieldAs(Timestamp.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getAsciiStream(int)
 	 */
 	public InputStream getAsciiStream(int columnIndex) throws SQLException {
-		try {
-			Field fld = fields[columnIndex - 1];
-			return (InputStream) fld.get(InputStream.class);
-		} catch (MappingException e) {
-			doTypeException(InputStream.class, e);
-			//this will never run.
-			return null;
-		}
+		checkIfClosed();
+		return (InputStream) getFieldAs(InputStream.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
@@ -493,8 +450,8 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#findColumn(java.lang.String)
 	 */
 	public int findColumn(String columnName) throws SQLException {
-		for (int i = 0; i < column_names.length; i++) {
-			if (columnName.equals(column_names[i]))
+		for (int i = 0; i < columnNames.length; i++) {
+			if (columnName.equals(columnNames[i]))
 				return i + 1;
 		}
 		return -1;
@@ -504,7 +461,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getCharacterStream(int)
 	 */
 	public Reader getCharacterStream(int columnIndex) throws SQLException {
-		return (Reader)getFieldAs(Reader.class, columnIndex, false);
+		return (Reader) getFieldAs(Reader.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
@@ -518,7 +475,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getBigDecimal(int)
 	 */
 	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-		return (BigDecimal)getFieldAs(BigDecimal.class, columnIndex, false);
+		return (BigDecimal) getFieldAs(BigDecimal.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
@@ -548,8 +505,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#isFirst()
 	 */
 	public boolean isFirst() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.rowsFrom == 0 && this.relRowIdx == 0;
 	}
 
 	/* (non-Javadoc)
@@ -644,14 +600,14 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#setFetchSize(int)
 	 */
 	public void setFetchSize(int rows) throws SQLException {
-		fetchsize = rows;
+		fetchSize = rows;
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getFetchSize()
 	 */
 	public int getFetchSize() throws SQLException {
-		return fetchsize;
+		return fetchSize;
 	}
 
 	/* (non-Javadoc)
@@ -1110,8 +1066,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getArray(int)
 	 */
 	public Array getArray(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (Array) getFieldAs(Array.class, i, false);
 	}
 
 	/* (non-Javadoc)
@@ -1150,8 +1105,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getArray(java.lang.String)
 	 */
 	public Array getArray(String colName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getArray(findColumn(colName));
 	}
 
 	/* (non-Javadoc)
@@ -1208,16 +1162,14 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getURL(int)
 	 */
 	public URL getURL(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (URL) getFieldAs(URL.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getURL(java.lang.String)
 	 */
 	public URL getURL(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getURL(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
@@ -1303,7 +1255,7 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @throws SQLException if the ResultSet is already closed.
 	 */
 	private void checkIfClosed() throws SQLException {
-		if (chanell == null)
+		if (conn == null)
 			throw new SQLException("This Resultset is already closed.");
 	}
 
