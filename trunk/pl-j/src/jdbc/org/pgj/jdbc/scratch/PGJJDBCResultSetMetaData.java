@@ -1,6 +1,7 @@
 /*
  * Created on Jun 12, 2003
  */
+
 package org.pgj.jdbc.scratch;
 
 import java.sql.ResultSetMetaData;
@@ -11,17 +12,21 @@ import java.sql.SQLException;
  * 
  * @author Laszlo Hornyak
  */
-public class PGJJDBCResultSetMetaData
-	implements ResultSetMetaData {
+public class PGJJDBCResultSetMetaData implements ResultSetMetaData {
 
 	private int column_count = 0;
 	boolean[] autoincrement = null;
+	boolean[] casesensitive = null;
+	boolean[] searchable = null;
+	boolean[] nullable = null;
+	PGJJDBCResultSet resultSet = null;
 
 	/**
 	 * @param chanell
 	 * @param cursorName
 	 */
-	public PGJJDBCResultSetMetaData() {
+	public PGJJDBCResultSetMetaData(PGJJDBCResultSet resultSet) {
+		this.resultSet = resultSet;
 	}
 
 	/* (non-Javadoc)
@@ -38,19 +43,18 @@ public class PGJJDBCResultSetMetaData
 		return autoincrement[column];
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see java.sql.ResultSetMetaData#isCaseSensitive(int)
 	 */
 	public boolean isCaseSensitive(int column) throws SQLException {
-		return true;
+		return casesensitive[column];
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSetMetaData#isSearchable(int)
 	 */
 	public boolean isSearchable(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -65,8 +69,10 @@ public class PGJJDBCResultSetMetaData
 	 * @see java.sql.ResultSetMetaData#isNullable(int)
 	 */
 	public int isNullable(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		if (nullable == null) {
+			return columnNullableUnknown;
+		}
+		return nullable[column] ? columnNullable : columnNoNulls;
 	}
 
 	/* (non-Javadoc)
