@@ -52,6 +52,7 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 
 		ChannelWrapper channelWrapper = new ChannelWrapper(logger, channel, executor);
 		ClientWrapper clientWrapper = new ClientWrapper(channelWrapper, client);
+		channelWrapper.setClientWrapper(clientWrapper);
 		executor.initClientSession(clientWrapper);
 
 		try {

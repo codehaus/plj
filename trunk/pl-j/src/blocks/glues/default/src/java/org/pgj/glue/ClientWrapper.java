@@ -23,7 +23,8 @@ class ClientWrapper implements Client {
 	 */
 	public ClientWrapper(Channel channel, Client client) {
 		super();
-		// TODO Auto-generated constructor stub
+		this.channel = channel;
+		this.client = client;
 	}
 
 	/*
