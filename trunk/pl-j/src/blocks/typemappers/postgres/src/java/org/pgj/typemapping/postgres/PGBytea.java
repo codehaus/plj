@@ -13,7 +13,7 @@ import org.pgj.typemapping.MappingException;
  */
 public class PGBytea extends AbstractPGField {
 	
-	private final static Class[] classes = new Class[] {byte[].class};
+	private final static Class[] classes = new Class[] {byte[].class, String.class};
 	
 	/* (non-Javadoc)
 	 * @see org.pgj.typemapping.postgres.AbstractPGField#backMap(java.lang.Object)
@@ -52,6 +52,11 @@ public class PGBytea extends AbstractPGField {
 			byte[] ret = new byte[ raw.length - 4 ];
 			System.arraycopy(raw, 4, ret, 0, raw.length - 4);
 			return ret;
+		} else if (clazz == String.class){
+			byte[] ret = new byte[ raw.length - 4 ];
+			System.arraycopy(raw, 4, ret, 0, raw.length - 4);
+			String s = new String(ret);
+			return s;
 		}
 		throw new MappingException("Can not map to "+clazz.getName());
 	}
