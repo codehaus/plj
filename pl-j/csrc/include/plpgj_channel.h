@@ -1,3 +1,4 @@
+
 /**
  * file name:			plpgj_channel.h
  * description:			Channel API.
@@ -7,10 +8,6 @@
 #ifndef PLPGJ_CHANNEL_H
 #define PLPGJ_CHANNEL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-	
 #include "plpgj_messages.h"
 
 #define PLPGJ_CHANNEL_OK			0
@@ -21,26 +18,22 @@ extern "C" {
  * Is the chanell initialized?
  * Returns 0 if not, anything else otherwise.
  */
-int plpgj_channel_initialized(void);
+int			plpgj_channel_initialized(void);
 
 /**
  * Initialize the chanell.
  * Returns 0 if not, anything else otherwise.
  */
-int plpgj_channel_initialize(void);
+int			plpgj_channel_initialize(void);
 
 /**
  * Send message across the channel.
  * Parameters:
- *  -message: a message to send
- * Returns 
+ *	-message: a message to send
+ * Returns
  */
-int plpgj_channel_send(message);
-message plpgj_channel_receive(void);
-const char* plpgj_channel_getimplname(void);
-
-#ifdef __cplusplus
-}
-#endif
+int			plpgj_channel_send(message);
+message		plpgj_channel_receive(void);
+const char *plpgj_channel_getimplname(void);
 
 #endif

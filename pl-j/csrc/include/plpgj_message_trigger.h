@@ -1,10 +1,6 @@
 #ifndef PLPGJ_MESSAGE_TRIGREQ_H
 #define PLPGJ_MESSAGE_TRIGREQ_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "plpgj_message_base.h"
 
 #define PLPGJ_TRIGGER_REASON_INSERT 1
@@ -17,37 +13,39 @@ extern "C" {
 #define PLPGJ_TRIGGER_STARTED_FOR_ROW 0
 #define PLPGJ_TRIGGER_STARTED_FOR_STATEMENT 1
 
-typedef struct {
+typedef struct
+{
 	base_message_content;
-	//class name
-	char classname[50];
-	//method name
-	char methodname[50];
-	char* tablename;
-	short reason;
-	short actionorder;
-	short row;
-	int colcount;
-	char** colnames;
-	char** coltypes;
-	pparam* _new;
-	pparam* _old;
-}str_msg_trigger_callreq;
+	/*
+	 * class name
+	 */
+	char		classname[50];
+	/*
+	 * method name
+	 */
+	char		methodname[50];
+	char	   *tablename;
+	short		reason;
+	short		actionorder;
+	short		row;
+	int			colcount;
+	char	  **colnames;
+	char	  **coltypes;
+	pparam	   *_new;
+	pparam	   *_old;
+} str_msg_trigger_callreq;
 
-typedef str_msg_trigger_callreq* trigger_callreq;
+typedef str_msg_trigger_callreq *trigger_callreq;
 
-typedef struct {
+typedef struct
+{
 	base_message_content;
-	char* tablename;
-	char** colnames;
-	int colcount;
-	pparam* _tuple;
-}str_msg_trigger_tupleresult;
+	char	   *tablename;
+	char	  **colnames;
+	int			colcount;
+	pparam	   *_tuple;
+} str_msg_trigger_tupleresult;
 
-typedef str_msg_trigger_tupleresult* trigger_tupleres;
-
-#ifdef __cplusplus
-}
-#endif
+typedef str_msg_trigger_tupleresult *trigger_tupleres;
 
 #endif

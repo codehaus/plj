@@ -3,12 +3,12 @@
 
 #include "plpgj_message_base.h"
 
-typedef struct str_error_message{
-	base_message_content
-	char* classname;
-	char* message;
-	char* stacktrace;
-}str_error_message, * error_message;
+typedef struct str_error_message
+{
+	base_message_content char *classname;
+	char	   *message;
+	char	   *stacktrace;
+} str_error_message, *error_message;
 
 
 
