@@ -18,6 +18,7 @@ import org.pgj.tools.channelutil.ClientUtils;
 
 /**
  * Glue worker thread.
+ * 
  * @author Laszlo Hornyak
  */
 public class GlueWorker
