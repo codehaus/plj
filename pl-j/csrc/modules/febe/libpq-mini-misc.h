@@ -41,6 +41,8 @@ pqGetInt(int *result, size_t bytes, PGconn_min *conn);
 int
 pqPutInt(int value, size_t bytes, PGconn_min *conn);
 
+int
+pqPutMsgStart(char msg_type, bool force_len, PGconn_min *conn);
 
 
 #endif
