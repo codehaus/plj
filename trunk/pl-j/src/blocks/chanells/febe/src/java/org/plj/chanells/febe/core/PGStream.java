@@ -7,10 +7,11 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/blocks/chanells/febe/src/java/org/plj/chanells/febe/core/PGStream.java,v 1.1 2004-01-27 17:35:11 lazlo Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/blocks/chanells/febe/src/java/org/plj/chanells/febe/core/PGStream.java,v 1.2 2004-03-09 22:43:52 lazlo Exp $
  *
  *-------------------------------------------------------------------------
  */
+
 package org.plj.chanells.febe.core;
 
 import java.io.BufferedInputStream;
@@ -18,6 +19,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import org.apache.avalon.framework.logger.Logger;
 
 /**
  * A modified version of the original JDBC PGStream.
@@ -26,11 +28,13 @@ import java.net.Socket;
  * @version 0.1
  */
 public class PGStream {
+
 	public int port;
 	public Socket connection;
 	public InputStream pg_input;
 	public BufferedOutputStream pg_output;
 	private byte[] byte_buf = new byte[8 * 1024];
+	Logger logger = null;
 
 	/*
 	 * Constructor:  Connect to the PostgreSQL back end and return
@@ -40,17 +44,15 @@ public class PGStream {
 	 * @param port the port number that the postmaster is sitting on
 	 * @exception IOException if an IOException occurs below it.
 	 */
-	public PGStream(Socket connection) throws IOException {
+	public PGStream(Socket connection, Logger logger) throws IOException {
 		this.connection = connection;
-
+		this.logger = logger;
 		// Submitted by Jason Venner <jason@idiom.com> adds a 10x speed
 		// improvement on FreeBSD machines (caused by a bug in their TCP Stack)
 		connection.setTcpNoDelay(true);
-
 		// Buffer sizes submitted by Sverre H Huseby <sverrehu@online.no>
 		pg_input = new BufferedInputStream(connection.getInputStream(), 8192);
-		pg_output =
-			new BufferedOutputStream(connection.getOutputStream(), 8192);
+		pg_output = new BufferedOutputStream(connection.getOutputStream(), 8192);
 	}
 
 	/*
@@ -60,6 +62,7 @@ public class PGStream {
 	 * @exception IOException if an I/O error occurs
 	 */
 	public void SendChar(int val) throws IOException {
+		logger.debug("SendChar: " + (char) val);
 		pg_output.write((byte) val);
 	}
 
@@ -72,11 +75,12 @@ public class PGStream {
 	 */
 	public void SendInteger(int val, int siz) throws IOException {
 		byte[] buf = new byte[siz];
-
+		logger.debug("SendInteger: " + val);
 		while (siz-- > 0) {
 			buf[siz] = (byte) (val & 0xff);
 			val >>= 8;
 		}
+		logger.debug("SendInteger: " + buf);
 		Send(buf);
 	}
 
@@ -88,10 +92,12 @@ public class PGStream {
 	 * @exception IOException if an I/O error occurs
 	 */
 	public void SendIntegerR(int val, int siz) throws IOException {
+		logger.warn("SendIntegerR -> this function should NOT be used.");
 		byte[] buf = new byte[siz];
-
+		logger.debug("SendIntegerR: " + val);
 		for (int i = 0; i < siz; i++) {
 			buf[i] = (byte) (val & 0xff);
+			logger.debug("buf["+i+"] = "+buf[i]);
 			val >>= 8;
 		}
 		Send(buf);
@@ -105,6 +111,7 @@ public class PGStream {
 	 */
 	public void Send(byte buf[]) throws IOException {
 		pg_output.write(buf);
+		logger.debug("Send(byte buf[]): " + buf);
 	}
 
 	/*
@@ -117,6 +124,7 @@ public class PGStream {
 	 */
 	public void Send(byte buf[], int siz) throws IOException {
 		Send(buf, 0, siz);
+		logger.debug("Send(byte buf[], int siz): " + buf);
 	}
 
 	/*
@@ -130,16 +138,15 @@ public class PGStream {
 	 */
 	public void Send(byte buf[], int off, int siz) throws IOException {
 		int i;
-
-		pg_output.write(
-			buf,
-			off,
-			((buf.length - off) < siz ? (buf.length - off) : siz));
+		pg_output.write(buf, off, ((buf.length - off) < siz
+				? (buf.length - off)
+				: siz));
 		if ((buf.length - off) < siz) {
 			for (i = buf.length - off; i < siz; ++i) {
 				pg_output.write(0);
 			}
 		}
+		logger.debug("Send(byte buf[], int off, int siz)" + buf);
 	}
 
 	/*
@@ -150,7 +157,6 @@ public class PGStream {
 	 */
 	public int ReceiveChar() throws IOException {
 		int c = 0;
-
 		try {
 			c = pg_input.read();
 			if (c < 0)
@@ -170,10 +176,8 @@ public class PGStream {
 	 */
 	public int ReceiveInteger(int siz) throws IOException {
 		int n = 0;
-
 		for (int i = 0; i < siz; i++) {
 			int b = pg_input.read();
-
 			if (b < 0)
 				throw new IOException("postgresql.stream.eof");
 			n = n | (b << (8 * i));
@@ -190,10 +194,8 @@ public class PGStream {
 	 */
 	public int ReceiveIntegerR(int siz) throws IOException {
 		int n = 0;
-
 		for (int i = 0; i < siz; i++) {
 			int b = pg_input.read();
-
 			if (b < 0)
 				throw new IOException("postgresql.stream.eof");
 			n = b | (n << 8);
@@ -253,7 +255,6 @@ public class PGStream {
 		int i;
 		int l_nf = ReceiveIntegerR(2);
 		byte[][] answer = new byte[l_nf][0];
-
 		for (i = 0; i < l_nf; ++i) {
 			int l_size = ReceiveIntegerR(4);
 			boolean isNull = l_size == -1;
@@ -280,10 +281,8 @@ public class PGStream {
 		int i, bim = (nf + 7) / 8;
 		byte[] bitmask = Receive(bim);
 		byte[][] answer = new byte[nf][0];
-
 		int whichbit = 0x80;
 		int whichbyte = 0;
-
 		for (i = 0; i < nf; ++i) {
 			boolean isNull = ((bitmask[whichbyte] & whichbit) == 0);
 			whichbit >>= 1;
@@ -328,7 +327,6 @@ public class PGStream {
 	 */
 	public void Receive(byte[] b, int off, int siz) throws IOException {
 		int s = 0;
-
 		while (s < siz) {
 			int w = pg_input.read(b, off + s, siz - s);
 			if (w < 0)
