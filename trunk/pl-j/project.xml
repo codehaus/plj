@@ -9,7 +9,8 @@
       <name>The pl-j developer group</name>
       <url>http://plj.codehaus.org</url>
     </organization>
-    <siteAddress>http://plj.codehaus.org</siteAddress>
+    <siteAddress>http://plj.codehaus.org/</siteAddress>
+    <siteDirectory>/home/projects/plj/public_html/</siteDirectory>
     <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10430</issueTrackingUrl>
     <repository>
        <connection>scm:cvs:pserver:anonymous@cvs.plj.codehaus.org:/home/projects/plj/scm:pl-j</connection>
@@ -87,10 +88,11 @@
         <sourceDirectory>src/interfaces</sourceDirectory>
     </build>
     <reports>
-        <report>maven-license-plugin</report>
+<!--        <report>maven-license-plugin</report>
         <report>maven-tasklist-plugin</report>
         <report>maven-changes-plugin</report>
         <report>maven-javadoc-plugin</report>
         <report>maven-multiproject-plugin</report>
+-->
     </reports>
 </project>
