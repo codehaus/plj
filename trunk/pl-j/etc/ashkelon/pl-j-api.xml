@@ -5,8 +5,8 @@
 	<description>Contains the interfaces a common server can be built of.</description>
 	<publisher>The PL-J team.</publisher>
 	<download_url>http://plj.codehaus.org/</download_url>
-	<release_date>2004-09-01T08:00:00.000</release_date>
-	<version>alpha-0.0.2</version>
+	<release_date>2004-11-01T08:00:00.000</release_date>
+	<version>alpha-0.0.5</version>
 	<package>org.pgj</package>
 	<package>org.pgj.messages</package>
 	<package>org.pgj.tools.jdbc</package>
