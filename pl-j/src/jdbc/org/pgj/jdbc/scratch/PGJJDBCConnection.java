@@ -16,7 +16,8 @@ import java.util.Map;
 
 import org.apache.log4j.Category;
 import org.pgj.Channel;
-import org.pgj.tools.channelutil.ChannelUtils;
+import org.pgj.Client;
+import org.pgj.tools.channelutil.ClientUtils;
 
 /**
  * PGJ JDBC Connection.
@@ -25,7 +26,8 @@ import org.pgj.tools.channelutil.ChannelUtils;
  */
 public class PGJJDBCConnection implements Connection {
 
-	private final static Category log = Category.getInstance(PGJJDBCConnection.class);
+	private final static Category log = Category
+			.getInstance(PGJJDBCConnection.class);
 
 	/** We are communicating with the backend using this chanell. */
 	private Channel communicationChanell = null;
@@ -38,7 +40,8 @@ public class PGJJDBCConnection implements Connection {
 	 */
 	public PGJJDBCConnection() {
 		super();
-		communicationChanell = ChannelUtils.getChannelforThread();
+		Client cli = ClientUtils.getClientforThread();
+		communicationChanell = cli.getChannel();
 	}
 
 	/* (non-Javadoc)
