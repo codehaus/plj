@@ -18,68 +18,32 @@ import org.apache.avalon.framework.configuration.ConfigurationException;
  */
 public class PLJJDBCMetaData implements DatabaseMetaData {
 
-	protected PLJJDBCMetaData(Configuration conf, PLJJDBCConnection conn) {
+	protected PLJJDBCMetaData(PLJJDBCConnection conn) {
 		this.conn = conn;
-		this.conf = conf;
 	}
 
-	private Configuration conf = null;
 	private PLJJDBCConnection conn = null;
 
-	private int getIntFromConf(String name) throws SQLException {
-		try {
-			return conf.getChild(name).getValueAsInteger();
-		} catch (ConfigurationException e) {
-			throw new SQLException("JDBC driver configuration not set for "
-					.concat(name));
-		}
-	}
-
-	private boolean getBooleanFromConf(String name) throws SQLException {
-		try {
-			return conf.getChild(name).getValueAsBoolean();
-		} catch (ConfigurationException e) {
-			throw new SQLException(
-					"JDBC driver configuration not set properly for "
-							.concat(name));
-		}
-	}
-
-	private String getStringFromConf(String name) throws SQLException {
-		try {
-			return conf.getChild(name).getValue();
-		} catch (ConfigurationException e) {
-			throw new SQLException(
-					"JDBC driver configuration not set properly for "
-							.concat(name));
-		}
-	}
-
-	private ResultSet getResultSetFromConf(String name, Object[] params)
-			throws SQLException {
-		//TODO make me tricky implementation!
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseMajorVersion()
 	 */
 	public int getDatabaseMajorVersion() throws SQLException {
-		return getIntFromConf("DatabaseMetaData");
+		return conn.getIntFromConf("DatabaseMajorVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseMinorVersion()
 	 */
 	public int getDatabaseMinorVersion() throws SQLException {
-		return getIntFromConf("DatabaseMinorVersion");
+		return conn.getIntFromConf("DatabaseMinorVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDefaultTransactionIsolation()
 	 */
 	public int getDefaultTransactionIsolation() throws SQLException {
-		return getIntFromConf("DefaultTransactionIsolation");
+		return conn.getIntFromConf("DefaultTransactionIsolation");
 	}
 
 	/* (non-Javadoc)
@@ -87,7 +51,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public int getDriverMajorVersion() {
 		try {
-			return getIntFromConf("DriverMajorVersion");
+			return conn.getIntFromConf("DriverMajorVersion");
 		} catch (SQLException e) {
 			return 0;
 		}
@@ -98,7 +62,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public int getDriverMinorVersion() {
 		try {
-			return getIntFromConf("DriverMinorVersion");
+			return conn.getIntFromConf("DriverMinorVersion");
 		} catch (SQLException e) {
 			return 0;
 		}
@@ -108,406 +72,406 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#getJDBCMajorVersion()
 	 */
 	public int getJDBCMajorVersion() throws SQLException {
-		return getIntFromConf("JDBCMajorVersion");
+		return conn.getIntFromConf("JDBCMajorVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getJDBCMinorVersion()
 	 */
 	public int getJDBCMinorVersion() throws SQLException {
-		return getIntFromConf("JDBCMinorVersion");
+		return conn.getIntFromConf("JDBCMinorVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxBinaryLiteralLength()
 	 */
 	public int getMaxBinaryLiteralLength() throws SQLException {
-		return getIntFromConf("MaxBinaryLiteralLength");
+		return conn.getIntFromConf("MaxBinaryLiteralLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxCatalogNameLength()
 	 */
 	public int getMaxCatalogNameLength() throws SQLException {
-		return getIntFromConf("MaxCatalogNameLength");
+		return conn.getIntFromConf("MaxCatalogNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxCharLiteralLength()
 	 */
 	public int getMaxCharLiteralLength() throws SQLException {
-		return getIntFromConf("MaxCharLiteralLength");
+		return conn.getIntFromConf("MaxCharLiteralLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxColumnNameLength()
 	 */
 	public int getMaxColumnNameLength() throws SQLException {
-		return getIntFromConf("MaxColumnNameLength");
+		return conn.getIntFromConf("MaxColumnNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxColumnsInGroupBy()
 	 */
 	public int getMaxColumnsInGroupBy() throws SQLException {
-		return getIntFromConf("MaxColumnsInGroupBy");
+		return conn.getIntFromConf("MaxColumnsInGroupBy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxColumnsInIndex()
 	 */
 	public int getMaxColumnsInIndex() throws SQLException {
-		return getIntFromConf("MaxColumnsInIndex");
+		return conn.getIntFromConf("MaxColumnsInIndex");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxColumnsInOrderBy()
 	 */
 	public int getMaxColumnsInOrderBy() throws SQLException {
-		return getIntFromConf("MaxColumnsInOrderBy");
+		return conn.getIntFromConf("MaxColumnsInOrderBy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxColumnsInSelect()
 	 */
 	public int getMaxColumnsInSelect() throws SQLException {
-		return getIntFromConf("MaxColumnsInSelect");
+		return conn.getIntFromConf("MaxColumnsInSelect");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxColumnsInTable()
 	 */
 	public int getMaxColumnsInTable() throws SQLException {
-		return getIntFromConf("MaxColumnsInTable");
+		return conn.getIntFromConf("MaxColumnsInTable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxConnections()
 	 */
 	public int getMaxConnections() throws SQLException {
-		return getIntFromConf("MaxConnections");
+		return conn.getIntFromConf("MaxConnections");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxCursorNameLength()
 	 */
 	public int getMaxCursorNameLength() throws SQLException {
-		return getIntFromConf("MaxCursorNameLength");
+		return conn.getIntFromConf("MaxCursorNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxIndexLength()
 	 */
 	public int getMaxIndexLength() throws SQLException {
-		return getIntFromConf("MaxIndexLength");
+		return conn.getIntFromConf("MaxIndexLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxProcedureNameLength()
 	 */
 	public int getMaxProcedureNameLength() throws SQLException {
-		return getIntFromConf("MaxProcedureNameLength");
+		return conn.getIntFromConf("MaxProcedureNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxRowSize()
 	 */
 	public int getMaxRowSize() throws SQLException {
-		return getIntFromConf("MaxRowSize");
+		return conn.getIntFromConf("MaxRowSize");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxSchemaNameLength()
 	 */
 	public int getMaxSchemaNameLength() throws SQLException {
-		return getIntFromConf("MaxSchemaNameLength");
+		return conn.getIntFromConf("MaxSchemaNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxStatementLength()
 	 */
 	public int getMaxStatementLength() throws SQLException {
-		return getIntFromConf("MaxStatementLength");
+		return conn.getIntFromConf("MaxStatementLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxStatements()
 	 */
 	public int getMaxStatements() throws SQLException {
-		return getIntFromConf("MaxStatements");
+		return conn.getIntFromConf("MaxStatements");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxTableNameLength()
 	 */
 	public int getMaxTableNameLength() throws SQLException {
-		return getIntFromConf("MaxTableNameLength");
+		return conn.getIntFromConf("MaxTableNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxTablesInSelect()
 	 */
 	public int getMaxTablesInSelect() throws SQLException {
-		return getIntFromConf("MaxTablesInSelect");
+		return conn.getIntFromConf("MaxTablesInSelect");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getMaxUserNameLength()
 	 */
 	public int getMaxUserNameLength() throws SQLException {
-		return getIntFromConf("MaxUserNameLength");
+		return conn.getIntFromConf("MaxUserNameLength");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getResultSetHoldability()
 	 */
 	public int getResultSetHoldability() throws SQLException {
-		return getIntFromConf("ResultSetHoldability");
+		return conn.getIntFromConf("ResultSetHoldability");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSQLStateType()
 	 */
 	public int get() throws SQLException {
-		return getIntFromConf("SQLStateType");
+		return conn.getIntFromConf("SQLStateType");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#allProceduresAreCallable()
 	 */
 	public boolean allProceduresAreCallable() throws SQLException {
-		return getBooleanFromConf("ProceduresAreCallable");
+		return conn.getBooleanFromConf("ProceduresAreCallable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#allTablesAreSelectable()
 	 */
 	public boolean allTablesAreSelectable() throws SQLException {
-		return getBooleanFromConf("allTablesAreSelectable");
+		return conn.getBooleanFromConf("allTablesAreSelectable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#dataDefinitionCausesTransactionCommit()
 	 */
 	public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-		return getBooleanFromConf("dataDefinitionCausesTransactionCommit");
+		return conn.getBooleanFromConf("dataDefinitionCausesTransactionCommit");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#dataDefinitionIgnoredInTransactions()
 	 */
 	public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-		return getBooleanFromConf("dataDefinitionIgnoredInTransactions");
+		return conn.getBooleanFromConf("dataDefinitionIgnoredInTransactions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#doesMaxRowSizeIncludeBlobs()
 	 */
 	public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-		return getBooleanFromConf("doesMaxRowSizeIncludeBlobs");
+		return conn.getBooleanFromConf("doesMaxRowSizeIncludeBlobs");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#isCatalogAtStart()
 	 */
 	public boolean isCatalogAtStart() throws SQLException {
-		return getBooleanFromConf("isCatalogAtStart");
+		return conn.getBooleanFromConf("isCatalogAtStart");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#isReadOnly()
 	 */
 	public boolean isReadOnly() throws SQLException {
-		return getBooleanFromConf("isReadOnly");
+		return conn.getBooleanFromConf("isReadOnly");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#locatorsUpdateCopy()
 	 */
 	public boolean locatorsUpdateCopy() throws SQLException {
-		return getBooleanFromConf("locatorsUpdateCopy");
+		return conn.getBooleanFromConf("locatorsUpdateCopy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#nullPlusNonNullIsNull()
 	 */
 	public boolean nullPlusNonNullIsNull() throws SQLException {
-		return getBooleanFromConf("nullPlusNonNullIsNull");
+		return conn.getBooleanFromConf("nullPlusNonNullIsNull");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#nullsAreSortedAtEnd()
 	 */
 	public boolean nullsAreSortedAtEnd() throws SQLException {
-		return getBooleanFromConf("nullsAreSortedAtEnd");
+		return conn.getBooleanFromConf("nullsAreSortedAtEnd");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#nullsAreSortedAtStart()
 	 */
 	public boolean nullsAreSortedAtStart() throws SQLException {
-		return getBooleanFromConf("nullsAreSortedAtStart");
+		return conn.getBooleanFromConf("nullsAreSortedAtStart");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#nullsAreSortedHigh()
 	 */
 	public boolean nullsAreSortedHigh() throws SQLException {
-		return getBooleanFromConf("nullsAreSortedHigh");
+		return conn.getBooleanFromConf("nullsAreSortedHigh");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#nullsAreSortedLow()
 	 */
 	public boolean nullsAreSortedLow() throws SQLException {
-		return getBooleanFromConf("nullsAreSortedLow");
+		return conn.getBooleanFromConf("nullsAreSortedLow");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#storesLowerCaseIdentifiers()
 	 */
 	public boolean storesLowerCaseIdentifiers() throws SQLException {
-		return getBooleanFromConf("storesLowerCaseIdentifiers");
+		return conn.getBooleanFromConf("storesLowerCaseIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#storesLowerCaseQuotedIdentifiers()
 	 */
 	public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-		return getBooleanFromConf("storesLowerCaseQuotedIdentifiers");
+		return conn.getBooleanFromConf("storesLowerCaseQuotedIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#storesMixedCaseIdentifiers()
 	 */
 	public boolean storesMixedCaseIdentifiers() throws SQLException {
-		return getBooleanFromConf("storesMixedCaseIdentifiers");
+		return conn.getBooleanFromConf("storesMixedCaseIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#storesMixedCaseQuotedIdentifiers()
 	 */
 	public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-		return getBooleanFromConf("storesMixedCaseQuotedIdentifiers");
+		return conn.getBooleanFromConf("storesMixedCaseQuotedIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#storesUpperCaseIdentifiers()
 	 */
 	public boolean storesUpperCaseIdentifiers() throws SQLException {
-		return getBooleanFromConf("storesUpperCaseIdentifiers");
+		return conn.getBooleanFromConf("storesUpperCaseIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#storesUpperCaseQuotedIdentifiers()
 	 */
 	public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-		return getBooleanFromConf("storesUpperCaseQuotedIdentifiers");
+		return conn.getBooleanFromConf("storesUpperCaseQuotedIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsANSI92EntryLevelSQL()
 	 */
 	public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-		return getBooleanFromConf("supportsANSI92EntryLevelSQL");
+		return conn.getBooleanFromConf("supportsANSI92EntryLevelSQL");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsANSI92FullSQL()
 	 */
 	public boolean supportsANSI92FullSQL() throws SQLException {
-		return getBooleanFromConf("supportsANSI92FullSQL");
+		return conn.getBooleanFromConf("supportsANSI92FullSQL");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsANSI92IntermediateSQL()
 	 */
 	public boolean supportsANSI92IntermediateSQL() throws SQLException {
-		return getBooleanFromConf("supportsANSI92IntermediateSQL");
+		return conn.getBooleanFromConf("supportsANSI92IntermediateSQL");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsAlterTableWithAddColumn()
 	 */
 	public boolean supportsAlterTableWithAddColumn() throws SQLException {
-		return getBooleanFromConf("supportsAlterTableWithAddColumn");
+		return conn.getBooleanFromConf("supportsAlterTableWithAddColumn");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsAlterTableWithDropColumn()
 	 */
 	public boolean supportsAlterTableWithDropColumn() throws SQLException {
-		return getBooleanFromConf("supportsAlterTableWithDropColumn");
+		return conn.getBooleanFromConf("supportsAlterTableWithDropColumn");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsBatchUpdates()
 	 */
 	public boolean supportsBatchUpdates() throws SQLException {
-		return getBooleanFromConf("supportsBatchUpdates");
+		return conn.getBooleanFromConf("supportsBatchUpdates");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCatalogsInDataManipulation()
 	 */
 	public boolean supportsCatalogsInDataManipulation() throws SQLException {
-		return getBooleanFromConf("supportsCatalogsInDataManipulation");
+		return conn.getBooleanFromConf("supportsCatalogsInDataManipulation");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCatalogsInIndexDefinitions()
 	 */
 	public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-		return getBooleanFromConf("supportsCatalogsInIndexDefinitions");
+		return conn.getBooleanFromConf("supportsCatalogsInIndexDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCatalogsInPrivilegeDefinitions()
 	 */
 	public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-		return getBooleanFromConf("supportsCatalogsInPrivilegeDefinitions");
+		return conn.getBooleanFromConf("supportsCatalogsInPrivilegeDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCatalogsInProcedureCalls()
 	 */
 	public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-		return getBooleanFromConf("supportsCatalogsInProcedureCalls");
+		return conn.getBooleanFromConf("supportsCatalogsInProcedureCalls");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCatalogsInTableDefinitions()
 	 */
 	public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-		return getBooleanFromConf("supportsCatalogsInTableDefinitions");
+		return conn.getBooleanFromConf("supportsCatalogsInTableDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsColumnAliasing()
 	 */
 	public boolean supportsColumnAliasing() throws SQLException {
-		return getBooleanFromConf("supportsColumnAliasing");
+		return conn.getBooleanFromConf("supportsColumnAliasing");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsConvert()
 	 */
 	public boolean supportsConvert() throws SQLException {
-		return getBooleanFromConf("supportsConvert");
+		return conn.getBooleanFromConf("supportsConvert");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCoreSQLGrammar()
 	 */
 	public boolean supportsCoreSQLGrammar() throws SQLException {
-		return getBooleanFromConf("supportsCoreSQLGrammar");
+		return conn.getBooleanFromConf("supportsCoreSQLGrammar");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsCorrelatedSubqueries()
 	 */
 	public boolean supportsCorrelatedSubqueries() throws SQLException {
-		return getBooleanFromConf("supportsCorrelatedSubqueries");
+		return conn.getBooleanFromConf("supportsCorrelatedSubqueries");
 	}
 
 	/* (non-Javadoc)
@@ -515,7 +479,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsDataDefinitionAndDataManipulationTransactions()
 			throws SQLException {
-		return getBooleanFromConf("supportsDataDefinitionAndDataManipulationTransactions");
+		return conn.getBooleanFromConf("supportsDataDefinitionAndDataManipulationTransactions");
 	}
 
 	/* (non-Javadoc)
@@ -523,385 +487,385 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsDataManipulationTransactionsOnly()
 			throws SQLException {
-		return getBooleanFromConf("supportsDataManipulationTransactionsOnly");
+		return conn.getBooleanFromConf("supportsDataManipulationTransactionsOnly");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsDifferentTableCorrelationNames()
 	 */
 	public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-		return getBooleanFromConf("supportsDifferentTableCorrelationNames");
+		return conn.getBooleanFromConf("supportsDifferentTableCorrelationNames");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsExpressionsInOrderBy()
 	 */
 	public boolean supportsExpressionsInOrderBy() throws SQLException {
-		return getBooleanFromConf("supportsExpressionsInOrderBy");
+		return conn.getBooleanFromConf("supportsExpressionsInOrderBy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsExtendedSQLGrammar()
 	 */
 	public boolean supportsExtendedSQLGrammar() throws SQLException {
-		return getBooleanFromConf("supportsExtendedSQLGrammar");
+		return conn.getBooleanFromConf("supportsExtendedSQLGrammar");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsFullOuterJoins()
 	 */
 	public boolean supportsFullOuterJoins() throws SQLException {
-		return getBooleanFromConf("supportsFullOuterJoins");
+		return conn.getBooleanFromConf("supportsFullOuterJoins");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGetGeneratedKeys()
 	 */
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		return getBooleanFromConf("supportsGetGeneratedKeys");
+		return conn.getBooleanFromConf("supportsGetGeneratedKeys");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGroupBy()
 	 */
 	public boolean supportsGroupBy() throws SQLException {
-		return getBooleanFromConf("supportsGroupBy");
+		return conn.getBooleanFromConf("supportsGroupBy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGroupByBeyondSelect()
 	 */
 	public boolean supportsGroupByBeyondSelect() throws SQLException {
-		return getBooleanFromConf("supportsGroupByBeyondSelect");
+		return conn.getBooleanFromConf("supportsGroupByBeyondSelect");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGroupByUnrelated()
 	 */
 	public boolean supportsGroupByUnrelated() throws SQLException {
-		return getBooleanFromConf("supportsGroupByUnrelated");
+		return conn.getBooleanFromConf("supportsGroupByUnrelated");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsIntegrityEnhancementFacility()
 	 */
 	public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-		return getBooleanFromConf("supportsIntegrityEnhancementFacility");
+		return conn.getBooleanFromConf("supportsIntegrityEnhancementFacility");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsLikeEscapeClause()
 	 */
 	public boolean supportsLikeEscapeClause() throws SQLException {
-		return getBooleanFromConf("supportsLikeEscapeClause");
+		return conn.getBooleanFromConf("supportsLikeEscapeClause");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsLimitedOuterJoins()
 	 */
 	public boolean supportsLimitedOuterJoins() throws SQLException {
-		return getBooleanFromConf("supportsLimitedOuterJoins");
+		return conn.getBooleanFromConf("supportsLimitedOuterJoins");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMinimumSQLGrammar()
 	 */
 	public boolean supportsMinimumSQLGrammar() throws SQLException {
-		return getBooleanFromConf("supportsMinimumSQLGrammar");
+		return conn.getBooleanFromConf("supportsMinimumSQLGrammar");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMixedCaseIdentifiers()
 	 */
 	public boolean supportsMixedCaseIdentifiers() throws SQLException {
-		return getBooleanFromConf("supportsMixedCaseIdentifiers");
+		return conn.getBooleanFromConf("supportsMixedCaseIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMixedCaseQuotedIdentifiers()
 	 */
 	public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-		return getBooleanFromConf("supportsMixedCaseQuotedIdentifiers");
+		return conn.getBooleanFromConf("supportsMixedCaseQuotedIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMultipleOpenResults()
 	 */
 	public boolean supportsMultipleOpenResults() throws SQLException {
-		return getBooleanFromConf("supportsMultipleOpenResults");
+		return conn.getBooleanFromConf("supportsMultipleOpenResults");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMultipleResultSets()
 	 */
 	public boolean supportsMultipleResultSets() throws SQLException {
-		return getBooleanFromConf("supportsMultipleResultSets");
+		return conn.getBooleanFromConf("supportsMultipleResultSets");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMultipleTransactions()
 	 */
 	public boolean supportsMultipleTransactions() throws SQLException {
-		return getBooleanFromConf("supportsMultipleTransactions");
+		return conn.getBooleanFromConf("supportsMultipleTransactions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsNamedParameters()
 	 */
 	public boolean supportsNamedParameters() throws SQLException {
-		return getBooleanFromConf("supportsNamedParameters");
+		return conn.getBooleanFromConf("supportsNamedParameters");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsNonNullableColumns()
 	 */
 	public boolean supportsNonNullableColumns() throws SQLException {
-		return getBooleanFromConf("supportsNonNullableColumns");
+		return conn.getBooleanFromConf("supportsNonNullableColumns");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenCursorsAcrossCommit()
 	 */
 	public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-		return getBooleanFromConf("supportsOpenCursorsAcrossCommit");
+		return conn.getBooleanFromConf("supportsOpenCursorsAcrossCommit");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenCursorsAcrossRollback()
 	 */
 	public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-		return getBooleanFromConf("supportsOpenCursorsAcrossRollback");
+		return conn.getBooleanFromConf("supportsOpenCursorsAcrossRollback");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenStatementsAcrossCommit()
 	 */
 	public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-		return getBooleanFromConf("supportsOpenStatementsAcrossCommit");
+		return conn.getBooleanFromConf("supportsOpenStatementsAcrossCommit");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenStatementsAcrossRollback()
 	 */
 	public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-		return getBooleanFromConf("supportsOpenStatementsAcrossRollback");
+		return conn.getBooleanFromConf("supportsOpenStatementsAcrossRollback");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOrderByUnrelated()
 	 */
 	public boolean supportsOrderByUnrelated() throws SQLException {
-		return getBooleanFromConf("supportsOrderByUnrelated");
+		return conn.getBooleanFromConf("supportsOrderByUnrelated");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOuterJoins()
 	 */
 	public boolean supportsOuterJoins() throws SQLException {
-		return getBooleanFromConf("supportsOuterJoins");
+		return conn.getBooleanFromConf("supportsOuterJoins");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsPositionedDelete()
 	 */
 	public boolean supportsPositionedDelete() throws SQLException {
-		return getBooleanFromConf("supportsPositionedDelete");
+		return conn.getBooleanFromConf("supportsPositionedDelete");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsPositionedUpdate()
 	 */
 	public boolean supportsPositionedUpdate() throws SQLException {
-		return getBooleanFromConf("supportsPositionedUpdate");
+		return conn.getBooleanFromConf("supportsPositionedUpdate");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSavepoints()
 	 */
 	public boolean supportsSavepoints() throws SQLException {
-		return getBooleanFromConf("supportsSavepoints");
+		return conn.getBooleanFromConf("supportsSavepoints");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInDataManipulation()
 	 */
 	public boolean supportsSchemasInDataManipulation() throws SQLException {
-		return getBooleanFromConf("supportsSchemasInDataManipulation");
+		return conn.getBooleanFromConf("supportsSchemasInDataManipulation");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInIndexDefinitions()
 	 */
 	public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-		return getBooleanFromConf("supportsSchemasInIndexDefinitions");
+		return conn.getBooleanFromConf("supportsSchemasInIndexDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInPrivilegeDefinitions()
 	 */
 	public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-		return getBooleanFromConf("supportsSchemasInPrivilegeDefinitions");
+		return conn.getBooleanFromConf("supportsSchemasInPrivilegeDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInProcedureCalls()
 	 */
 	public boolean supportsSchemasInProcedureCalls() throws SQLException {
-		return getBooleanFromConf("supportsSchemasInProcedureCalls");
+		return conn.getBooleanFromConf("supportsSchemasInProcedureCalls");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInTableDefinitions()
 	 */
 	public boolean supportsSchemasInTableDefinitions() throws SQLException {
-		return getBooleanFromConf("supportsSchemasInTableDefinitions");
+		return conn.getBooleanFromConf("supportsSchemasInTableDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSelectForUpdate()
 	 */
 	public boolean supportsSelectForUpdate() throws SQLException {
-		return getBooleanFromConf("supportsSelectForUpdate");
+		return conn.getBooleanFromConf("supportsSelectForUpdate");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsStatementPooling()
 	 */
 	public boolean supportsStatementPooling() throws SQLException {
-		return getBooleanFromConf("supportsStatementPooling");
+		return conn.getBooleanFromConf("supportsStatementPooling");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsStoredProcedures()
 	 */
 	public boolean supportsStoredProcedures() throws SQLException {
-		return getBooleanFromConf("supportsStoredProcedures");
+		return conn.getBooleanFromConf("supportsStoredProcedures");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInComparisons()
 	 */
 	public boolean supportsSubqueriesInComparisons() throws SQLException {
-		return getBooleanFromConf("supportsSubqueriesInComparisons");
+		return conn.getBooleanFromConf("supportsSubqueriesInComparisons");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInExists()
 	 */
 	public boolean supportsSubqueriesInExists() throws SQLException {
-		return getBooleanFromConf("supportsSubqueriesInExists");
+		return conn.getBooleanFromConf("supportsSubqueriesInExists");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInIns()
 	 */
 	public boolean supportsSubqueriesInIns() throws SQLException {
-		return getBooleanFromConf("supportsSubqueriesInIns");
+		return conn.getBooleanFromConf("supportsSubqueriesInIns");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInQuantifieds()
 	 */
 	public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-		return getBooleanFromConf("supportsSubqueriesInQuantifieds");
+		return conn.getBooleanFromConf("supportsSubqueriesInQuantifieds");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsTableCorrelationNames()
 	 */
 	public boolean supportsTableCorrelationNames() throws SQLException {
-		return getBooleanFromConf("supportsTableCorrelationNames");
+		return conn.getBooleanFromConf("supportsTableCorrelationNames");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsTransactions()
 	 */
 	public boolean supportsTransactions() throws SQLException {
-		return getBooleanFromConf("supportsTransactions");
+		return conn.getBooleanFromConf("supportsTransactions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsUnion()
 	 */
 	public boolean supportsUnion() throws SQLException {
-		return getBooleanFromConf("supportsUnion");
+		return conn.getBooleanFromConf("supportsUnion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsUnionAll()
 	 */
 	public boolean supportsUnionAll() throws SQLException {
-		return getBooleanFromConf("supportsUnionAll");
+		return conn.getBooleanFromConf("supportsUnionAll");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#usesLocalFilePerTable()
 	 */
 	public boolean usesLocalFilePerTable() throws SQLException {
-		return getBooleanFromConf("usesLocalFilePerTable");
+		return conn.getBooleanFromConf("usesLocalFilePerTable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#usesLocalFiles()
 	 */
 	public boolean usesLocalFiles() throws SQLException {
-		return getBooleanFromConf("usesLocalFiles");
+		return conn.getBooleanFromConf("usesLocalFiles");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#deletesAreDetected(int)
 	 */
 	public boolean deletesAreDetected(int type) throws SQLException {
-		return getBooleanFromConf("deletesAreDetected");
+		return conn.getBooleanFromConf("deletesAreDetected");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#insertsAreDetected(int)
 	 */
 	public boolean insertsAreDetected(int type) throws SQLException {
-		return getBooleanFromConf("insertsAreDetected");
+		return conn.getBooleanFromConf("insertsAreDetected");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#othersDeletesAreVisible(int)
 	 */
 	public boolean othersDeletesAreVisible(int type) throws SQLException {
-		return getBooleanFromConf("othersDeletesAreVisible");
+		return conn.getBooleanFromConf("othersDeletesAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#othersInsertsAreVisible(int)
 	 */
 	public boolean othersInsertsAreVisible(int type) throws SQLException {
-		return getBooleanFromConf("othersInsertsAreVisible");
+		return conn.getBooleanFromConf("othersInsertsAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#othersUpdatesAreVisible(int)
 	 */
 	public boolean othersUpdatesAreVisible(int type) throws SQLException {
-		return getBooleanFromConf("othersUpdatesAreVisible");
+		return conn.getBooleanFromConf("othersUpdatesAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#ownDeletesAreVisible(int)
 	 */
 	public boolean ownDeletesAreVisible(int type) throws SQLException {
-		return getBooleanFromConf("ownDeletesAreVisible");
+		return conn.getBooleanFromConf("ownDeletesAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#ownInsertsAreVisible(int)
 	 */
 	public boolean ownInsertsAreVisible(int type) throws SQLException {
-		return getBooleanFromConf("ownInsertsAreVisible");
+		return conn.getBooleanFromConf("ownInsertsAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#ownUpdatesAreVisible(int)
 	 */
 	public boolean ownUpdatesAreVisible(int type) throws SQLException {
-		return getBooleanFromConf("ownUpdatesAreVisible");
+		return conn.getBooleanFromConf("ownUpdatesAreVisible");
 	}
 
 	/* (non-Javadoc)
@@ -909,14 +873,14 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsResultSetHoldability(int holdability)
 			throws SQLException {
-		return getBooleanFromConf("supportsResultSetHoldability");
+		return conn.getBooleanFromConf("supportsResultSetHoldability");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsResultSetType(int)
 	 */
 	public boolean supportsResultSetType(int type) throws SQLException {
-		return getBooleanFromConf("supportsResultSetType");
+		return conn.getBooleanFromConf("supportsResultSetType");
 	}
 
 	/* (non-Javadoc)
@@ -924,14 +888,14 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsTransactionIsolationLevel(int level)
 			throws SQLException {
-		return getBooleanFromConf("supportsTransactionIsolationLevel");
+		return conn.getBooleanFromConf("supportsTransactionIsolationLevel");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#updatesAreDetected(int)
 	 */
 	public boolean updatesAreDetected(int type) throws SQLException {
-		return getBooleanFromConf("updatesAreDetected");
+		return conn.getBooleanFromConf("updatesAreDetected");
 	}
 
 	/* (non-Javadoc)
@@ -939,7 +903,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsConvert(int fromType, int toType)
 			throws SQLException {
-		return getBooleanFromConf("supportsConvert");
+		return conn.getBooleanFromConf("supportsConvert");
 	}
 
 	/* (non-Javadoc)
@@ -947,126 +911,126 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsResultSetConcurrency(int type, int concurrency)
 			throws SQLException {
-		return getBooleanFromConf("supportsResultSetConcurrency");
+		return conn.getBooleanFromConf("supportsResultSetConcurrency");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getCatalogSeparator()
 	 */
 	public String getCatalogSeparator() throws SQLException {
-		return getStringFromConf("getCatalogSeparator");
+		return conn.getStringFromConf("getCatalogSeparator");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getCatalogTerm()
 	 */
 	public String getCatalogTerm() throws SQLException {
-		return getStringFromConf("catalogTerm");
+		return conn.getStringFromConf("catalogTerm");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseProductName()
 	 */
 	public String getDatabaseProductName() throws SQLException {
-		return getStringFromConf("databaseProductName");
+		return conn.getStringFromConf("databaseProductName");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseProductVersion()
 	 */
 	public String getDatabaseProductVersion() throws SQLException {
-		return getStringFromConf("databaseProductVersion");
+		return conn.getStringFromConf("databaseProductVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDriverName()
 	 */
 	public String getDriverName() throws SQLException {
-		return getStringFromConf("driverName");
+		return conn.getStringFromConf("driverName");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDriverVersion()
 	 */
 	public String getDriverVersion() throws SQLException {
-		return getStringFromConf("driverVersion");
+		return conn.getStringFromConf("driverVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getExtraNameCharacters()
 	 */
 	public String getExtraNameCharacters() throws SQLException {
-		return getStringFromConf("extraNameCharacters");
+		return conn.getStringFromConf("extraNameCharacters");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getIdentifierQuoteString()
 	 */
 	public String getIdentifierQuoteString() throws SQLException {
-		return getStringFromConf("identifierQuoteString");
+		return conn.getStringFromConf("identifierQuoteString");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getNumericFunctions()
 	 */
 	public String getNumericFunctions() throws SQLException {
-		return getStringFromConf("numericFunctions");
+		return conn.getStringFromConf("numericFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getProcedureTerm()
 	 */
 	public String getProcedureTerm() throws SQLException {
-		return getStringFromConf("procedureTerm");
+		return conn.getStringFromConf("procedureTerm");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSQLKeywords()
 	 */
 	public String getSQLKeywords() throws SQLException {
-		return getStringFromConf("SQLKeywords");
+		return conn.getStringFromConf("SQLKeywords");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSchemaTerm()
 	 */
 	public String getSchemaTerm() throws SQLException {
-		return getStringFromConf("schemaTerm");
+		return conn.getStringFromConf("schemaTerm");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSearchStringEscape()
 	 */
 	public String getSearchStringEscape() throws SQLException {
-		return getStringFromConf("searchStringEscape");
+		return conn.getStringFromConf("searchStringEscape");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getStringFunctions()
 	 */
 	public String getStringFunctions() throws SQLException {
-		return getStringFromConf("stringFunctions");
+		return conn.getStringFromConf("stringFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSystemFunctions()
 	 */
 	public String getSystemFunctions() throws SQLException {
-		return getStringFromConf("systemFunctions");
+		return conn.getStringFromConf("systemFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getTimeDateFunctions()
 	 */
 	public String getTimeDateFunctions() throws SQLException {
-		return getStringFromConf("timeDateFunctions");
+		return conn.getStringFromConf("timeDateFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getURL()
 	 */
 	public String getURL() throws SQLException {
-		return getStringFromConf("URL");
+		return conn.getStringFromConf("URL");
 	}
 
 	/* (non-Javadoc)
@@ -1074,7 +1038,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public String getUserName() throws SQLException {
 		//this is worng here...
-		return getStringFromConf("userName");
+		return conn.getStringFromConf("userName");
 	}
 
 	/* (non-Javadoc)
@@ -1088,28 +1052,28 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#getCatalogs()
 	 */
 	public ResultSet getCatalogs() throws SQLException {
-		return getResultSetFromConf("catalogs", null);
+		return conn.getResultSetFromConf("catalogs", null);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSchemas()
 	 */
 	public ResultSet getSchemas() throws SQLException {
-		return getResultSetFromConf("schemas", null);
+		return conn.getResultSetFromConf("schemas", null);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getTableTypes()
 	 */
 	public ResultSet getTableTypes() throws SQLException {
-		return getResultSetFromConf("tableTypes", null);
+		return conn.getResultSetFromConf("tableTypes", null);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getTypeInfo()
 	 */
 	public ResultSet getTypeInfo() throws SQLException {
-		return getResultSetFromConf("typeInfo", null);
+		return conn.getResultSetFromConf("typeInfo", null);
 	}
 
 	/* (non-Javadoc)
@@ -1117,7 +1081,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getExportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		return getResultSetFromConf("exportedKeys", new Object[]{catalog,
+		return conn.getResultSetFromConf("exportedKeys", new Object[]{catalog,
 				schema, table});
 	}
 
@@ -1126,7 +1090,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getImportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		return getResultSetFromConf("importedKeys", new Object[]{catalog,
+		return conn.getResultSetFromConf("importedKeys", new Object[]{catalog,
 				schema, table});
 	}
 
@@ -1135,7 +1099,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getPrimaryKeys(String catalog, String schema, String table)
 			throws SQLException {
-		return getResultSetFromConf("primaryKeys", new Object[]{catalog,
+		return conn.getResultSetFromConf("primaryKeys", new Object[]{catalog,
 				schema, table});
 	}
 
@@ -1144,7 +1108,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getProcedures(String catalog, String schemaPattern,
 			String procedureNamePattern) throws SQLException {
-		return getResultSetFromConf("procedures", new Object[]{catalog,
+		return conn.getResultSetFromConf("procedures", new Object[]{catalog,
 				schemaPattern, procedureNamePattern});
 	}
 
@@ -1153,7 +1117,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getSuperTables(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		return getResultSetFromConf("superTables", new Object[]{catalog,
+		return conn.getResultSetFromConf("superTables", new Object[]{catalog,
 				schemaPattern, tableNamePattern});
 	}
 
@@ -1162,7 +1126,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getSuperTypes(String catalog, String schemaPattern,
 			String typeNamePattern) throws SQLException {
-		return getResultSetFromConf("superTypes", new Object[]{catalog,
+		return conn.getResultSetFromConf("superTypes", new Object[]{catalog,
 				schemaPattern, typeNamePattern});
 	}
 
@@ -1171,7 +1135,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getTablePrivileges(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		return getResultSetFromConf("tablePrivileges", new Object[]{catalog,
+		return conn.getResultSetFromConf("tablePrivileges", new Object[]{catalog,
 				schemaPattern, tableNamePattern});
 	}
 
@@ -1180,7 +1144,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getVersionColumns(String catalog, String schema,
 			String table) throws SQLException {
-		return getResultSetFromConf("versionColumns", new Object[]{schema,
+		return conn.getResultSetFromConf("versionColumns", new Object[]{schema,
 				table});
 	}
 
@@ -1189,7 +1153,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getBestRowIdentifier(String catalog, String schema,
 			String table, int scope, boolean nullable) throws SQLException {
-		return getResultSetFromConf("bestRowIdentifier", new Object[]{catalog,
+		return conn.getResultSetFromConf("bestRowIdentifier", new Object[]{catalog,
 				schema, table, new Integer(scope), new Boolean(nullable)});
 	}
 
@@ -1198,7 +1162,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getIndexInfo(String catalog, String schema, String table,
 			boolean unique, boolean approximate) throws SQLException {
-		return getResultSetFromConf("indexInfo", new Object[]{catalog, schema,
+		return conn.getResultSetFromConf("indexInfo", new Object[]{catalog, schema,
 				table, new Boolean(unique), new Boolean(approximate)});
 	}
 
@@ -1207,7 +1171,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getUDTs(String catalog, String schemaPattern,
 			String typeNamePattern, int[] types) throws SQLException {
-		return getResultSetFromConf("UDTs", new Object[]{catalog,
+		return conn.getResultSetFromConf("UDTs", new Object[]{catalog,
 				schemaPattern, typeNamePattern, types});
 	}
 
@@ -1217,7 +1181,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getAttributes(String catalog, String schemaPattern,
 			String typeNamePattern, String attributeNamePattern)
 			throws SQLException {
-		return getResultSetFromConf("attributes", new Object[]{catalog,
+		return conn.getResultSetFromConf("attributes", new Object[]{catalog,
 				schemaPattern, typeNamePattern, attributeNamePattern});
 	}
 
@@ -1226,7 +1190,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getColumnPrivileges(String catalog, String schema,
 			String table, String columnNamePattern) throws SQLException {
-		return getResultSetFromConf("columnPrivileges", new Object[]{catalog,
+		return conn.getResultSetFromConf("columnPrivileges", new Object[]{catalog,
 				schema, table, columnNamePattern});
 	}
 
@@ -1236,7 +1200,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getColumns(String catalog, String schemaPattern,
 			String tableNamePattern, String columnNamePattern)
 			throws SQLException {
-		return getResultSetFromConf("columns", new Object[]{catalog,
+		return conn.getResultSetFromConf("columns", new Object[]{catalog,
 				schemaPattern, tableNamePattern, columnNamePattern});
 	}
 
@@ -1246,7 +1210,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getProcedureColumns(String catalog, String schemaPattern,
 			String procedureNamePattern, String columnNamePattern)
 			throws SQLException {
-		return getResultSetFromConf("procedureColumns", new Object[]{catalog,
+		return conn.getResultSetFromConf("procedureColumns", new Object[]{catalog,
 				schemaPattern, procedureNamePattern, columnNamePattern});
 	}
 
@@ -1255,7 +1219,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getTables(String catalog, String schemaPattern,
 			String tableNamePattern, String[] types) throws SQLException {
-		return getResultSetFromConf("tables", new Object[]{catalog,
+		return conn.getResultSetFromConf("tables", new Object[]{catalog,
 				schemaPattern, tableNamePattern, types});
 	}
 
@@ -1265,7 +1229,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getCrossReference(String primaryCatalog,
 			String primarySchema, String primaryTable, String foreignCatalog,
 			String foreignSchema, String foreignTable) throws SQLException {
-		return getResultSetFromConf("crossReference", new Object[]{
+		return conn.getResultSetFromConf("crossReference", new Object[]{
 				primaryCatalog, primarySchema, primaryTable, foreignCatalog,
 				foreignSchema, foreignTable});
 	}
@@ -1274,7 +1238,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#getSQLStateType()
 	 */
 	public int getSQLStateType() throws SQLException {
-		return getIntFromConf("getSQLStateType");
+		return conn.getIntFromConf("getSQLStateType");
 	}
 
 }
