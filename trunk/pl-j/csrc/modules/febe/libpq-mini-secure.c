@@ -1,3 +1,4 @@
+
 /*-------------------------------------------------------------------------
  *
  * fe-secure.c
@@ -89,13 +90,17 @@
 #include <ctype.h>
 #include <string.h>
 
-//#include "libpq-fe.h"
-//#include "libpq-int.h"
-//#include "fe-auth.h"
-//#include "pqsignal.h"
+/* #include "libpq-fe.h" */
+
+/* #include "libpq-int.h" */
+
+/* #include "fe-auth.h" */
+
+/* #include "pqsignal.h" */
 
 #include "executor/spi.h"
-#include "utils/elog.h"
+//#include "utils/elog.h"
+#include "pljelog.h"
 
 #ifdef WIN32
 #include "win32.h"
@@ -121,36 +126,18 @@
 
 #include <signal.h>
 
-/*pqsigfunc
-pqsignal(int signo, pqsigfunc func)
-{
-#if !defined(HAVE_POSIX_SIGNALS)
-        return signal(signo, func);
-#else
-        struct sigaction act,
-                                oact;
-
-        act.sa_handler = func;
-        sigemptyset(&act.sa_mask);
-        act.sa_flags = 0;
-        if (signo != SIGALRM)
-                act.sa_flags |= SA_RESTART;
-        if (sigaction(signo, &act, &oact) < 0)
-                return SIG_ERR;
-        return oact.sa_handler;
-#endif   // !HAVE_POSIX_SIGNALS
-} */
-
 
 /* ------------------------------------------------------------ */
+
 /*			 Procedures common to all secure sessions			*/
+
 /* ------------------------------------------------------------ */
 
 /*
  *	Initialize global context
  */
 int
-pqsecure_initialize(PGconn_min *conn)
+pqsecure_initialize(PGconn_min * conn)
 {
 	int			r = 0;
 
@@ -169,9 +156,11 @@ pqsecure_destroy(void)
  *	Attempt to negotiate secure session.
  */
 PostgresPollingStatusType
-pqsecure_open_client(PGconn_min *conn)
+pqsecure_open_client(PGconn_min * conn)
 {
-	/* shouldn't get here */
+	/*
+	 * shouldn't get here 
+	 */
 	return PGRES_POLLING_FAILED;
 }
 
@@ -179,7 +168,7 @@ pqsecure_open_client(PGconn_min *conn)
  *	Close secure session.
  */
 void
-pqsecure_close(PGconn_min *conn)
+pqsecure_close(PGconn_min * conn)
 {
 }
 
@@ -187,26 +176,12 @@ pqsecure_close(PGconn_min *conn)
  *	Read data from a secure connection.
  */
 ssize_t
-pqsecure_read(PGconn_min *conn, void *ptr, size_t len)
+pqsecure_read(PGconn_min * conn, void *ptr, size_t len)
 {
 	ssize_t		n = 0;
 
-elog(DEBUG1, "pqsecure_read");
-	//if(conn -> inCursor < conn -> inEnd)
-	//{
-		
-		n = recv(conn->sock, ptr, len, 0);
-	//} else {
-	//	elog(DEBUG1, "hey, there is still something we can use!");
-	//}
-
-	elog(DEBUG1, "received: %d", n);
-	elog(DEBUG1, "length: %d", len);
-	{
-	int i;
-	for(i=0; i<n; i++)
-		elog(DEBUG1, "data: %d",(char) *(((char*)ptr)+i));
-	}
+	pljelog(DEBUG1, "pqsecure_read");
+	n = recv(conn->sock, ptr, len, 0);
 	return n;
 }
 
@@ -214,14 +189,12 @@ elog(DEBUG1, "pqsecure_read");
  *	Write data to a secure connection.
  */
 ssize_t
-pqsecure_write(PGconn_min *conn, const void *ptr, size_t len)
+pqsecure_write(PGconn_min * conn, const void *ptr, size_t len)
 {
 	ssize_t		n;
 
-		n = send(conn->sock, ptr, len, 0);
+	n = send(conn->sock, ptr, len, 0);
 
 
 	return n;
 }
-
-
