@@ -15,7 +15,6 @@ import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.messages.TriggerCallRequest;
 import org.pgj.messages.TupleResult;
-import org.pgj.tools.channelutil.ClientUtils;
 
 /**
  * Glue worker thread.
@@ -41,33 +40,17 @@ public class GlueWorker
 	/** Are we asked to terminate? */
 	private boolean terminating = false;
 
-	/**
-	 * ThreadLocal variable to store the client.
-	 */
-	private static ThreadLocal clientThread = new ThreadLocal() {
-
-		protected final Object initialValue() {
-			return null;
-		}
-	};
-
 	public GlueWorker() {
 	}
 	/** Logger */
-	Logger logger = null;
+	private Logger logger = null;
 
 	/**
 	 * @see Executable#execute()
 	 */
 	public void execute() {
 
-		/* if the client is not set, so this is a new call from a client
-		 * we must set the Client object for this thread, and unset it
-		 * after the call is done. (see finally block)
-		 */
-		boolean setClient = ClientUtils.getClientforThread() == null;
-		if (setClient)
-			ClientUtils.setClientforThread(client);
+		executor.initClientSession(client);
 
 		try {
 			while (true) {
@@ -96,20 +79,18 @@ public class GlueWorker
 					chanell.sendToRDBMS(ans);
 				} else {
 					logger
-							.fatalError("hmmmm. result should be Exception or Result");
+							.fatalError("Result should be Exception, Result or TupleResult");
 				}
 			}
 		} catch (Throwable e) {
 			logger.error("problem:", e);
 		} finally {
+			executor.destroyClientSession(client);
+
 			//cleanup, let gc do its work.
 			client = null;
 			executor = null;
 			chanell = null;
-
-			//no funny tricks ;)
-			if (setClient)
-				ClientUtils.setClientforThread(null);
 		}
 	}
 
@@ -166,4 +147,5 @@ public class GlueWorker
 	public void setClient(Client client) {
 		this.client = client;
 	}
+
 }

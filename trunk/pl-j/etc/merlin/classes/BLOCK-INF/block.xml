@@ -73,6 +73,9 @@
 				<resource
 					id="pl-j:pl-j-tools"
 					version="0.0.2"/>
+				<resource
+					id="pl-j:pl-j-jdbc"
+					version="0.0.2"/>
 
 			</repository>
 		</classpath>
@@ -138,6 +141,10 @@
 		class="org.pgj.tools.classloaders.impl.FSClassLoader">
 		<configuration>
 			<root>/tmp/plj-tests/</root>
+		<!--		
+			<preload>org.pgj.jdbc.scratch.PLJJDBCDriver</preload>
+			<preload>org.pgj.jdbc.postgresql.Driver</preload> 
+			-->
 		</configuration>
 		<categories priority="DEBUG">
 			<category name="/classloader"/>
@@ -165,10 +172,25 @@
 		<dependencies>
 			<dependency key="channel" source="channel"/>
 			<dependency key="executor" source="executor"/>
+			<dependency key="jdbc-configurator" source="jdbc-configurator"/>
 		</dependencies>
 		<categories priority="DEBUG">
 			<category name="/glue"/>
 		</categories>
+	</component>
+
+	<component
+		name="jdbc-configurator"
+		class="org.pgj.jdbc.core.JDBCInitializer">
+		<dependencies>
+			<dependency key="classloader" source="classloader"/>
+		</dependencies>
+		<categories priority="DEBUG">
+			<category name="/jdbc-initer"/>
+		</categories>
+		<configuration>
+			<class>org.pgj.jdbc.scratch.PLJJDBCDriver</class>
+		</configuration>
 	</component>
 
 	<component
