@@ -9,6 +9,10 @@ package org.pgj.typemapping.postgres;
  * 
  * @author Laszlo Hornyak
  */
+//TODO the character classes need a major review
 public class PGText extends PGVarchar {
 
+	public String rdbmsType() {
+		return "text";
+	}
 }

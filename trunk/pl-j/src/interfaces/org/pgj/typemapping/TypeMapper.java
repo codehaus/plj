@@ -1,3 +1,4 @@
+
 package org.pgj.typemapping;
 
 import org.pgj.messages.Result;
@@ -22,6 +23,7 @@ public interface TypeMapper {
 	 * @param raw_data			raw data from the RDBMS
 	 * @param type				The name of the RDBMS type (varchar, int, etc)
 	 * @return The Field representation of the data.
+	 * @throws MappingException if soemthing is wrong with the mapping
 	 */
 	Field map(byte[] raw_data, String type) throws MappingException;
 
@@ -37,6 +39,7 @@ public interface TypeMapper {
 	 * Map back a java type to a RDBMS type with specifying the asked type.
 	 * @param object			The object to map back to RDBMS type
 	 * @param type				The RDBMS type name.
+	 * @return backmapped field of the object
 	 * @throws MappingException if the object cannot be mappedto the asked RDBMS type.
 	 */
 	Field backMap(Object object, String type) throws MappingException;
@@ -55,7 +58,19 @@ public interface TypeMapper {
 	 * @throws MappingException if the object type cannot be mapped to an RDBMS type.
 	 */
 	Result createResult(Object obj) throws MappingException;
-	
+
+	/**
+	 * Create a result object from a java object (backmap).
+	 * @param obj			a java object
+	 * @param expect		the expected RDBMS type of the returned result
+	 * @param strict		Strict backmapping. If true, the typemapper should throw MappingException if it cant map back to the expected type. If false, it may return the default type instead.
+	 * @return the result object.
+	 * @throws MappingException if the object type cannot be mapped to an RDBMS type.
+	 */
+	Result createResult(Object obj, String expect, boolean strict)
+			throws MappingException;
+
+
 	/**
 	 * Returns the rdbms type of the given class.
 	 * @param cl	the class
