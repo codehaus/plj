@@ -6,6 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * A little collection of very stupid methods that can be java UDFs.
+ * 
+ * @author Laszlo Hornyak
+ * 
+ */
 public class Businnes {
 
 	public Businnes() {
@@ -19,7 +25,8 @@ public class Businnes {
 	}
 
 	public String test() {
-		System.out.println("\nIf you see this, it means your stored procedure is running.\n");
+		System.out
+				.println("\nIf you see this, it means your stored procedure is running.\n");
 
 		System.out.println("Hello\n\n" + System.getProperty("java.version")
 				+ "\n\n");
@@ -56,16 +63,21 @@ public class Businnes {
 		return "Haleluja, vazzeg!";
 	}
 
-	public int testInt0(){
+	public int testInt0() {
+		System.out.println("testInt0() was called. its return value is 1984");
 		return 1984;
 	}
 
-	public int testInt1(Integer i1, Integer i2){
+	public int testInt1(Integer i1, Integer i2) {
 		return i1.intValue() + i2.intValue();
 	}
 
-	public int testInt2(Integer i1){
+	public int testInt2(Integer i1) {
 		return i1.intValue();
+	}
+
+	public String testString0(String str) {
+		return str.toLowerCase();
 	}
 
 }
