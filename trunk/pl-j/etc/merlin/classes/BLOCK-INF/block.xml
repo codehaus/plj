@@ -44,6 +44,9 @@
 				<resource
 					id="log4j:log4j" 
 					version="1.2.8"/>
+				<resource
+					id="commons-beanutils:commons-beanutils" 
+					version="1.6.1"/>
 
 
 				<resource 
@@ -159,6 +162,19 @@
 		<categories priority="DEBUG">
 			<category name="/glue"/>
 		</categories>
+	</component>
+
+	<component
+		name="tuplemapper"
+		class="org.pgj.tools.tuplemapper.impl.reflected.ReflectedTupleMapper">
+		<dependencies>
+		</dependencies>
+		<categories>
+			<category name="/tuplemapper"/>
+		</categories>
+		<configuration>
+			<relation name="plj_test" class="org.deadcat_enterprises.TestTableRecord"/>
+		</configuration>
 	</component>
 
 	<component
