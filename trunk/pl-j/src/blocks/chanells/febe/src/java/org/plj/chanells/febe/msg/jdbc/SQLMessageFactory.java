@@ -13,6 +13,7 @@ import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
 import org.pgj.messages.SQL;
 import org.pgj.messages.SQLCursorClose;
+import org.pgj.messages.SQLCursorOpenWithSQL;
 import org.pgj.messages.SQLExecute;
 import org.pgj.messages.SQLFetch;
 import org.pgj.messages.SQLPrepare;
@@ -49,6 +50,7 @@ public class SQLMessageFactory implements MessageFactory {
 		map.put(SQLFetch.class.getName(), new FetchMessageFactory());
 		map.put(SQLCursorClose.class.getName(), new SQLCursorCloseMessageFactory());
 		map.put(SQLUnPrepare.class.getName(), new UnPrepareMessageFactory());
+		map.put(SQLCursorOpenWithSQL.class.getName(), new CursorOpenWithSQLMessageFactory());
 	}
 
 	/* (non-Javadoc)
@@ -76,6 +78,7 @@ public class SQLMessageFactory implements MessageFactory {
 		String clname = msg.getClass().getName();
 		AbstractSQLMessageFactory msgf = (AbstractSQLMessageFactory) map.get(clname);
 		if(msgf == null){
+			logger.fatalError("sender method not implemented for "+clname);
 			throw new CommunicationException("sender method not implemented for "+clname);
 		}
 		stream.SendInteger(msgf.getSQLType(), 4);
