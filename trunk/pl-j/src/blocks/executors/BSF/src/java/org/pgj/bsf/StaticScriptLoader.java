@@ -13,7 +13,10 @@ import org.apache.avalon.framework.configuration.ConfigurationException;
 
 /**
  * A static Script repository that loads scripts from the configuration and does not store it.
+ * 
  * @author Laszlo Hornyak
+ * 
+ * @avalon.component name="scriptloader" lifestyle="singleton"
  */
 public class StaticScriptLoader implements ScriptRepository, Configurable {
 
@@ -52,7 +55,7 @@ public class StaticScriptLoader implements ScriptRepository, Configurable {
 			String lang = scripts[i].getAttribute("language");
 			String src = scripts[i].getValue();
 			String name = scripts[i].getAttribute("name");
-			Script script = new Script(lang, src);
+			Script script = new Script(lang, src, name);
 			scriptMap.put(name, script);
 		}
 	}
