@@ -239,7 +239,10 @@ message plpgj_channel_receive(void){
 
 	//elog(DEBUG1, "header: %d", header);
 
-	ret = pqReadData(min_conn);
+	if(min_conn -> inCursor == min_conn -> inEnd){
+		elog(DEBUG1,"fetching data...");
+		ret = pqReadData(min_conn);
+	}
 	/*switch(ret) {
 		case 1: elog(DEBUG1, "got data from the server"); 
 		break;
