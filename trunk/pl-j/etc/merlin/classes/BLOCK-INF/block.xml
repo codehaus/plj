@@ -1,5 +1,15 @@
 <?xml version="1.0"?>
 
+<!--
+	The container definition for tests and developement.
+	It starts up a FEBE channel on port 1984 and a PostgreSQL typemapper with
+	some configured datatypes, a java executor with a filesystem classloader
+	the glue and a brand new log4j adapter service.
+
+	Start merlin and have fun!
+
+-->
+
 <container name="pl-j-test">
 
 	<classloader>
@@ -51,6 +61,9 @@
 				<resource
 					id="pl-j:pl-j-glue"
 					version="0.0.1"/>
+				<resource
+					id="pl-j:pl-j-tools"
+					version="0.0.1"/>
 
 			</repository>
 		</classpath>
@@ -64,6 +77,11 @@
 				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
 			</map>
+			<backmap>
+				<type class="java.lang.Integer" type="int4"/>
+				<type class="java.lang.String" type="varchar"/>
+			</backmap>
+			
 		</configuration>
 		<categories priority="DEBUG">
 			<category name="/typemapper"/>
@@ -141,6 +159,34 @@
 		<categories priority="DEBUG">
 			<category name="/glue"/>
 		</categories>
+	</component>
+
+	<component
+		name="log4j-init"
+		class="org.pgj.tools.log4j.Log4jInitComponent">
+		<dependencies>
+		</dependencies>
+		<categories priority="DEBUG">
+		</categories>
+		<configuration>
+			<properties>
+				<!--
+				The root logger is the PLJAppender, so all log categories
+				not configured here will go to RDBMS (or at least try to go there)
+				-->
+				<property name="log4j.rootLogger" value="INFO, plj"/>
+				<property name="log4j.appender.plj" value="org.pgj.tools.log4j.PLJAppender"/>
+				<property name="log4j.appender.plj.layout" value="org.apache.log4j.PatternLayout"/>
+				<property name="log4j.appender.plj.layout.conversionPattern" value=" %d [%t] %-5p %c{1} - %m%n"/>
+				
+				<!--
+				These entries are for the PostgreSQL typemapper`s 
+				Field implementations. (it uses log4j). Its logs should remain
+				local.
+				-->
+				
+			</properties>
+		</configuration>
 	</component>
 
 </container>
