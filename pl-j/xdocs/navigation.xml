@@ -20,13 +20,14 @@
     </menu>
 
     <menu name="Documentation">
-      <item name="Changes"               href="/changes-report.html"/>
-      <item name="JDBC"               href="/jdbc.html"/>
-      <item name="Trigger support"               href="/triggers.html"/>
+      <item name="Current changes"				href="/current-changes.html"/>
+      <item name="JDBC"               			href="/jdbc.html"/>
+      <item name="Trigger support"				href="/triggers.html"/>
     </menu>
 
     <links>
       <item name="PostgreSQL ORDBMS"           href="http://www.postgresql.org/"/>
+      <item name="Codehaus"           href="http://www.codehaus.org/"/>
     </links>
 
   </body>
