@@ -10,7 +10,7 @@
 			in java (or other procedural languages, of course).
 			</p>
 			<p>
-			Unfortunately, triggers has no standardized API, not even java
+			Unfortunately, triggers have no standardized API, not even java
 			triggers, so we are trying to provide all the available solutions
 			as API:
 			<ul>
