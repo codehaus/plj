@@ -1,3 +1,4 @@
+
 package org.pgj.tools.classloaders.impl;
 
 import java.io.File;
@@ -32,8 +33,13 @@ import org.pgj.tools.classloaders.PLJClassLoader;
  * @avalon.component name="fsclassloader" lifestyle="singleton"
  * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
  */
-public class FSClassLoader extends SecureClassLoader implements PLJClassLoader,
-		Configurable, Initializable, LogEnabled, FSClassLoaderMBean {
+public class FSClassLoader extends SecureClassLoader
+		implements
+			PLJClassLoader,
+			Configurable,
+			Initializable,
+			LogEnabled,
+			FSClassLoaderMBean {
 
 	/** avalon logger object */
 	Logger logger = null;
@@ -202,13 +208,13 @@ public class FSClassLoader extends SecureClassLoader implements PLJClassLoader,
 					Configuration[] param = permission[p].getChildren("param");
 
 					Object[] initargs = new Object[param.length]; // Used when
-																  // loading
-																  // Permission
-																  // class
+					// loading
+					// Permission
+					// class
 					Class[] classes = new Class[param.length]; // Used when
-															   // creating
-															   // Constructor
-															   // (See below)
+					// creating
+					// Constructor
+					// (See below)
 
 					for (int pa = 0; pa < param.length; pa++) {
 
@@ -302,6 +308,30 @@ public class FSClassLoader extends SecureClassLoader implements PLJClassLoader,
 	 */
 	public InputStream getResourceAsStream(String name) {
 		return this.getClass().getClassLoader().getResourceAsStream(name);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.tools.classloaders.PLJClassLoader#removeClass(java.lang.String)
+	 */
+	public void removeClass(String name) throws ClassNotFoundException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.tools.classloaders.PLJClassLoader#store(java.lang.String, byte[], java.lang.String)
+	 */
+	public void store(String name, byte[] raw, String jar) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.tools.classloaders.PLJClassLoader#removeJar(java.lang.String)
+	 */
+	public void removeJar(String name) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
