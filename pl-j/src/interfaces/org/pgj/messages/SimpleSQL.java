@@ -1,19 +1,18 @@
 /*
  * Created on Jun 20, 2003
- *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
+
 package org.pgj.messages;
 
 /**
- * @author Laszlo Hornyak
  * A Simple SQL message.
+ * 
+ * @author Laszlo Hornyak
  */
 public class SimpleSQL extends SQL {
-	
-	String sql = null;
-	
+
+	private String sql = null;
+
 	/**
 	 * @return
 	 */
@@ -27,5 +26,4 @@ public class SimpleSQL extends SQL {
 	public void setSql(String string) {
 		sql = string;
 	}
-
 }

@@ -1,10 +1,12 @@
 package org.pgj.messages;
 
 import java.util.Vector;
-import org.pgj.typemapping.*;
+
+import org.pgj.typemapping.Field;
 
 /**
  * Describes a object oriented method call on an object.
+ * 
  * @author Laszlo Hornyak
  * @since 0.1
  */
@@ -13,25 +15,21 @@ public class CallRequest extends Message {
 	/**
 	 * Parameter vector.
 	 */
-	Vector params = new Vector();
-
+	private Vector params = new Vector();
 	/** Name of the method to call. */
-	String methodname = null;
+	private String methodname = null;
 	/** The class that contains the method. */
-	String classname = null;
+	private String classname = null;
 	/** Expected return type */
-	String expect = null;
-
+	private String expect = null;
 	/** is oneway */
-	boolean oneWay;
-
+	private boolean oneWay;
 	public final static int INSTATNTIATION_SESSION = 1;
 	public final static int INSTATNTIATION_CALL = 2;
 	public final static int INSTATNTIATION_GLOBAL = 3;
-
 	/** instantiation of the object. By default INSTATNTIATION_CALL*/
-	int instantiation = INSTATNTIATION_CALL;
-	
+	private int instantiation = INSTATNTIATION_CALL;
+
 	/**
 	 * Default constructor.
 	 */
@@ -61,7 +59,7 @@ public class CallRequest extends Message {
 	public void setClassname(String name) {
 		classname = name;
 	}
-	
+
 	/**
 	 * Get the @link #classname
 	 * @return the class name.
@@ -69,7 +67,7 @@ public class CallRequest extends Message {
 	public String getClassname() {
 		return classname;
 	}
-	
+
 	/**
 	 * Add a parameter to the call.
 	 * @param param pam-param :)
@@ -124,5 +122,4 @@ public class CallRequest extends Message {
 	public void setInstantiation(int i) {
 		instantiation = i;
 	}
-
 }

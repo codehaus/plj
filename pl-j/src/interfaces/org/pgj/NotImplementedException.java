@@ -1,14 +1,12 @@
 /*
  * Created on Jun 12, 2003
- *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
 package org.pgj;
 
 /**
- * @author Laszlo Hornyak
  * This method can be thrown from anywhere in PGJ telling that road is under construction.
+ * 
+ * @author Laszlo Hornyak
  */
 public class NotImplementedException extends RuntimeException {
 

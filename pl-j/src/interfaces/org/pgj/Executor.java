@@ -5,6 +5,7 @@ import org.pgj.messages.*;
 /**
  * An interface for call executors.
  * Executor objects performa the calls received from the client.
+ * 
  * @author Laszlo Hornyak
  * @since 0.1
  * @version planing
@@ -21,7 +22,7 @@ public interface Executor{
 	 * <br>
 	 * @param call the call request to peform.
 	 * @return the ansver Message to the call.
-	 * The call must be instance of Result or Exception, other messages MUST be sent directly by
+	 * The call must be instance of Result or Error, other messages MUST be sent directly by
 	 * Channel implementation.
 	 */
 	/*@
