@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<api>
+	<name>pl-j-tools</name>
+	<summarydescription>Tools project PL-J</summarydescription>
+	<description>Some service interfaces and some of their implementations any component implementation may use. Also includes some related class.</description>
+	<publisher>The PL-J team.</publisher>
+	<download_url>http://plj.codehaus.org/</download_url>
+	<release_date>2004-11-01T08:00:00.000</release_date>
+	<version>alpha-0.0.5</version>
+	<package>org.pgj.tools</package>
+	<package>org.pgj.tools.transactions</package>
+	<package>org.pgj.tools.transactions.impl</package>
+	<package>org.pgj.tools.transactions.impl</package>
+	<package>org.pgj.tools.classloaders.impl</package>
+	<package>org.pgj.tools.classloaders</package>
+	<package>org.pgj.tools.log4j</package>
+	<package>org.pgj.tools.utils</package>
+	<package>org.pgj.tools.pljava</package>
+	<package>org.pgj.tools.methodfinder.impl</package>
+	<package>org.pgj.tools.methodfinder</package>
+	<package>org.pgj.tools.tuplemapper.impl</package>
+	<package>org.pgj.tools.tuplemapper</package>
+	<package>org.pgj.tools.tuplemapper.impl.hub</package>
+	<package>org.pgj.tools.tuplemapper.impl.map</package>
+	<package>org.pgj.tools.tuplemapper.impl.pljava</package>
+	<package>org.pgj.tools.tuplemapper.impl.reflected</package>
+	<package>org.pgj.tools.tuplemapper.impl.scripting</package>
+	<package>org.pgj.typemapping</package>
+</api>
