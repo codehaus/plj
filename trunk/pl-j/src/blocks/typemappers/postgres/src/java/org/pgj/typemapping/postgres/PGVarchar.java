@@ -38,8 +38,12 @@ public class PGVarchar extends AbstractPGField {
 		if (clazz.equals(classes[0]))
 			return getAsString();
 		else if (clazz.equals(classes[1])) {
-			return getAsString();
-		} else
+			return getAsBytea();
+		}
+		else if (clazz.equals(classes[2])){
+			return getAsChara();
+		}
+		else
 			throw new MappingException();
 	}
 
@@ -59,7 +63,9 @@ public class PGVarchar extends AbstractPGField {
 	}
 
 	private byte[] getAsBytea() throws MappingException {
-		return raw;
+		byte[] b = new byte[raw.length - 4];
+		System.arraycopy(raw, 4, b, 0, raw.length - 4);
+		return b;
 	}
 
 	private char[] getAsChara() throws MappingException {
