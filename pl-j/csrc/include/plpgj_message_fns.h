@@ -20,6 +20,7 @@ extern "C" {
 #define MT_LOG						4
 #define MT_TRIGREQ					5
 #define MT_TUPLRES					6
+#define MT_TRANSEVENT				7
 
 /**
  * Crete a call structure.

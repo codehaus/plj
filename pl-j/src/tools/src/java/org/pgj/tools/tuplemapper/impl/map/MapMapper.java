@@ -73,7 +73,7 @@ public class MapMapper
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.tuplemapper.TupleMapper#backMap(java.lang.Object)
 	 */
-	public Tuple backMap(Object obj) throws MappingException {
+	public Tuple backMap(Object obj, TypeMapper typeMapper) throws MappingException {
 		// TODO Auto-generated method stub
 		if (obj == null)
 			throw new MappingException("Tuple can`t be NULL");

@@ -14,6 +14,7 @@ import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.messages.TriggerCallRequest;
+import org.pgj.messages.TupleResult;
 import org.pgj.tools.channelutil.ClientUtils;
 
 /**
@@ -90,7 +91,8 @@ public class GlueWorker
 				if (logger.isDebugEnabled())
 					logger.debug("ansver:" + ans);
 				if ((ans instanceof Result)
-						|| (ans instanceof org.pgj.messages.Error)) {
+						|| (ans instanceof org.pgj.messages.Error)
+						|| (ans instanceof TupleResult)) {
 					chanell.sendToRDBMS(ans);
 				} else {
 					logger
