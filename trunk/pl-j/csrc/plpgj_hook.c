@@ -18,6 +18,7 @@
 #include "parser/parse_type.h"
 #include "module_config.h"
 #include "commands/trigger.h"
+#include "executor/spi_priv.h"
 
 #include "utils/palloc.h"
 #include "utils/memutils.h"
@@ -53,11 +54,13 @@ void		plpgj_log_do(log_message);
 
 void plpgj_utl_sendint(int);
 void plpgj_utl_sendstr(const char*);
-void plpgj_utl_senderror(const char*);
+void plpgj_utl_senderror(char*);
 
 void		plpgj_EOXactCallBack(bool isCommit, void *arg);
 
+#if (POSTGRES_VERSION == 74)
 void		plpgj_ErrorContextCallback(void *arg);
+#endif
 
 int			callbacks_init = 0;
 
@@ -73,14 +76,14 @@ short		plpgj_tx_externalize_nested = 0;
 #define plpgj_tx_externalize		plj_get_configvalue_boolean("plpgj.tx.externalize")
 #define plpgj_tx_externalize_nested	plj_get_configvalue_boolean("plpgj.tx.externalize.nested")
 
+#if (POSTGRES_VERSION == 74)
 #define plpgj_return_cleanup		if(envstack_isempty()) { unreg_error_callback(); UnregisterEOXactCallback(plpgj_EOXactCallBack, NULL); elog(DEBUG1, "plpgj_return_cleanup: done"); }
+#else
+#define plpgj_return_cleanup		
+#endif
 
 
-/*	*/
-
-/* impl */
-
-/*	*/
+#if (POSTGRES_VERSION == 74)
 
 void reg_error_callback() {
 	if (!callbacks_init)
@@ -89,7 +92,7 @@ void reg_error_callback() {
 		mycallback = SPI_palloc(sizeof(ErrorContextCallback));
 		mycallback->previous = error_context_stack;
 		mycallback->callback = plpgj_ErrorContextCallback;
-		mycallback->arg = "hello world!";
+		mycallback->arg = NULL;
 
 		error_context_stack = mycallback;
 
@@ -98,6 +101,76 @@ void reg_error_callback() {
 
 }
 
+#endif
+
+
+#if (POSTGRES_VERSION != 74)
+
+void handle_exception(void){
+	ErrorData  *edata;
+	edata = CopyErrorData();
+	plpgj_utl_senderror(edata -> message);
+
+	FlushErrorState();
+
+//	RollbackAndReleaseCurrentSubTransaction();
+	SPI_restore_connection();
+}
+
+#else
+#endif
+
+void sql_cursor_open(message msg){
+				Portal		portal;
+				sql_msg_cursor_open sql_c_o = (sql_msg_cursor_open) msg;
+				char* cname = sql_c_o -> cursorname;
+				void* plan;
+				char success = 0;
+
+				elog(DEBUG1, "[plj core - cursor open] ");
+
+				if(strlen(cname) == 0){
+					cname = NULL;
+				}
+				elog(DEBUG1, " -> %s", cname);
+
+				/*
+				 * TODO: creates constantly bidirectional cursors :(
+				 */
+
+				PG_TRY();
+				{
+					elog(DEBUG1,"[plj core - cursor open] -> %s", sql_c_o -> query);
+					plan = SPI_prepare(sql_c_o -> query, 0, NULL);
+					elog(DEBUG1,"[plj core - cursor open] -> prepared");
+#if (POSTGRES_VERSION == 74)
+					portal = //CreatePortal(sql_c_o->cursorname, 1, 1);
+						SPI_cursor_open(cname, plan, NULL, NULL);
+#else
+					portal =
+						SPI_cursor_open(cname, plan, NULL, NULL, true);
+#endif
+					elog(DEBUG1,"[plj core - cursor open] portal opened");
+					success = 1;
+				}
+				PG_CATCH();
+				{
+					elog(DEBUG1,"[plj core - cursor open] error caught at cursor opening");
+					//plpgj_utl_senderror("");
+					handle_exception();
+				}
+				PG_END_TRY();
+				
+				if(success){
+					plpgj_utl_sendstr(portal -> name);
+					elog(DEBUG1," -> ansvered");
+				}
+
+
+}
+
+
+#if (POSTGRES_VERSION == 74)
 void unreg_error_callback() {
 	if (callbacks_init) {
 		elog(DEBUG1, "unreg_error_callback: 1");
@@ -112,13 +185,16 @@ void unreg_error_callback() {
 	}
 	callbacks_init = 0;
 }
+#endif
 
 Datum
 plpgj_call_hook(PG_FUNCTION_ARGS)
 {
 
+#if (POSTGRES_VERSION == 74)
 	if(envstack_isempty())
 		reg_error_callback();
+#endif
 
 	message		req;
 	int			message_type;
@@ -129,9 +205,10 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		plpgj_channel_initialize();
 	}
 
+#if (POSTGRES_VERSION == 74)
 	if(plpgj_tx_externalize && envstack_isempty())
 		RegisterEOXactCallback(plpgj_EOXactCallBack, NULL);
-		pljelog(DEBUG1, "5");
+#endif
 
 
 	/*
@@ -151,12 +228,15 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 	}
 	else
 	{
+		pljelog(DEBUG1, "creating call structure");
 		req = (message) plpgj_create_call(fcinfo);
 	}
 
+	pljelog(DEBUG1, "7");
 	plpgj_channel_send((message) req);
 	free_message(req);
 
+	pljelog(DEBUG1, "7");
 	do
 	{
 		void	   *ansver = NULL;
@@ -193,12 +273,12 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				break;
 			default:
 				pljelog(FATAL, "received: unknown message.");
-				/*
-				 * TODO perhaps there is a more elegant way to escape from here.
-				 */
+				//this wont run.
 				PG_RETURN_NULL();
 		}
+		elog(DEBUG1, "[plj core] free message");
 		free_message(ansver);
+		elog(DEBUG1, "[plj core] free message done");
 
 		/*
 		 * here is how to escape from the loop
@@ -207,12 +287,6 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 
 		if (message_type == MT_RESULT)
 		{
-			/*
-			 * TODO what now? we should return a value HERE.
-			 */
-			/*
-			 * PG_RETURN...
-			 */
 
 			pljelog(DEBUG1, "result");
 			plpgj_result res = (plpgj_result) ansver;
@@ -245,14 +319,6 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 
 				type = (Form_pg_type) GETSTRUCT(typetup);
 				ReleaseSysCache(typetup);
-
-				/*
-				 */
-				/*
-				 * (see http://jira.codehaus.org/secure/ViewIssue.jspa?key=PLJ-1)
-				 */
-				/*
-				 */
 
 				oldctx = CurrentMemoryContext;
 				MemoryContextSwitchTo(QueryContext);
@@ -291,6 +357,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		}
 		if (message_type == MT_EXCEPTION) {
 			elog(ERROR, ((error_message)ansver) -> message);
+			plpgj_return_cleanup;
 			PG_RETURN_NULL();
 		}
 		if (message_type == MT_TUPLRES)
@@ -436,6 +503,7 @@ plpgj_sql_do(sql_msg msg)
 					elog(DEBUG1,"success");
 				PG_CATCH();
 					elog(DEBUG1,"failure");
+					handle_exception();
 				PG_END_TRY();
 				
 				pljlogging_error = 0;
@@ -455,11 +523,12 @@ plpgj_sql_do(sql_msg msg)
 				int i;
 
 				sql = (sql_pexecute)msg;
-				nulls = SPI_palloc( sql -> nparams * sizeof(char)) + 1;
 				if(sql -> nparams == 0){
 					values = NULL;
+					nulls = NULL;
 				} else {
 					values = SPI_palloc( sql -> nparams * sizeof(Datum));
+					nulls = SPI_palloc( sql -> nparams * sizeof(char)) + 1;
 				}
 				for(i = 0; i < sql -> nparams; i++) {
 					if(sql -> params[i].data.isnull){
@@ -489,62 +558,88 @@ plpgj_sql_do(sql_msg msg)
 						
 					}
 				}
-				nulls[sql -> nparams + 1] = 0;
+				elog(DEBUG1,"sql->nparams=%d", sql -> nparams);
+				elog(DEBUG1,"sql->planid=%d", sql -> planid);
+				if(!plantable_entry_valid(sql -> planid)){
+					elog(WARNING,"Invalidated plan id: %d", sql -> planid);
+					plpgj_utl_senderror("Invalidated plan id");
+					break;
+				}
+				if(nulls != NULL)
+					nulls[sql -> nparams + 1] = 0;
+
 				pljelog(DEBUG1,"executing.");
 				{
 				int ret;
 				Portal pret;
 				pljlogging_error = 1;
 				PG_TRY();
+					_SPI_plan* pln;
+					pln = (_SPI_plan*) plantable[sql -> planid];
+					elog(DEBUG1, "plan: (%d) %s", sql -> planid, pln -> query );
 					switch(sql -> action){
 						case SQL_PEXEC_ACTION_OPENCURSOR:
 							pljelog(DEBUG1,"SQL_PEXEC_ACTION_OPENCURSOR");
-							pret = SPI_cursor_open(NULL, plantable[sql -> planid], values, nulls);
+							
+							if(plantable[sql -> planid] == NULL){
+								elog(WARNING, "hoppa");
+							} else {
+								elog(WARNING, "oksa");
+							}
+							if(values == NULL){
+								elog(WARNING, "values is null");
+							} else {
+								elog(WARNING, "values not null");
+							}
+
+							#if POSTGRES_VERSION >= 80
+							pret = SPI_cursor_open(NULL, plantable[sql -> planid], values, nulls == NULL ? "" : nulls, true);
+							#else
+							pret = SPI_cursor_open(NULL, plantable[sql -> planid], values, nulls == NULL ? "" : nulls);
+							#endif
 							elog(DEBUG1, "SPI_processed: %d", SPI_processed);
+							if(pret == NULL) {
+								plpgj_utl_senderror("Cursor open error");
+							} else {
+								plpgj_utl_sendstr(pret -> name);
+							}
 							break;
 						case SQL_PEXEC_ACTION_EXECUTE:
-							pljelog(DEBUG1,"SQL_PEXEC_ACTION_EXECUTE: %d, %s", sql -> planid, nulls);
+							pljelog(DEBUG1,"SQL_PEXEC_ACTION_EXECUTE: %d, >%s<", sql -> planid, nulls == NULL ? "null" : nulls);
 							ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
+							pljelog(DEBUG1,"SQL_PEXEC_ACTION_EXECUTE: %d, %s", sql -> planid, nulls == NULL ? "null" : nulls);
+							switch (ret) {
+							case SPI_ERROR_ARGUMENT:
+								elog(DEBUG1, "SPI_ERROR_ARGUMENT");
+								plpgj_utl_senderror("SPI_ERROR_ARGUMENT");
 							break;
+							case SPI_ERROR_PARAM:
+								elog(DEBUG1, "SPI_ERROR_PARAM");
+								plpgj_utl_senderror("SPI_ERROR_PARAM");
+							break;
+							default:
+								elog(DEBUG1,"success?");
+								plpgj_utl_sendint(1);
+							break;
+							}
+						break;
 						case SQL_PEXEC_ACTION_UPDATE:
 							pljelog(DEBUG1,"SQL_PEXEC_ACTION_UPDATE");
 							ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
+							plpgj_utl_sendint(ret);
 							break;
 					}
 				PG_CATCH();
-					elog(ERROR, "ERROR");
+					_SPI_plan* pln;
+					//plpgj_utl_senderror(plj_exceptionreason());
+					elog(WARNING, "[plj core - plan exec] error at execution.");
+					pln = (_SPI_plan*) plantable[sql -> planid];
+					elog(DEBUG1, "%s",  pln -> query );
+					//FlushErrorState();
+					handle_exception();
 				PG_END_TRY();
 				pljlogging_error = 0;
 				pljelog(DEBUG1,"executed.");
-				//TODO: add logic here!!
-				switch (sql -> action){
-				case SQL_PEXEC_ACTION_EXECUTE:
-					switch (ret) {
-					case SPI_ERROR_ARGUMENT:
-						pljelog(DEBUG1, "SPI_ERROR_ARGUMENT");
-						plpgj_utl_senderror("SPI_ERROR_ARGUMENT");
-						break;
-					case SPI_ERROR_PARAM:
-						pljelog(DEBUG1, "SPI_ERROR_PARAM");
-						plpgj_utl_senderror("SPI_ERROR_PARAM");
-						break;
-					default:
-						pljelog(DEBUG1,"success?");
-						plpgj_utl_sendint(1);
-						break;
-					}
-					break;
-				case SQL_PEXEC_ACTION_UPDATE:
-					plpgj_utl_sendint(ret);
-					break;
-				case SQL_PEXEC_ACTION_OPENCURSOR:
-					if(pret == NULL) {
-						plpgj_utl_senderror("Cursor open error");
-					} else {
-						plpgj_utl_sendstr(pret -> name);
-					}
-					break;
-				}
 			}
 
 			}
@@ -565,27 +660,20 @@ plpgj_sql_do(sql_msg msg)
 					PortalDrop(portal, 0);
 					plpgj_utl_sendint(1);
 				PG_CATCH();
-					plpgj_utl_senderror("Portal drop problem");
+				//	plpgj_utl_senderror("Portal drop problem");
+					handle_exception();
 				PG_END_TRY();
 
 			}
 			break;
 		case SQL_TYPE_CURSOR_OPEN:
 			{
-				Portal		portal;
-				sql_msg_cursor_open sql_c_o = (sql_msg_cursor_open) msg;
-
-				/*
-				 * TODO: creates constantly bidirectional cursors :(
-				 */
-				portal = CreatePortal(sql_c_o->cursorname, 1, 1);
-
-
+				sql_cursor_open(msg);
 			}
 			break;
 		case SQL_TYPE_FETCH:
 			{
-				
+			
 			Portal portal;
 			plpgj_result result;
 			int i, j;
@@ -657,6 +745,11 @@ plpgj_sql_do(sql_msg msg)
 			}
 			
 			break;
+		case SQL_TYPE_UNPREPARE: {
+			sql_msg_unprepare unprep = (sql_msg_unprepare) msg;
+			remove_plantable_entry(unprep -> planid);
+			}
+			break;
 		default:
 			pljelog(FATAL, "Unhandled SQL message.");
 	}
@@ -725,6 +818,8 @@ plpgj_EOXactCallBack(bool isCommit, void *arg)
 /**
  * ErrorContextCallback function
  */
+
+#if (POSTGRES_VERSION == 74)
 void
 plpgj_ErrorContextCallback(void *arg)
 {
@@ -754,9 +849,12 @@ plpgj_ErrorContextCallback(void *arg)
 //	pljelog(DEBUG1, "sending exception");
 	plpgj_channel_send((message) msg);
 
+
 	/*
 	 * Unregister ErrorContextCallback
 	 */
+	unreg_error_callback();
+
 	/*
 	 * error_context_stack = error_context_stack -> previous;
 	 */
@@ -767,7 +865,11 @@ plpgj_ErrorContextCallback(void *arg)
 	if(reenable_loging)
 		pljloging = 1;
 
+	
+
 }
+
+#endif
 
 void plpgj_utl_sendstr(const char* str) {
 				plpgj_result res;
@@ -856,8 +958,15 @@ void plpgj_utl_sendint(int i) {
 
 }
 
-void plpgj_utl_senderror(const char* errorstr){
-	
+void
+plpgj_utl_senderror(char* errmsg){
+	str_error_message msg;
+
+	msg.msgtype = MT_EXCEPTION;
+	msg.classname = "rdbms";
+	msg.stacktrace = "";
+	msg.message = errmsg;
+	plpgj_channel_send((message) &msg);
 }
 
 typedef struct plj_envstack_struct {
