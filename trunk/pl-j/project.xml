@@ -17,7 +17,7 @@
 	
 	The implementation is built from jakarta-avalon blocks.
 	</description>
-    <shortDescription>Java stored procedures for SQL database</shortDescription>
+    <shortDescription>Java stored procedures for SQL databases</shortDescription>
     <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10430</issueTrackingUrl>
     <siteAddress>plj.codehaus.org</siteAddress>
     <siteDirectory>/home/projects/plj/public_html/</siteDirectory>
