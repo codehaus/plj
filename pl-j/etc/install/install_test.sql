@@ -82,3 +82,19 @@ as '
 ' language 'plj';
 
 
+create table plj_testtable(
+	id	int primary key,
+	name	varchar
+);
+
+create or replace function plpgj_test_lametrigger1fn() returns trigger
+as '
+	class=org.deadcat_enterprises.PLJTriggers
+	method=testTableInsertTrigger
+	oneway=false
+	instantiation=static
+' language 'plj';
+
+create trigger plpgj_test_lametrigger1 before insert on plj_testtable
+	execute procedure plpgj_test_lametrigger1fn();
+
