@@ -14,6 +14,7 @@ import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.logger.LogEnabled;
 import org.apache.avalon.framework.logger.Logger;
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 
 //TODO test this classLoader!
@@ -140,9 +141,10 @@ public class JDBCClassLoader extends ClassLoader
 	}
 
 	/**
+	 * @throws ClassStoreException
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#hasClass(String)
 	 */
-	public boolean hasClass(String fqn) {
+	public boolean hasClass(String fqn) throws ClassStoreException {
 		Connection conn = null;
 		PreparedStatement sta = null;
 		ResultSet res = null;
@@ -158,7 +160,8 @@ public class JDBCClassLoader extends ClassLoader
 
 			return res.getInt(1) > 0;
 		} catch (SQLException e) {
-			logger.fatalError("", e);
+			logger.error("hasClass", e);
+			throw new ClassStoreException(e);
 		} finally {
 			try {
 				if (sta != null)
@@ -173,7 +176,6 @@ public class JDBCClassLoader extends ClassLoader
 				logger.error("", e1);
 			}
 		}
-		return false;
 	}
 
 	protected Logger logger = null;
@@ -188,7 +190,8 @@ public class JDBCClassLoader extends ClassLoader
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#removeClass(java.lang.String)
 	 */
-	public void removeClass(String name) throws ClassNotFoundException {
+	public void removeClass(String name) throws ClassNotFoundException,
+			ClassStoreException {
 		Connection conn = null;
 		PreparedStatement p = null;
 		try {
@@ -197,7 +200,7 @@ public class JDBCClassLoader extends ClassLoader
 			p.setString(1, name);
 			p.execute();
 		} catch (SQLException e) {
-			throw new ClassNotFoundException(e.getMessage());
+			throw new ClassStoreException(e);
 		} finally {
 			try {
 				if (p != null)
@@ -232,7 +235,8 @@ public class JDBCClassLoader extends ClassLoader
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#store(java.lang.String, byte[], java.lang.String)
 	 */
-	public void store(String name, byte[] raw, String jar) {
+	public void store(String name, byte[] raw, String jar)
+			throws ClassStoreException {
 		Connection conn = null;
 		PreparedStatement sta = null;
 		try {
@@ -248,6 +252,7 @@ public class JDBCClassLoader extends ClassLoader
 			sta.execute();
 		} catch (SQLException e) {
 			logger.error("store", e);
+			throw new ClassStoreException(e);
 		} finally {
 			try {
 				if (sta != null)
@@ -267,7 +272,7 @@ public class JDBCClassLoader extends ClassLoader
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.classloaders.PLJClassLoader#removeJar(java.lang.String)
 	 */
-	public void removeJar(String name) {
+	public void removeJar(String name) throws ClassStoreException {
 		Connection conn = null;
 		PreparedStatement sta = null;
 		try {
@@ -277,6 +282,7 @@ public class JDBCClassLoader extends ClassLoader
 			sta.execute();
 		} catch (SQLException e) {
 			logger.error("removeJar", e);
+			throw new ClassStoreException(e);
 		} finally {
 			try {
 				if (sta != null)
