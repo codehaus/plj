@@ -7,6 +7,6 @@ package org.pgj;
  * @author Laszlo Hornyak
  */
 public interface Client{
-	
+	Channel getChannel();
 }
 
