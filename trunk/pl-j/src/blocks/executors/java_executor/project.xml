@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
   <id>pl-j-javaexecutor</id>
   <name>pl-j-javaexecutor</name>
-  <currentVersion>0.0.1</currentVersion>
+  <currentVersion>0.0.2</currentVersion>
 
   <!-- extend>${basedir}/../../../../project.xml</extend -->
 
@@ -33,7 +33,7 @@
 			<id>pl-j</id>
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
@@ -41,7 +41,7 @@
 			<id>pl-j</id>
 			<type>jar</type>
 			<artifactId>pl-j-tools</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
