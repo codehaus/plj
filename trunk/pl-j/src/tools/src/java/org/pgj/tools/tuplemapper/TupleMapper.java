@@ -4,6 +4,7 @@
 
 package org.pgj.tools.tuplemapper;
 
+import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
 
 
@@ -14,7 +15,7 @@ import org.pgj.typemapping.Tuple;
 public interface TupleMapper {
 
 	/** Map a tuple to a java object. */
-	Object mapTuple(Tuple tuple);
+	Object mapTuple(Tuple tuple) throws MappingException;
 
 	/** Get the mapped class for a given tuple. */
 	Class getMappedClass(Tuple tuple);

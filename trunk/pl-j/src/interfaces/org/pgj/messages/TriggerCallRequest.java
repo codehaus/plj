@@ -3,6 +3,8 @@
  */
 package org.pgj.messages;
 
+import org.pgj.typemapping.Tuple;
+
 /**
  * Trigger call.
  * 
@@ -20,6 +22,14 @@ public class TriggerCallRequest extends AbstractCall {
 	private String tableName = null;
 	private int reason = TRIGGER_REASON_INSERT;
 	private int type = TRIGGER_FIRED_BEFORE;
+
+	public final static int TRIGGER_ROWMODE_ROW = 0;
+	public final static int TRIGGER_ROWMODE_STATEMENT = 1;
+
+	private int rowmode = TRIGGER_ROWMODE_ROW;
+
+	private Tuple _new = null;
+	private Tuple _old = null;
 
 	/**
 	 * @return Returns the reason.
@@ -40,11 +50,52 @@ public class TriggerCallRequest extends AbstractCall {
 	public String getTableName() {
 		return tableName;
 	}
+
 	/**
 	 * @param tableName
 	 *            The tableName to set.
 	 */
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+
+	/**
+	 * @return Returns the _new.
+	 */
+	public Tuple getNew() {
+		return _new;
+	}
+
+	/**
+	 * @param _new The _new to set.
+	 */
+	public void setNew(Tuple _new) {
+		this._new = _new;
+	}
+	/**
+	 * @return Returns the _old.
+	 */
+	public Tuple getOld() {
+		return _old;
+	}
+
+	/**
+	 * @param _old The _old to set.
+	 */
+	public void setOld(Tuple _old) {
+		this._old = _old;
+	}
+	/**
+	 * @return Returns the rowmode.
+	 */
+	public int getRowmode() {
+		return rowmode;
+	}
+
+	/**
+	 * @param rowmode The rowmode to set.
+	 */
+	public void setRowmode(int rowmode) {
+		this.rowmode = rowmode;
 	}
 }
