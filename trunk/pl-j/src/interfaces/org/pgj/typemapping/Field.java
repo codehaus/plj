@@ -40,17 +40,22 @@ public interface Field {
 
 	/**
 	 * Returns the data mapped to the class 'clazz'.
+	 * @param clazz
+	 * @return
 	 * @throws MappingException if the data cannot be mapped into the specified class.
 	 */
 	Object get(Class clazz) throws MappingException;
 
 	/**
 	 * Get the data in the default represenation.
+	 * @return
+	 * @throws MappingException
 	 */
 	Object defaultGet() throws MappingException;
 
 	/** 
 	 * Returns the RDBMS datatype it represents.
+	 * @return RDBMS datatype this class represents.
 	 */
 	String rdbmsType();
 
