@@ -10,7 +10,7 @@
 
   <inceptionYear>2003</inceptionYear>
 
-  <description>Mapps PostgreSQL types into java types</description>
+  <description>Maps PostgreSQL types into java types.</description>
   <shortDescription>PostgreSQL typemapper.</shortDescription>
 
 	<dependencies>
