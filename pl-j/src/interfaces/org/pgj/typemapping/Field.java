@@ -9,6 +9,12 @@ package org.pgj.typemapping;
 public interface Field {
 
 	/**
+	 * Tells if the field is null or not.
+	 * @return true if the field is NULL.
+	 */
+	boolean isNull();
+	
+	/**
 	 * A field is created from array bytes (raw data).
 	 * @param raw			The raw byte[] data from the RDBMS.
 	 */

@@ -15,11 +15,18 @@ import org.pgj.typemapping.TypeMapper;
 
 /**
  * PostgreSQL type mapper.
+ * 
+ * @author Laszlo Hornyak
+ * 
  * @avalon.component name="postgre-typemapper" type="org.pgj.typemapping.TypeMapper"
  * @avalon.service type="org.pgj.typemapping.TypeMapper"
  */
 public class PostgresTypeMapper
-	implements TypeMapper, Configurable, Initializable, LogEnabled {
+		implements
+			TypeMapper,
+			Configurable,
+			Initializable,
+			LogEnabled {
 
 	HashMap map = new HashMap();
 
@@ -32,15 +39,32 @@ public class PostgresTypeMapper
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.pgj.typemapping.TypeMapper#map(byte[], java.lang.String)
+	 */
 	public Field map(byte[] raw_data, String type) throws MappingException {
-		logger.debug("mapping: " + type);
-		//if(type.equals())
-		return null;
+		try {
+			logger.debug("mapping: " + type);
+			Class clazz = (Class) map.get(type);
+			if (clazz == null)
+				throw new MappingException("no field type configured for "
+						+ type);
+			AbstractPGField fld = (AbstractPGField) clazz.newInstance();
+			if (raw_data == null) {
+				fld.setNull(true);
+			} else {
+				fld.set(raw_data);
+			}
+			return fld;
+		} catch (InstantiationException e) {
+			throw new MappingException(
+					"Configuration error. Class could not be instantiated", e);
+		} catch (IllegalAccessException e) {
+			throw new MappingException(
+					"Configuration error. Class could not be instantiated", e);
+		}
 	}
 
-	//
-	//from Configurable
-	//
 	public void configure(Configuration conf) throws ConfigurationException {
 
 		Configuration mapConfig = conf.getChild("map");
@@ -50,15 +74,13 @@ public class PostgresTypeMapper
 		try {
 
 			for (int i = 0; i < typeConfigs.length; i++) {
-				map.put(
-					typeConfigs[i].getAttribute("db"),
-					Class.forName(typeConfigs[i].getAttribute("class")));
+				map.put(typeConfigs[i].getAttribute("db"), Class
+						.forName(typeConfigs[i].getAttribute("class")));
 			}
 
 		} catch (ClassNotFoundException cnfe) {
 			throw new ConfigurationException(
-				"configured type mapper class was not found",
-				cnfe);
+					"configured type mapper class was not found", cnfe);
 		}
 
 		Configuration backMapConfig = conf.getChild("backmap");
@@ -69,7 +91,8 @@ public class PostgresTypeMapper
 			String bmClassName = backMapping.getAttribute("class");
 
 			if (bmClassName == null) {
-				throw new ConfigurationException("class is a required attribute");
+				throw new ConfigurationException(
+						"class is a required attribute");
 			}
 
 			String bmType = backMapping.getAttribute("type");
@@ -82,16 +105,15 @@ public class PostgresTypeMapper
 			try {
 				bmClass = Class.forName(bmClassName);
 			} catch (ClassNotFoundException cnfe) {
-				throw new ConfigurationException(
-					"The class " + bmClassName + " does not exist.",
-					cnfe);
+				throw new ConfigurationException("The class " + bmClassName
+						+ " does not exist.", cnfe);
 			}
 
 			Class mapperClass = (Class) map.get(bmType);
 
 			if (mapperClass == null) {
 				throw new ConfigurationException(
-					"No typemapper configured for " + bmType + ".");
+						"No typemapper configured for " + bmType + ".");
 			}
 
 			backMap.put(bmClass, mapperClass);
@@ -99,16 +121,16 @@ public class PostgresTypeMapper
 		}
 	}
 
-	//
-	//from initializable
-	//
+	/* (non-Javadoc)
+	 * @see org.apache.avalon.framework.activity.Initializable#initialize()
+	 */
 	public void initialize() throws java.lang.Exception {
 		logger.debug("initialized");
 	}
 
-	//
-	//from LogEnabled
-	//
+	/* (non-Javadoc)
+	 * @see org.apache.avalon.framework.logger.LogEnabled#enableLogging(org.apache.avalon.framework.logger.Logger)
+	 */
 	public void enableLogging(Logger logger) {
 		this.logger = logger;
 	}
@@ -121,11 +143,9 @@ public class PostgresTypeMapper
 		if (type == null)
 			return (backMap(object));
 
-		logger.debug(
-			"backMap -ing "
+		logger.debug("backMap -ing "
 				+ (object == null ? "[null]" : object.getClass().getName())
-				+ " to "
-				+ type);
+				+ " to " + type);
 
 		Class mapperClass = (Class) map.get(type);
 		if (mapperClass == null) {
@@ -137,11 +157,11 @@ public class PostgresTypeMapper
 		try {
 			field = (AbstractPGField) mapperClass.newInstance();
 		} catch (InstantiationException e) {
-			throw new MappingException(
-				"InstantiationException. " + e.getMessage());
+			throw new MappingException("InstantiationException. "
+					+ e.getMessage());
 		} catch (IllegalAccessException e) {
-			throw new MappingException(
-				"IllegalAccessException. " + e.getMessage());
+			throw new MappingException("IllegalAccessException. "
+					+ e.getMessage());
 		}
 
 		field.backMap(object);
@@ -154,8 +174,7 @@ public class PostgresTypeMapper
 	 */
 	public Field backMap(Object object) throws MappingException {
 
-		logger.debug(
-			"backMap -ing "
+		logger.debug("backMap -ing "
 				+ (object == null ? "[null]" : object.getClass().getName()));
 
 		AbstractPGField fld = null;
@@ -164,24 +183,25 @@ public class PostgresTypeMapper
 
 		//this secures that derived classes can be mapped too.
 		while (fcl == null && ocl != Object.class) {
-			logger.debug(ocl.getName() + " cannot be mapped back, but i try its superclass.");
+			logger.debug(ocl.getName()
+					+ " cannot be mapped back, but i try its superclass.");
 			ocl = ocl.getSuperclass();
 			fcl = (Class) backMap.get(ocl);
 		}
 
 		//check if no back mapping possible
-		if(fcl == null){
+		if (fcl == null) {
 			logger.debug("did not find backmapping.");
 			throw new MappingException(ocl.getName() + " cannot be mapped back");
 		}
 		try {
 			fld = (AbstractPGField) fcl.newInstance();
 		} catch (InstantiationException e) {
-			throw new MappingException(
-				"InstantiationException. " + e.getMessage());
+			throw new MappingException("InstantiationException. "
+					+ e.getMessage());
 		} catch (IllegalAccessException e) {
-			throw new MappingException(
-				"IllegalAccessException. " + e.getMessage());
+			throw new MappingException("IllegalAccessException. "
+					+ e.getMessage());
 		}
 		fld.backMap(object);
 

@@ -1,34 +1,18 @@
 package org.pgj.typemapping.postgres;
 
-import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 
 /**
- * @author bitfakk
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * @author Laszlo Hornyak
+ * Void datatype for PostgreSQL.
  */
-public class PGVoid implements Field {
+public class PGVoid extends AbstractPGField {
 
 	/**
 	 * Constructor for PGVoid.
 	 */
 	public PGVoid() {
 		super();
-	}
-
-	/**
-	 * @see Field#set(byte[])
-	 */
-	public void set(byte[] raw) {
-	}
-
-	/**
-	 * @see Field#get()
-	 */
-	public byte[] get() {
-		return null;
 	}
 
 	/**
@@ -64,6 +48,12 @@ public class PGVoid implements Field {
 	 */
 	public String rdbmsType() {
 		return "void";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.typemapping.postgres.AbstractPGField#backMap(java.lang.Object)
+	 */
+	protected void backMap(Object obj) throws MappingException {
 	}
 
 }

@@ -5,10 +5,8 @@ import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 
 /**
- * @author bitfakk
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * @author Laszlo Hornyak
+ * The functionality needed by all PostgreSQL data type.
  */
 public abstract class AbstractPGField implements Field {
 
@@ -47,4 +45,20 @@ public abstract class AbstractPGField implements Field {
 		return raw;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.pgj.typemapping.Field#isNull()
+	 */
+	public boolean isNull() {
+		return raw == null;
+	}
+
+
+	public void setNull(boolean nll){
+		if(nll && raw != null){
+			raw = null;
+		}
+		if(!nll && raw == null){
+			raw = new byte[0];
+		}
+	}
 }

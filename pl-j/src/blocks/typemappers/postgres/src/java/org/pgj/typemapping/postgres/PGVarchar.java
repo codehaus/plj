@@ -4,9 +4,9 @@ import org.apache.log4j.Category;
 import org.pgj.typemapping.MappingException;
 
 /**
- * @author Laszlo Hornyak
- *
  * Field for PostgreSQL 'varchar' type.
+ *
+ * @author Laszlo Hornyak
  */
 public class PGVarchar extends AbstractPGField {
 
@@ -14,8 +14,8 @@ public class PGVarchar extends AbstractPGField {
 
 	byte[] data;
 
-	private final static Class[] classes =
-		{ String.class, byte[].class, char[].class };
+	private final static Class[] classes = {String.class, byte[].class,
+			char[].class};
 
 	/**
 	 * @see Field#getJavaClasses()
@@ -65,6 +65,7 @@ public class PGVarchar extends AbstractPGField {
 	private char[] getAsChara() throws MappingException {
 		return null;
 	}
+
 	/**
 	 * @see AbstractPGField#backMap(Object)
 	 */
