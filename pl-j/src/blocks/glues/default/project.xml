@@ -9,9 +9,10 @@
   <extends>../../project.xml</extends>
 
   <inceptionYear>2003</inceptionYear>
+  <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
 
-  <description>Default glue.</description>
-  <shortDescription>Default GLUE component.</shortDescription>
+  <description>The glue. It is the heart of the system, it forwards messages between executors and channels, handles errors.</description>
+  <shortDescription>The GLUE component.</shortDescription>
 
 	<dependencies>
 		<dependency>
