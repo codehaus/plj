@@ -6,8 +6,9 @@
 	</properties>
 	<body>
 		<section name="Triggers">
-			<p>Yes, PL-J will soon have support for triggers written entirely 
-			in java (or other procedural languages, of course).
+			<p>
+			Since alpha-0.0.2 there is trigger suppot in PL-J, though this functionality is only
+			for real wariors.
 			</p>
 			<p>
 			Unfortunately, triggers have no standardized API, not even java
