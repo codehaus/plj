@@ -1,7 +1,8 @@
 
 #include "module_config.h"
 #include "executor/spi.h"
-#include "utils/elog.h"
+//#include "utils/elog.h"
+#include "pljelog.h"
 
 const char *get_sql =
 	"SELECT config_value FROM SQLJ.plj_config where config_key='%s'";
@@ -32,18 +33,20 @@ plj_get_configvalue_string(const char *paramName)
 		return SPI_getvalue(tuptable->vals[0], tupdesc, 1);
 	}
 
-	elog(WARNING, "config value not set");
+	pljelog(WARNING, "config value not set: %s", paramName);
 	return "";
 }
 
 int
 plj_get_configvalue_int(const char *paramName)
 {
+	//if not set, will return 0
 	return atoi(plj_get_configvalue_string(paramName));
 }
 
 int
 plj_get_configvalue_boolean(const char *paramName)
 {
+	//if not set, will return false
 	return (strcmp("true", plj_get_configvalue_string(paramName)) == 0);
 }
