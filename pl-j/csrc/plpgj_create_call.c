@@ -44,6 +44,8 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	Oid funcoid;
 	HeapTuple proctup;
 	Form_pg_proc procstruct;
+	HeapTuple retTypetup;
+	Form_pg_type rettype;
 	char *func_src;
 	int i, fret, func_src_len;
 	regmatch_t matches[MAX_NO_OPTS];
@@ -51,7 +53,7 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	
 	plpgj_create_call_regex_init();
 	
-	ret = palloc(sizeof(str_msg_callreq));
+	ret = SPI_palloc(sizeof(str_msg_callreq));
 	memset(ret, 0, sizeof(str_msg_callreq));
 	ret->msgtype = MT_CALLREQ;
 	ret->length = sizeof(str_msg_callreq);
@@ -119,8 +121,49 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 			break;
 	}
 	
-	//need to get EXPECT field!!
+	ret -> nrOfParams = fcinfo -> nargs;
+	if(ret -> nrOfParams > 0)
+		ret -> parameters = SPI_palloc( 
+			(ret -> nrOfParams) * sizeof(struct fnc_param) );
 	
+	// fill in parameter type structures
+	for(i = 0; i < ret -> nrOfParams; i++) {
+		Form_pg_type paramtype;
+		HeapTuple typeTup;
+		typeTup = SearchSysCache(TYPEOID, ObjectIdGetDatum(procstruct -> proargtypes[i] ), 0, 0, 0 );
+		if (!HeapTupleIsValid(typeTup))
+			elog(ERROR, "INVALID TYPE OID?");
+
+		paramtype = (Form_pg_type) GETSTRUCT(typeTup);
+		if(fcinfo -> argnull[i]) {
+			ret -> parameters[i].data.isnull = 1;
+			ret -> parameters[i].data.data = NULL;
+			ret -> parameters[i].data.length = 0;
+		} else {
+			Datum sendDatum;
+			sendDatum = OidFunctionCall1(paramtype -> typsend, fcinfo -> arg[i]);
+			ret -> parameters[i].data.isnull = 0;
+			ret -> parameters[i].data.data = 
+				DatumGetPointer(sendDatum);
+			elog(DEBUG1,"alive");
+                        ret -> parameters[i].data.length = 
+				datumGetSize(fcinfo -> arg[i], paramtype -> typbyval, paramtype -> typlen);
+			elog(DEBUG1,"alive");
+			//if param is not null, get it from
+		}
+
+		ret -> parameters[i].type = paramtype -> typname.data;
+		ReleaseSysCache(typeTup);
+	}
+
+	// fill in expected return type
+	retTypetup = SearchSysCache(TYPEOID, ObjectIdGetDatum(procstruct -> prorettype), 0, 0, 0);
+	if (!HeapTupleIsValid(retTypetup))
+		elog(ERROR, "return type is invalid?");
+	rettype = (Form_pg_type) GETSTRUCT(retTypetup);
+	ret -> expect = (char*)rettype -> typname.data;
+	ReleaseSysCache(retTypetup);
+
 	//elog(DEBUG1, func_src);
 	return ret;
 }
