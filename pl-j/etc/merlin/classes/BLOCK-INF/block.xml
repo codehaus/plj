@@ -53,29 +53,35 @@
 				<resource
 					id="commons-logging:commons-logging" 
 					version="1.0.3"/>
+				<resource
+					id="logkit:logkit" 
+					version="2.0"/>
 
 
 				<resource 
 					id="pl-j:pl-j-api" 
-					version="0.0.4"/>
+					version="0.0.5"/>
 				<resource
 					id="pl-j:pl-j-javaexecutor"
-					version="0.0.4"/>
+					version="0.0.5"/>
 				<resource
 					id="pl-j:pl-j-febe"
-					version="0.0.4"/>
+					version="0.0.5"/>
 				<resource
 					id="pl-j:pl-j-postgres"
-					version="0.0.4"/>
+					version="0.0.5"/>
 				<resource
 					id="pl-j:pl-j-glue"
-					version="0.0.4"/>
+					version="0.0.5"/>
 				<resource
 					id="pl-j:pl-j-tools"
-					version="0.0.4"/>
+					version="0.0.5"/>
 				<resource
 					id="pl-j:pl-j-jdbc"
-					version="0.0.4"/>
+					version="0.0.5"/>
+				<resource
+					id="pl-j:pl-j-bsfexec"
+					version="0.0.5"/>
 
 			</repository>
 		</classpath>
@@ -90,12 +96,14 @@
 				<type db="int8" class="org.pgj.typemapping.postgres.PGBigInt"/>
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
 				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
+				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
 			</map>
 			<backmap>
 				<type class="java.lang.Integer" type="int4"/>
 				<type class="java.lang.String" type="varchar"/>
 				<type class="java.lang.Boolean" type="bool"/>
 				<type class="java.lang.Long" type="int8"/>
+				<type class="[B" type="bytea"/>
 			</backmap>
 			
 		</configuration>
@@ -140,21 +148,45 @@
 		</categories>
 	</component>
 
+	<!--
+		JDBC ClassLoader for PL-J. Handle with care!
+		Do not modify config unless you know what it exaclty does.
+		-->
+	<component
+		name="classloader"
+		class="org.pgj.tools.classloaders.impl.JDBCClassLoader">
+		<configuration>
+
+			<driver>org.pgj.jdbc.scratch.PLJJDBCDriver</driver>
+			<url>jdbc:default:database</url>
+			<user>default</user>
+			<password>default</password>
+
+			<select>select jar, classcode from sqlj.plj_classes where fqn = ?</select>
+			<store>insert into sqlj.plj_classes (classcode, fqn, jar) values (?, ?, ?)</store>
+			<delete>delete from sqlj.plj_classes where fqn = ?</delete>
+			<count>select count(*) from sqlj.plj_classes where fqn = ?</count>
+			<deleteJar>delete from sqlj.plj_classes where jar = ?</deleteJar>
+
+		</configuration>		
+	</component>
+	
+	<!--
+		The filsesystem based classloader implementation.
 	<component
 		name="classloader"
 		class="org.pgj.tools.classloaders.impl.FSClassLoader">
 		<configuration>
 			<root>/tmp/plj-tests/</root>
-		<!--		
 			<preload>org.pgj.jdbc.scratch.PLJJDBCDriver</preload>
 			<preload>org.pgj.jdbc.postgresql.Driver</preload> 
-			-->
 		</configuration>
 		<categories priority="DEBUG">
 			<category name="/classloader"/>
 		</categories>
 	</component>
-
+	-->
+	
 	<component
 		name="default-methodfinder"
 		class="org.pgj.tools.methodfinder.impl.DefaultMethodFinder">
@@ -166,6 +198,9 @@
 		</configuration>
 	</component>
 
+	<!--
+		Java executor component. Executes public static java methods.
+		-->
 	<component
 		name="executor"
 		class="org.pgj.jexec.JavaExecutor">
@@ -182,10 +217,17 @@
 		</categories>
 	</component>
 
+	<!--
+		Experimental!
+		JTA integration.
+		-->
 	<component 
 		name="jta-adapter"
 		class="org.pgj.tools.transactions.impl.FakeJTAAdapter"/>
 
+	<!--
+		The Controller component.
+		-->
 	<component
 		name="glue"
 		class="org.pgj.glue.Glue">

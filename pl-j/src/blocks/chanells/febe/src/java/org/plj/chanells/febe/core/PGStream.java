@@ -7,7 +7,7 @@
  * Copyright (c) 2003, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/blocks/chanells/febe/src/java/org/plj/chanells/febe/core/PGStream.java,v 1.3 2004-08-29 22:18:09 kocka Exp $
+ *	  $Header: /home/projects/plj/scm-cvs/pl-j/src/blocks/chanells/febe/src/java/org/plj/chanells/febe/core/PGStream.java,v 1.4 2004-11-01 23:14:32 kocka Exp $
  *
  *-------------------------------------------------------------------------
  */
@@ -16,9 +16,12 @@ package org.plj.chanells.febe.core;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
+
 import org.apache.avalon.framework.logger.Logger;
 
 /**
@@ -32,7 +35,9 @@ public class PGStream {
 	public int port;
 	public Socket connection;
 	public InputStream pg_input;
-	public BufferedOutputStream pg_output;
+	//public BufferedOutputStream pg_output;
+	private ByteArrayOutputStream pg_output;
+	private OutputStream out = null;
 	private byte[] byte_buf = new byte[8 * 1024];
 	Logger logger = null;
 
@@ -51,8 +56,10 @@ public class PGStream {
 		// improvement on FreeBSD machines (caused by a bug in their TCP Stack)
 		connection.setTcpNoDelay(true);
 		// Buffer sizes submitted by Sverre H Huseby <sverrehu@online.no>
-		pg_input = new BufferedInputStream(connection.getInputStream(), 8192);
-		pg_output = new BufferedOutputStream(connection.getOutputStream(), 8192);
+		pg_input = new BufferedInputStream(connection.getInputStream(), 32768);
+		//pg_output = new BufferedOutputStream(connection.getOutputStream(), 32768);
+		pg_output = new ByteArrayOutputStream();
+		out = connection.getOutputStream();
 	}
 
 	/*
@@ -62,7 +69,6 @@ public class PGStream {
 	 * @exception IOException if an I/O error occurs
 	 */
 	public void SendChar(int val) throws IOException {
-		logger.debug("SendChar: " + (char) val);
 		pg_output.write((byte) val);
 	}
 
@@ -76,12 +82,10 @@ public class PGStream {
 	 */
 	public void SendInteger(int val, int siz) throws IOException {
 		byte[] buf = new byte[siz];
-		logger.debug("SendInteger: " + val);
 		while (siz-- > 0) {
 			buf[siz] = (byte) (val & 0xff);
 			val >>= 8;
 		}
-		logger.debug("SendInteger: " + buf);
 		Send(buf);
 	}
 
@@ -95,10 +99,8 @@ public class PGStream {
 	public void SendIntegerR(int val, int siz) throws IOException {
 		logger.warn("SendIntegerR -> this function should NOT be used.");
 		byte[] buf = new byte[siz];
-		logger.debug("SendIntegerR: " + val);
 		for (int i = 0; i < siz; i++) {
 			buf[i] = (byte) (val & 0xff);
-			logger.debug("buf["+i+"] = "+buf[i]);
 			val >>= 8;
 		}
 		Send(buf);
@@ -112,7 +114,6 @@ public class PGStream {
 	 */
 	public void Send(byte buf[]) throws IOException {
 		pg_output.write(buf);
-		logger.debug("Send(byte buf[]): " + buf);
 	}
 
 	/*
@@ -125,7 +126,6 @@ public class PGStream {
 	 */
 	public void Send(byte buf[], int siz) throws IOException {
 		Send(buf, 0, siz);
-		logger.debug("Send(byte buf[], int siz): " + buf);
 	}
 
 	/*
@@ -147,7 +147,6 @@ public class PGStream {
 				pg_output.write(0);
 			}
 		}
-		logger.debug("Send(byte buf[], int off, int siz)" + buf);
 	}
 
 	/*
@@ -344,6 +343,10 @@ public class PGStream {
 	 */
 	public void flush() throws IOException {
 		pg_output.flush();
+		byte[] b = pg_output.toByteArray();
+		out.write(b);
+		out.flush();
+		pg_output.reset();
 	}
 
 	/*
@@ -353,6 +356,7 @@ public class PGStream {
 	 */
 	public void close() throws IOException {
 		pg_output.close();
+		out.close();
 		pg_input.close();
 		connection.close();
 	}

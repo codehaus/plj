@@ -24,6 +24,7 @@ import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.messages.TriggerCallRequest;
 import org.pgj.messages.TupleResult;
+import org.pgj.tools.classloaders.PGJClassLoaderAdapter;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.jdbc.JDBCConfigurator;
 import org.pgj.tools.methodfinder.MethodFinder;

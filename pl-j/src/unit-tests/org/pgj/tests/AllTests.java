@@ -3,11 +3,11 @@
  */
 package org.pgj.tests;
 
-import org.pgj.tests.management.InstallJarTest;
-import org.pgj.tests.management.RemoveJarTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.pgj.tests.management.InstallJarTest;
+import org.pgj.tests.management.RemoveJarTest;
 
 
 /**
