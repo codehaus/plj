@@ -576,8 +576,46 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#previous()
 	 */
 	public boolean previous() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+
+		checkIfClosed();
+
+		if (rows == null || relRowIdx >= rows.size() + rowsFrom) {
+
+			//needs fetch
+			SQLFetch fetch = new SQLFetch();
+			fetch.setCount(fetchSize);
+			fetch.setCursorName(cursorName);
+			switch (fetchDirection) {
+				case ResultSet.FETCH_FORWARD :
+					fetch.setDirection(SQLFetch.FETCH_BACKWARD);
+					break;
+				case ResultSet.FETCH_REVERSE :
+					fetch.setDirection(SQLFetch.FETCH_FORWARD);
+					break;
+				default :
+					throw new SQLException("Fetch direction unknown");
+			}
+			Result res = (Result) conn.doSendReceive(fetch);
+			int rowCnt = res.getRows();
+			int colCnt = res.getColumns();
+			if (colCnt == 0)
+				return false;
+			if(rows == null)
+				rows = new ArrayList(rowCnt);
+			for (int i = 0; i < rowCnt; i++) {
+				Field[] fld = new Field[colCnt];
+				for (int j = 0; j < colCnt; j++)
+					fld[j] = res.get(i, j);
+				int addto = this.rows.size();
+				//rows.set(addto, fld);
+				rows.add(addto, fld);
+			}
+
+		}
+		fields = (Field[]) rows.get(rowsFrom + relRowIdx);
+
+		relRowIdx++;
+		return fields != null;
 	}
 
 	/* (non-Javadoc)
@@ -1242,6 +1280,8 @@ public class PLJJDBCResultSet implements ResultSet {
 
 	/** 
 	 * Throws the type conversion exception.
+	 * @param clazz
+	 * @param me
 	 * @throws SQLException		always, thats why call it.
 	 */
 	private void doTypeException(Class clazz, MappingException me)
@@ -1263,12 +1303,12 @@ public class PLJJDBCResultSet implements ResultSet {
 			throws SQLException {
 		if (fields.length + 1 < col)
 			throw new SQLException("");
-		if (fields[col - 1] == null || fields[col - 1].isNull())
+		if (fields[col - 1] == null || fields[col - 1].isNull()) {
 			if (!errorIfNull) {
 				return null;
-			} else {
-				throw new SQLException("Field " + col + " is null.");
-			}
+			} 
+			throw new SQLException("Field " + col + " is null.");
+		}
 		try {
 			return fields[col - 1].get(clazz);
 		} catch (MappingException e) {
@@ -1277,4 +1317,8 @@ public class PLJJDBCResultSet implements ResultSet {
 		}
 	}
 
+	private void doUpdate(int col, Object obj, Class cls) throws SQLException {
+		
+	}
+	
 }
