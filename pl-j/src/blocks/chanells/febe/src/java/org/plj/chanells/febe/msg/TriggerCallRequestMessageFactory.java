@@ -53,7 +53,7 @@ public class TriggerCallRequestMessageFactory implements MessageFactory {
 		Tuple tuple = new Tuple();
 
 		for (int i = 0; i < paramnames.length; i++) {
-			boolean isnull = stream.ReceiveInteger(4) == 1;
+			boolean isnull = stream.ReceiveIntegerR(4) == 1;
 			if (isnull) {
 				logger.debug("null param");
 			} else {
