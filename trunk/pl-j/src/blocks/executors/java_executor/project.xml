@@ -9,7 +9,6 @@
   <!-- extend>${basedir}/../../../../project.xml</extend -->
 
   <inceptionYear>2003</inceptionYear>
-  <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
 
   <description>The java executor block. Executes a java method call using the reflection api.</description>
   <shortDescription>The java executor block.</shortDescription>
@@ -34,7 +33,6 @@
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
 			<version>0.0.2</version>
-			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
 		<dependency>
@@ -42,7 +40,6 @@
 			<type>jar</type>
 			<artifactId>pl-j-tools</artifactId>
 			<version>0.0.2</version>
-			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
 	</dependencies>
