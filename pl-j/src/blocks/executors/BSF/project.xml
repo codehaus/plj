@@ -23,6 +23,27 @@
             <type>jar</type>
             <properties/>
         </dependency>
+        <dependency>
+            <groupId>pl-j</groupId>
+            <artifactId>pl-j-api</artifactId>
+            <version>0.0.4</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>avalon-framework</groupId>
+            <artifactId>avalon-framework-api</artifactId>
+            <version>4.1.5</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>pl-j</groupId>
+            <artifactId>pl-j-tools</artifactId>
+            <version>0.0.4</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
