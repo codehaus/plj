@@ -38,8 +38,6 @@ void plpgj_create_call_regex_init(){
 	
 	ret = regcomp(&func_opt_regexp, __func_opt_regexp, REG_NEWLINE);
 	
-	elog(DEBUG1,"pg95_regcomp: %d (0 = success)",ret);
-	
 	plpgj_re_init = 1;
 }
 
@@ -79,8 +77,6 @@ void plpgj_fill_callstruct(
 		int end;
 		char tmp[100];
 
-		elog(DEBUG1,"trace!");
-
 		fret = regexec(&func_opt_regexp, func_src + i, MAX_NO_OPTS, matches, 0);
 		if(fret)
 			break;
@@ -90,11 +86,9 @@ void plpgj_fill_callstruct(
 		namestart = matches[1].rm_so; 
 		nameend = matches[1].rm_eo;
 		
-		elog(DEBUG1,"trace 1");
 		strncpy(tmp, func_src+i+namestart, nameend-namestart);
-		elog(DEBUG1,"trace 2");
 		tmp[nameend-namestart] = 0;
-		elog(DEBUG1,"name:%s", tmp);
+
 		//elog(DEBUG1,"namestart: %d, nameend: %d", namestart, nameend);
 		//elog(DEBUG1,"start: %d, end: %d", start, end);
 		strncpy(tmp, func_src+i+start, end-start);
@@ -117,7 +111,7 @@ void plpgj_fill_callstruct(
 			}
 			strncpy(methodname, func_src+i+start, end-start);
 		}else {
-			elog(DEBUG1,"");
+			elog(WARNING,"unhandled directive");
 		}
 		
 		i+=end+1;
@@ -128,6 +122,9 @@ void plpgj_fill_callstruct(
 
 }
 
+/**
+ * Creates a prtocol-implementation-friendly representation of a tuple.
+ */
 pparam* plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc){
 	int i;
 
@@ -143,15 +140,32 @@ pparam* plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc){
 		Datum binval;
 		Oid typeid;
 		bool isnull;
+		int2 typlen = 0;
+		bool typbyval = FALSE;
+		regproc typsnd;
+		HeapTuple typtup;
+		Form_pg_type typ;
+
+
+		//alloc each param
 		ret[i] = palloc( sizeof(struct fnc_param) );
-		elog(DEBUG1, "hello world :)");
-		elog(DEBUG1, "fname: %s", SPI_fname(desc, i+1) );
+		typeid = SPI_gettypeid(desc, i+1);
+
+		typtup = SearchSysCache(TYPEOID, ObjectIdGetDatum(typeid), 0, 0, 0);
+		typ = (Form_pg_type)GETSTRUCT(typtup);
+		typbyval = typ -> typbyval;
+		typlen = typ -> typlen;
+		typsnd = typ -> typsend;
+		ReleaseSysCache(typtup);
+
 		if(tuple != NULL){
-			binval = SPI_getbinval(tuple, desc, i+1, &isnull);
+			binval = OidFunctionCall1(
+				typsnd, 
+				SPI_getbinval(tuple, desc, i+1, &isnull));
 			
-			ret[i] -> data.data = binval;
+			ret[i] -> data.data = DatumGetPointer(binval);
 			ret[i] -> data.isnull = isnull;
-			ret[i] -> data.length = datumGetSize(binval, 1, 0);
+			ret[i] -> data.length = datumGetSize(binval, typbyval, typlen);
 			
 			ret[i] -> type = SPI_gettype(desc, i + 1);
 			elog(DEBUG1, "type: %s", ret[i] -> type);
@@ -159,7 +173,6 @@ pparam* plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc){
 			elog(WARNING, "tupl is null");
 		}
 		elog(DEBUG1,"trace");
-		typeid = SPI_gettypeid(desc, i+1);
 		if(isnull){
 			elog(DEBUG1,"null");
 		} else {
@@ -170,12 +183,17 @@ pparam* plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc){
 	return ret;
 }
 
+/**
+ * Fills in the colnames and the coltypes for the trigger call request.
+ */
 int plpgj_create_trigger_tuplekind(
 		trigger_callreq call,
 		TriggerData* tdata){
 
 	int i;
 	elog(DEBUG1, "plpgj_create_trigger_tuplekind");
+	
+	//TODO is this here still needed?
 	if(tdata == NULL)
 		elog(ERROR, "tdata is null");
 	if(tdata -> tg_relation == NULL)
@@ -199,11 +217,14 @@ int plpgj_create_trigger_tuplekind(
 	return 1;
 }
 
+/**
+ * Creates trigger call. It has some in common with plpgj_create_call
+ * so a merge will be neccesary here.
+ */
 trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS){
 	TriggerData* tdata;
 	trigger_callreq ret;
 	Form_pg_proc procStruct;
-	Oid relid;
 
 	ret = SPI_palloc(sizeof(str_msg_trigger_callreq));
 	ret -> msgtype = MT_TRIGREQ;
@@ -265,6 +286,9 @@ trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS){
 	return ret;
 }
 
+/**
+ * Creates call message structure from call data. (if not trigger call)
+ */
 callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	callreq ret;
 	Oid funcoid;
@@ -273,8 +297,7 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	HeapTuple retTypetup;
 	Form_pg_type rettype;
 	char *func_src;
-	int i, fret, func_src_len;
-	regmatch_t matches[MAX_NO_OPTS];
+	int i, func_src_len;
 	i = 0;
 	
 	ret = SPI_palloc(sizeof(str_msg_callreq));
