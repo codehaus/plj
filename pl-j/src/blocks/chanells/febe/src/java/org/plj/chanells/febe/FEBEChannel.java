@@ -24,6 +24,7 @@ import org.apache.avalon.framework.service.Serviceable;
 import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.CommunicationException;
+import org.pgj.messages.Log;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.typemapping.MappingException;
@@ -153,12 +154,15 @@ public class FEBEChannel
 				type = new Character('E');
 			} else if (msg instanceof Result) {
 				type = new Character('R');
+			} else if (msg instanceof Log) {
+				type = new Character('L');
 			}
 			if (type == null)
 				throw new CommunicationException("unhandled type of message");
 			MessageFactory factory = (MessageFactory) messageFactoryMap
 					.get(type);
 			stream.SendChar(type.charValue());
+			logger.debug(msg.toString());
 			factory.sendMessage(msg, stream);
 			stream.flush();
 		} catch (IOException e) {
