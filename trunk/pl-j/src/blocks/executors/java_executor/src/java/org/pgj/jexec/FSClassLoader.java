@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,23 +24,22 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.classloaders.pgjClassLoader;
 
 /**
- *
- * File system classloader. Loads and stores classes using a filesystem.
+ * File system classloader. Loads and stores classes 
+ * using a filesystem.
  * 
  * @author Laszlo Hornyak
  * @since 0.1
  * 
- * @avalon.component name="fsclassloader"
+ * @avalon.component name="fsclassloader" lifestyle="singleton"
  * @avalon.service type="org.pgj.classloaders.pgjClassLoader"
  */
-public class FSClassLoader
-	extends SecureClassLoader
-	implements
-		pgjClassLoader,
-		Configurable,
-		Initializable,
-		LogEnabled,
-		FSClassLoaderMBean {
+public class FSClassLoader extends SecureClassLoader
+		implements
+			pgjClassLoader,
+			Configurable,
+			Initializable,
+			LogEnabled,
+			FSClassLoaderMBean {
 
 	/** avalon logger object */
 	Logger logger = null;
@@ -57,11 +57,11 @@ public class FSClassLoader
 	 * @see pgjClassLoader#load(String)
 	 */
 	public Class load(String fqn) throws ClassNotFoundException {
-		
+
 		Class cl = (Class) map.get(fqn);
 		if (cl != null)
 			return cl;
-		
+
 		String filename = root + fqn.replace('.', '/').trim() + ".class";
 		logger.debug("loading class file:" + filename);
 
@@ -75,16 +75,17 @@ public class FSClassLoader
 			map.put(fqn, cl);
 			return cl;
 		} catch (IOException ioe) {
-			logger.debug("Using the system class loader."+ioe.getMessage());
+			logger.debug("Using the system class loader." + ioe.getMessage());
 			//return getSystemClassLoader().loadClass(fqn);
-			throw new ClassNotFoundException("Could not find: "+filename);
+			throw new ClassNotFoundException("Could not find: " + filename);
 		}
 	}
 
 	protected PermissionCollection getPermissions(CodeSource cs) {
 		String url = cs.getLocation().toString();
-		PermissionCollection pc = (PermissionCollection) permissionTable.get(url);
-		if(pc == null)
+		PermissionCollection pc = (PermissionCollection) permissionTable
+				.get(url);
+		if (pc == null)
 			pc = super.getPermissions(cs);
 		return pc;
 	}
@@ -92,7 +93,7 @@ public class FSClassLoader
 	private CodeSource getCodeSource(String fqn) {
 		CodeSource cs = null;
 		try {
-			URL codeURL = new URL("file://"+fqn);
+			URL codeURL = new URL("file://" + fqn);
 			// TODO Remove this !!!
 			logger.debug(codeURL.toString());
 			cs = new CodeSource(codeURL, null);
@@ -156,56 +157,63 @@ public class FSClassLoader
 			}
 			if (!f.isDirectory()) {
 				logger.fatalError("The root directory is not a directory!!");
-			}			
-			
+			}
+
 			// Creating permissionTable for classes
-			
+
 			permissionTable = new Hashtable();
-			CodeSource cs = new CodeSource(new URL("file://jsp.files"),null);
-			
+			CodeSource cs = new CodeSource(new URL("file://jsp.files"), null);
+
 			// Class loader to load xxx.xxx.xxxxPermission class
 			ClassLoader cl = java.lang.ClassLoader.getSystemClassLoader();
-			
-			// Filling it with "java.security.PermissionCollection's"
-			
-			Configuration[] classPermission = config.getChildren("class-permission");
-			for (int cp = 0; cp < classPermission.length; cp++) {
-				
-				String fqn = classPermission[cp].getAttribute("fqn");
-				PermissionCollection permissionCollection = super.getPermissions(cs);
 
-				Configuration[] permission = classPermission[cp].getChildren("permission");
+			// Filling it with "java.security.PermissionCollection's"
+
+			Configuration[] classPermission = config
+					.getChildren("class-permission");
+			for (int cp = 0; cp < classPermission.length; cp++) {
+
+				String fqn = classPermission[cp].getAttribute("fqn");
+				PermissionCollection permissionCollection = super
+						.getPermissions(cs);
+
+				Configuration[] permission = classPermission[cp]
+						.getChildren("permission");
 				for (int p = 0; p < permission.length; p++) {
-				
+
 					// Parameters for the permission. Example java.util.PropertyPermission "user.home", "read" (user.home and read is parameter)
-					
+
 					Configuration[] param = permission[p].getChildren("param");
-					
+
 					Object[] initargs = new Object[param.length]; // Used when loading Permission class
 					Class[] classes = new Class[param.length]; // Used when creating Constructor (See below)
-					
+
 					for (int pa = 0; pa < param.length; pa++) {
-						
+
 						initargs[pa] = param[pa].getValue();
 						classes[pa] = initargs[pa].getClass();
-						
+
 					}
-					
-					
+
+
 					// loading  Permission class with above parameters. Example: java.util.PropertyPermission
-					Constructor con = cl.loadClass(permission[p].getChild("class").getValue()).getConstructor(classes);
-					permissionCollection.add((Permission) con.newInstance(initargs));
+					Constructor con = cl.loadClass(
+							permission[p].getChild("class").getValue())
+							.getConstructor(classes);
+					permissionCollection.add((Permission) con
+							.newInstance(initargs));
 					logger.debug(permissionCollection.toString());
-					
+
 				}
-				
+
 				// Put fqn as key for permissionCollection for later lookup
 				// "file://" is added so i dont have to strip it out from ClassSource when i get from table.See "this.getPermissions(CodeSource cs)" 
-				permissionTable.put("file://"+fqn,permissionCollection);
-				
+				permissionTable.put("file://" + fqn, permissionCollection);
+
 			}
 		} catch (Exception ex) {
-			throw new ConfigurationException("Init failed... ( "+ex.getMessage()+" )");
+			throw new ConfigurationException("Init failed... ( "
+					+ ex.getMessage() + " )");
 		}
 	}
 
@@ -243,6 +251,31 @@ public class FSClassLoader
 	public void reloadClass(String fqn) throws ClassNotFoundException {
 		Class cl = (Class) map.get(fqn);
 		load(fqn);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
+	 */
+	public Class loadClass(String name) throws ClassNotFoundException {
+		try {
+			return load(name);
+		} catch (ClassNotFoundException e) {
+			return this.getClass().getClassLoader().loadClass(name);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.ClassLoader#getResource(java.lang.String)
+	 */
+	public URL getResource(String name) {
+		return this.getClass().getClassLoader().getResource(name);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
+	 */
+	public InputStream getResourceAsStream(String name) {
+		return this.getClass().getClassLoader().getResourceAsStream(name);
 	}
 
 }
