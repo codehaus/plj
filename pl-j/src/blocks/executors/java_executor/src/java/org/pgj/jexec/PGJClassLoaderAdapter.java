@@ -8,9 +8,11 @@ import org.pgj.tools.classloaders.PLJClassLoader;
 
 
 /**
+ * A very basic class to integrate PLJClassloaders.
+ * 
  * @author Laszlo Hornyak
  */
-public class PGJClassLoaderAdapter extends ClassLoader {
+class PGJClassLoaderAdapter extends ClassLoader {
 
 	/* (non-Javadoc)
 	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
@@ -19,12 +21,12 @@ public class PGJClassLoaderAdapter extends ClassLoader {
 		return cl.load(name);
 	}
 
-	PLJClassLoader cl = null;
+	private PLJClassLoader cl = null;
 
 	/**
 	 * 
 	 */
-	public PGJClassLoaderAdapter(PLJClassLoader cl) {
+	protected PGJClassLoaderAdapter(PLJClassLoader cl) {
 		super();
 		this.cl = cl;
 	}

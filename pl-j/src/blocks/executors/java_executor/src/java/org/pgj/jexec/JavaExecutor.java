@@ -1,7 +1,6 @@
 
 package org.pgj.jexec;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
@@ -14,6 +13,7 @@ import org.apache.avalon.framework.logger.Logger;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
+import org.pgj.Client;
 import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
 import org.pgj.messages.CallRequest;
@@ -21,11 +21,13 @@ import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.messages.TriggerCallRequest;
 import org.pgj.messages.TupleResult;
+import org.pgj.tools.channelutil.ClientUtils;
 import org.pgj.tools.classloaders.PLJClassLoader;
+import org.pgj.tools.jdbc.JDBCConfigurator;
+import org.pgj.tools.jdbc.JDBCUtil;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Tuple;
 import org.pgj.typemapping.TypeMapper;
-
 
 /**
  * Executes java code as UDF or trigger.
@@ -57,18 +59,14 @@ public class JavaExecutor extends ClassLoader
 
 	public static final String FN_UTILITIES_CLASS = "org.pgj.jexec.Utils";
 
-	private String tempDirectory = null;
-	private File tempDirectoryFile = null;
+	/** A block that helps configuring JDBC. */
+	private JDBCConfigurator jdbcConfigurator = null;
 
 	public void enableLogging(Logger logger) {
 		this.logger = logger;
 	}
 
 	public void configure(Configuration conf) throws ConfigurationException {
-		tempDirectory = conf.getChild("tempDir").getValue();
-		tempDirectoryFile = new File(tempDirectory);
-		if (!tempDirectoryFile.exists())
-			tempDirectoryFile.mkdirs();
 		logger.debug("configured");
 	}
 
@@ -170,6 +168,7 @@ public class JavaExecutor extends ClassLoader
 	 * @avalon.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
 	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 * @avalon.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper" optional="true"
+	 * @avalon.dependency key="jdbc-configurator" type="org.pgj.tools.jdbc.JDBCConfigurator"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classloader = (PLJClassLoader) arg0.lookup("classloader");
@@ -180,6 +179,7 @@ public class JavaExecutor extends ClassLoader
 			logger
 					.warn("I got no tuplemapper, i won`t be able to run triggers.");
 		}
+		jdbcConfigurator = (JDBCConfigurator) arg0.lookup("jdbc-configurator");
 	}
 
 	/* (non-Javadoc)
@@ -257,6 +257,27 @@ public class JavaExecutor extends ClassLoader
 			//TODO it is very dangerous to catch all throwables here...
 			return createException(t);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.Executor#initClientSession(org.pgj.Client)
+	 */
+	public void initClientSession(Client sessionClient) {
+		/* if the client is not set, so this is a new call from a client
+		 * we must set the Client object for this thread, and unset it
+		 * after the call is done. (see finally block)
+		 */
+		ClientUtils.setClientforThread(sessionClient);
+		Configuration conf = jdbcConfigurator.getJDBCConfiguration();
+		JDBCUtil.setConfiguration(conf);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.Executor#destroyClientSession(org.pgj.Client)
+	 */
+	public void destroyClientSession(Client sessionClient) {
+		ClientUtils.setClientforThread(null);
+		JDBCUtil.setConfiguration(null);
 	}
 
 }

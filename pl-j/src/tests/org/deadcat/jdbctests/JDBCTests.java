@@ -24,6 +24,16 @@ public class JDBCTests {
 	 */
 	private static final Logger logger = Logger.getLogger(JDBCTests.class);
 
+	static {
+		try {
+			Class.forName("org.pgj.jdbc.scratch.PLJJDBCDriver");
+		} catch (ClassNotFoundException e) {
+			logger
+					.warn("The plj jdbc driver couldn't load. There may be JDBC errors.");
+		}
+	}
+
+
 	/**
 	 * The most evident UDF using JDBC.
 	 * 
@@ -45,14 +55,14 @@ public class JDBCTests {
 			return 1;
 		} finally {
 			try {
-				if(sta!=null){
+				if (sta != null) {
 					sta.close();
 				}
 			} catch (SQLException e) {
 				logger.error("error closing statement");
 			}
 			try {
-				if(conn!=null){
+				if (conn != null) {
 					conn.close();
 				}
 			} catch (SQLException e) {
