@@ -61,5 +61,9 @@
 		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
 		<sourceDirectory>src/java</sourceDirectory>
 	</build>
-
+	
+	<reports>
+		<report>maven-faq-plugin</report>
+	</reports>
+	
 </project>
