@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+
+  <pomVersion>3</pomVersion>
+  <id>pl-j</id>
+  <name>pl-j</name>
+  <currentVersion>0.0.1</currentVersion>
+  <organization>
+    <name>The developer group</name>
+    <url>http://ghoul.fastcrypt.com///</url>
+    <!-- the image is wrong, doesn`t matter anyway -->
+    <logo>/images/logo.png</logo>
+  </organization>
+
+  <inceptionYear>2003</inceptionYear>
+
+  <description>Pl-j is a Java stored procudure platform.</description>
+  <shortDescription>Java procedureal language</shortDescription>
+
+	<developers>
+		<developer>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+		<id>ant</id>
+		<type>jar</type>
+		<artifactID>ant</artifactID>
+		<version>1.6</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+		
+	</build>
+
+</project>
