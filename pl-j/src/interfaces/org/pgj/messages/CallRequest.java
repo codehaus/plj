@@ -10,16 +10,12 @@ import org.pgj.typemapping.Field;
  * @author Laszlo Hornyak
  * @since 0.1
  */
-public class CallRequest extends Message {
+public class CallRequest extends AbstractCall {
 
 	/**
 	 * Parameter vector.
 	 */
 	private Vector params = new Vector();
-	/** Name of the method to call. */
-	private String methodname = null;
-	/** The class that contains the method. */
-	private String classname = null;
 	/** Expected return type */
 	private String expect = null;
 	/** is oneway */
@@ -29,44 +25,6 @@ public class CallRequest extends Message {
 	public final static int INSTATNTIATION_GLOBAL = 3;
 	/** instantiation of the object. By default INSTATNTIATION_CALL*/
 	private int instantiation = INSTATNTIATION_CALL;
-
-	/**
-	 * Default constructor.
-	 */
-	public CallRequest() {
-	}
-
-	/**
-	 * Set the @link #methodname
-	 * @param name the name of the method.
-	 */
-	public void setMethodname(String name) {
-		methodname = name;
-	}
-
-	/**
-	 * Get the @link #methodname
-	 * @return the name of the method.
-	 */
-	public String getMethodname() {
-		return methodname;
-	}
-
-	/**
-	 * Set the @link #classname
-	 * @param name the class name.
-	 */
-	public void setClassname(String name) {
-		classname = name;
-	}
-
-	/**
-	 * Get the @link #classname
-	 * @return the class name.
-	 */
-	public String getClassname() {
-		return classname;
-	}
 
 	/**
 	 * Add a parameter to the call.
