@@ -25,10 +25,18 @@ public interface Executor{
 	 * The call must be instance of Result or Error, other messages MUST be sent directly by
 	 * Channel implementation.
 	 */
-	/*@
-	 @
-	 @*/
 	public Message execute(CallRequest call);
-	
-}
 
+	/**
+	 * Initialize environment for new client. Called when a new client
+	 * connects.
+	 * @param sessionClient the client of the session.
+	 */
+	public void initClientSession(Client sessionClient);
+
+	/**
+	 * Free allocated resources in the environment.
+	 * @param sessionClient the client of the session.
+	 */
+	public void destroyClientSession(Client sessionClient);
+}
