@@ -12,6 +12,7 @@ import org.plj.chanells.febe.core.PGStream;
 
 /**
  * Creates error message.
+ * 
  * @author Laszlo Hornyak
  * @version 0.1
  */
@@ -22,26 +23,35 @@ public class ErrorMessageFactory implements MessageFactory {
 	public ErrorMessageFactory(Logger logger) {
 		this.logger = logger;
 	}
+
 	public static final int MESSAGE_HEADER_ERROR = 'E';
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessageHeader()
 	 */
 	public int getMessageHeader() {
 		return 'E';
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessage(org.plj.chanells.febe.core.PGStream)
 	 */
 	public Message getMessage(PGStream stream, Encoding encoding)
 			throws IOException {
 		org.pgj.messages.Error msg = new org.pgj.messages.Error();
+		msg.setExceptionClassName(stream.ReceiveString(encoding));
 		msg.setMessage(stream.ReceiveString(encoding));
-		return null;
+		msg.setStackTrace(stream.ReceiveString(encoding));
+		return msg;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.plj.chanells.febe.msg.MessageFactory#sendMessage()
 	 */
 	public void sendMessage(Message msg, PGStream stream) throws IOException {
@@ -51,7 +61,7 @@ public class ErrorMessageFactory implements MessageFactory {
 		stream.Send(cname);
 		byte[] cmsg = null;
 		String mesg = ((org.pgj.messages.Error) msg).getMessage();
-		if(mesg == null ){
+		if (mesg == null) {
 			cmsg = new byte[0];
 		} else {
 			cmsg = mesg.getBytes();
@@ -61,7 +71,9 @@ public class ErrorMessageFactory implements MessageFactory {
 		stream.flush();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getHandledClassname()
 	 */
 	public String getHandledClassname() {
