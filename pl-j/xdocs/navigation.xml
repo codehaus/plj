@@ -8,17 +8,8 @@
 
     <menu name="General Information">
       <item name="Introduction"					href="introduction.html"/>
-      <item name="Build, and install howto"		href="build-install-howto.html"/>
-      <item name="How to help"					href="how-to-help.html"/>
+      <item name="Build and install howto"				href="http://docs.codehaus.org/display/PLJ/Build+and+install+howto"/>
     </menu>
-
-    <!-- menu name="Subprojects">
-      <item name="pl-j-febe"               href="/multiproject/pl-j-febe/index.html"/>
-      <item name="pl-j-postgres"           href="/multiproject/pl-j-postgres/index.html"/>
-      <item name="pl-j-javaexecutor"       href="/multiproject/pl-j-javaexecutor/index.html"/>
-      <item name="pl-j-glue"               href="/multiproject/pl-j-glue/index.html"/>
-      <item name="pl-j-tools"              href="/multiproject/pl-j-tools/index.html"/>
-    </menu -->
 
     <menu name="Documentation">
       <item name="Current changes"				href="/current-changes.html"/>

@@ -10,6 +10,7 @@
     </organization>
     <inceptionYear>2003</inceptionYear>
     <package>org.pgj</package>
+    <logo>/images/plj-logo3-2.png</logo>
     <description>
     Pl-j is a stored procedure platform. It`s primary target is PostgreSQL and Java. 
 	It is possible to adopt other object oriented languages and database platforms.
