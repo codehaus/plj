@@ -35,18 +35,18 @@
     <mailingLists>
         <mailingList>
             <name>dev@plj.codehaus.org</name>
-            <subscribe>pg@fastcrypt.com</subscribe>
-            <unsubscribe>pg@fastcrypt.com</unsubscribe>
+            <subscribe>dev-subscribe@pl-j.codehaus.org</subscribe>
+            <unsubscribe>dev-unsubscribe@pl-j.codehaus.org</unsubscribe>
         </mailingList>
         <mailingList>
             <name>user@plj.codehaus.org</name>
-            <subscribe>pg@fastcrypt.com</subscribe>
-            <unsubscribe>pg@fastcrypt.com</unsubscribe>
+            <subscribe>user-subscribe@pl-j.codehaus.org</subscribe>
+            <unsubscribe>user-unsubscribe@pl-j.codehaus.org</unsubscribe>
         </mailingList>
         <mailingList>
             <name>announce@plj.codehaus.org</name>
-            <subscribe>pg@fastcrypt.com</subscribe>
-            <unsubscribe>pg@fastcrypt.com</unsubscribe>
+            <subscribe>announce-subscribe@plj.codehaus.org</subscribe>
+            <unsubscribe>announce-unsubscribe@plj.codehaus.org</unsubscribe>
         </mailingList>
     </mailingLists>
     <developers>
