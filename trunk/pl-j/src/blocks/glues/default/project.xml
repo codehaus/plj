@@ -1,84 +1,76 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
-
-  <pomVersion>3</pomVersion>
-  <id>pl-j-glue</id>
-  <name>pl-j-glue</name>
-  <currentVersion>0.0.3</currentVersion>
-  
-  <extends>../../project.xml</extends>
-
-  <inceptionYear>2003</inceptionYear>
-
-  <description>The glue. It is the heart of the system, it forwards messages between executors and channels, handles errors.</description>
-  <shortDescription>The GLUE component.</shortDescription>
-
-	<dependencies>
-		<dependency>
-			<id>ant</id>
-			<type>jar</type>
-			<artifactId>ant</artifactId>
-			<version>1.6</version>
-		</dependency>
-
-		<dependency>
-			<id>avalon-framework</id>
-			<type>jar</type>
-			<artifactId>avalon-framework</artifactId>
-			<version>4.1.5</version>
-		</dependency>
-
-		<dependency>
-			<id>excalibur-thread</id>
-			<type>jar</type>
-			<artifactId>excalibur-thread</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-
-		<dependency>
-			<id>excalibur-pool</id>
-			<type>jar</type>
-			<artifactId>excalibur-pool</artifactId>
-			<version>1.2</version>
-		</dependency>
-
-		<dependency>
-			<id>excalibur</id>
-			<type>jar</type>
-			<artifactId>excalibur-threadcontext</artifactId>
-			<version>1.0</version>
-		</dependency>
-
-		<dependency>
-			<id>pl-j</id>
-			<artifactId>pl-j-api</artifactId>
-			<type>jar</type>
-			<version>0.0.3</version>
-		</dependency>
-
-		<dependency>
-			<id>pl-j</id>
-			<artifactId>pl-j-tools</artifactId>
-			<type>jar</type>
-			<version>0.0.3</version>
-		</dependency>
-
+    <pomVersion>3</pomVersion>
+    <artifactId>pl-j-glue</artifactId>
+    <name>pl-j-glue</name>
+    <groupId>pl-j-glue</groupId>
+    <currentVersion>0.0.4</currentVersion>
+    <inceptionYear>2003</inceptionYear>
+    <description>The glue. It is the heart of the system, it forwards messages between executors and channels, handles errors.</description>
+    <shortDescription>The GLUE component.</shortDescription>
+    <dependencies>
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>avalon-framework</groupId>
+            <artifactId>avalon-framework</artifactId>
+            <version>4.1.5</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>excalibur-thread</groupId>
+            <artifactId>excalibur-thread</artifactId>
+            <version>1.1.1</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>excalibur-pool</groupId>
+            <artifactId>excalibur-pool</artifactId>
+            <version>1.2</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>excalibur</groupId>
+            <artifactId>excalibur-threadcontext</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>pl-j</groupId>
+            <artifactId>pl-j-api</artifactId>
+            <version>0.0.4</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>pl-j</groupId>
+            <artifactId>pl-j-tools</artifactId>
+            <version>0.0.4</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
         <dependency>
             <groupId>jboss</groupId>
             <artifactId>jboss-j2ee</artifactId>
             <version>3.2.3</version>
             <type>jar</type>
+            <properties/>
         </dependency>
-
-	</dependencies>
-
-	<build>
-		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
-		<sourceDirectory>src/java</sourceDirectory>
-	</build>
-
-	<reports>
-		<report>maven-faq-plugin</report>
-	</reports>
-
+    </dependencies>
+    <build>
+        <nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+        <sourceDirectory>src/java</sourceDirectory>
+    </build>
+    <reports>
+        <report>maven-faq-plugin</report>
+    </reports>
+    <properties/>
 </project>
