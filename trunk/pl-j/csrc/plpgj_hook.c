@@ -428,11 +428,11 @@ plpgj_sql_do(sql_msg msg)
 
 				elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
 				pljlogging_error = 1;
-				//THIS WILL FUCK YOUR SYSTEM IF YOU HAVE prepare
 				
 				PG_TRY();
 					
 					plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
+					plan = SPI_saveplan(plan);
 					elog(DEBUG1,"success");
 				PG_CATCH();
 					elog(DEBUG1,"failure");

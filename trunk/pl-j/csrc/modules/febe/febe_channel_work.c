@@ -522,6 +522,19 @@ febe_receive_sql_cursorclose(){
 	return ret;
 }
 
+sql_msg_unprepare
+febe_receive_sql_unprepare(){
+	sql_msg_unprepare ret;
+
+	ret = SPI_palloc(sizeof(struct str_sql_unprepare));
+	ret -> msgtype = MT_SQL;
+	ret -> sqltype = SQL_TYPE_UNPREPARE;
+	ret -> length = sizeof(struct str_sql_unprepare);
+	ret -> planid = febe_receive_integer_4();
+
+	return ret;
+}
+
 sql_msg
 febe_receive_sql(void)
 {
@@ -540,6 +553,8 @@ febe_receive_sql(void)
 			return (sql_msg) febe_receive_sql_fetch();
 		case SQL_TYPE_CURSOR_CLOSE:
 			return (sql_msg)febe_receive_sql_cursorclose();
+		case SQL_TYPE_UNPREPARE:
+			return (sql_msg)febe_receive_sql_unprepare();
 		default:
 			//pljlogging_error = 1;
 		elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);

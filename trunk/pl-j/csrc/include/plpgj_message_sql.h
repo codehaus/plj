@@ -10,6 +10,7 @@
 #define SQL_TYPE_CURSOR_OPEN			4
 #define SQL_TYPE_PREPARE			5
 #define SQL_TYPE_PEXECUTE			6
+#define SQL_TYPE_UNPREPARE			7
 
 typedef struct str_sql_msg
 {
@@ -32,6 +33,12 @@ typedef struct str_sql_prepare
 	char	**types;
 }	*sql_msg_prepapre;
 
+typedef struct str_sql_unprepare
+{
+	base_message_content;
+	sql_message_content;
+	int	planid;
+}	*sql_msg_unprepare;
 
 #define SQL_PEXEC_ACTION_EXECUTE	0
 #define SQL_PEXEC_ACTION_UPDATE		1
