@@ -59,4 +59,8 @@
 		<attainGoal name="subprojects:clean"/>
 	</postGoal>
 
+	<preGoal name="multiproject:artifact">
+		<attainGoal name="jar:jar"/>
+	</preGoal>
+
 </project>
