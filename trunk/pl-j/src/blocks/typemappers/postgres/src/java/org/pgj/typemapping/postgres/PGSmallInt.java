@@ -67,7 +67,10 @@ public class PGSmallInt extends AbstractPGField {
 	public Object get(Class clazz) throws MappingException {
 		// TODO Auto-generated method stub
 		cat.debug("mapping to " + clazz.getName());
-		return null;
+		if ("java.lang.Integer".equals(clazz.getName()))
+			return defaultGet();
+
+		throw new MappingException("sorry this is on my todo list");
 	}
 
 	/* (non-Javadoc)
