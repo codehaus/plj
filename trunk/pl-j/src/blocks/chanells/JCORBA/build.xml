@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+
+<!--
+	JCORBA build
+-->
+
+<project name="pgj.chanells.jcorba" default="warn">
+	
+	<path id="project_classpath_uber">
+		<fileset dir="${project.home}/${phoenix.extlib}">
+			<include name="**.jar"/>
+		</fileset>
+		<fileset dir="${project.home}/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+		<pathelement location="${project.home}/src/interfaces/"/>
+	</path>
+	
+	<target name="init" description="does nothing to init -maybe I should remove it.">
+		<echo message="${project.home}/lib/phoenix-metagenerate.jar"/>
+	    <taskdef name="generatemeta" classname="org.apache.avalon.phoenix.tools.metagenerate.MetaGenerateTask" classpathref="project_classpath_uber"/>
+	</target>
+	
+	<target name="warn" description="fail by default">
+		<fail message="Do not run ant here!!"/>
+	</target>
+	
+	<target name="compile.impl" depends="init" description="compiles the implementation">
+		<echo message="${project.home}"/>
+		<javac srcdir="." classpathref="project_classpath_uber"/>
+		<generatemeta dest="src">
+            <fileset dir="src">
+                <include name="**/*.java" />
+            </fileset>
+		</generatemeta>
+	</target>
+	
+	<target name="compile" depends="compile.impl, init, idl-compile" description="compiles everything (java, c)"/>
+	
+	<target name="idl-compile">
+		<taskdef classpath="./tools/" name="idl-compile" classname="org.pgj.tools.IDLTask"/>
+		<idl-compile side="server" IDL="../../../../etc/corba/callserver.idl" includes="../../../../etc/corba/" output="src"/>
+		<idl-compile side="server" IDL="../../../../etc/corba/callreq.idl" includes="../../../../etc/corba/" output="src"/>
+		<idl-compile side="server" IDL="../../../../etc/corba/commons.idl" includes="../../../../etc/corba/" output="src"/>
+		<idl-compile side="server" IDL="../../../../etc/corba/error.idl" includes="../../../../etc/corba/" output="src"/>
+		<idl-compile side="server" IDL="../../../../etc/corba/result.idl" includes="../../../../etc/corba/" output="src"/>
+		<idl-compile side="server" IDL="../../../../etc/corba/sql.idl" includes="../../../../etc/corba/" output="src"/>
+	</target>
+	
+	<target name="mkjar" depends="compile, init" description="creates the jar">
+		<jar jarfile="jcorba_chanell.jar">
+			<manifest>
+				<attribute name="Built-by" value="jakarta-ant"/>
+				<section name="org/pgj/chanells/jcorba/JCORBAChanell.class">
+					<attribute name="Avalon-Block" value="true"/>
+				</section>
+			</manifest>
+			<fileset dir="." includes="org/**"/>
+		</jar>
+	</target>
+	
+	<target name="clean" depends="init" description="clean the src">
+		<delete file="corba_chanell.jar"/>
+		<exec executable="make" dir="csrc">
+			<arg line="clean"/>
+		</exec>
+	</target>
+	
+	<target name="mkskels">
+		<exec executable="">
+		</exec>
+	</target>
+</project>

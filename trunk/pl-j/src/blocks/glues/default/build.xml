@@ -1,0 +1,45 @@
+<project name="pgj.executors.java" default="warn">
+	
+	<property name="jarname" value="default-glue.jar"/> 
+
+	<path id="project_classpath_uber">
+		<fileset dir="${project.home}/${phoenix.extlib}">
+			<include name="**.jar"/>
+		</fileset>
+		<pathelement location="${project.home}/src/blocks/executors/java_executor/interfaces/"/>
+		<pathelement location="${project.home}/src/interfaces/"/>
+	</path>
+
+	<target name="warn" description="fail by default">
+		<fail message="Do not run ant here!!"/>
+	</target>
+	
+	<target name="compile.impl" description="compile the implementation">
+		<echo message="${project.home}/${phoenix.extlib}/avalon-framework-20022706.jar"/>
+		<javac srcdir="." classpathref="project_classpath_uber">
+		</javac>
+	</target>
+	
+	<target name="compile" depends="compile.impl" description="compile all"/>
+	
+	<target name="mkjar" depends="compile" description="make jar">
+		<jar jarfile="${jarname}">
+			<manifest>
+				<attribute name="Built-by" value="jakarta-ant"/>
+				<section name="org/pgj/glue/Glue.class">
+					<attribute name="Avalon-Block" value="true"/>
+				</section>
+			</manifest>
+			<fileset dir="." includes="org/**"/>
+		</jar>
+	</target>
+	
+	<target name="clean" description="cleans the source">
+		<delete file="${jarname}"/>
+		<delete>
+			<fileset dir="org" includes="**/*.class"/>
+		</delete>
+	</target>
+	
+	
+</project>
