@@ -36,6 +36,7 @@ import org.plj.chanells.febe.msg.ErrorMessageFactory;
 import org.plj.chanells.febe.msg.LogMessageFactory;
 import org.plj.chanells.febe.msg.MessageFactory;
 import org.plj.chanells.febe.msg.ResultMessageFactory;
+import org.plj.chanells.febe.msg.TriggerCallRequestMessageFactory;
 
 /**
  * A chanell built on FE/BE protocoll basing on the PostgreSQL JDBC team`s
@@ -219,6 +220,11 @@ public class FEBEChannel
 		messageFactoryMap.put(new Character(
 				(char) ResultMessageFactory.MESSAGE_HEADER_RESULT),
 				new ResultMessageFactory(logger, typeMapper));
+		messageFactoryMap
+				.put(
+						new Character(
+								(char) TriggerCallRequestMessageFactory.MESSAGE_HEADER_TRIGGER),
+						new TriggerCallRequestMessageFactory(logger));
 	}
 	private ServerSocketFactory serverSocketFactory;
 
