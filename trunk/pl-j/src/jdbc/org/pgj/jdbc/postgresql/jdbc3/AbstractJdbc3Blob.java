@@ -1,7 +1,7 @@
 package org.pgj.jdbc.postgresql.jdbc3;
 
 
-import java.sql.*;
+import java.sql.SQLException;
 
 public abstract class AbstractJdbc3Blob extends org.pgj.jdbc.postgresql.jdbc2.AbstractJdbc2Blob
 {
