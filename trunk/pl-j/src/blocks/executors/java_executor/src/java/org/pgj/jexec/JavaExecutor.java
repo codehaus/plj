@@ -111,7 +111,7 @@ public class JavaExecutor extends ClassLoader
 				Thread.currentThread().setContextClassLoader(null);
 			}
 			logger.debug("<----creating result");
-			Result ret = typemapper.createResult(obj);
+			Result ret = typemapper.createResult(obj, c.getExpect(), false);
 			logger.debug("---->created result");
 			ret.setClient(c.getClient());
 			return ret;
