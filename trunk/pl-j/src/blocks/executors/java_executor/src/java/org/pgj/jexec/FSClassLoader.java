@@ -23,10 +23,12 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.classloaders.pgjClassLoader;
 
 /**
- * @author bitfakk
- * @since 0.1
  *
  * File system classloader. Loads and stores classes using a filesystem.
+ * 
+ * @author Laszlo Hornyak
+ * @since 0.1
+ * 
  * @avalon.component name="fsclassloader"
  * @avalon.service type="org.pgj.classloaders.pgjClassLoader"
  */
@@ -220,10 +222,6 @@ public class FSClassLoader
 	public boolean hasClass(String fqn) {
 		return false;
 	}
-
-	//==============
-	//management api
-	//==============
 
 	/**
 	 * Flusehes cache.

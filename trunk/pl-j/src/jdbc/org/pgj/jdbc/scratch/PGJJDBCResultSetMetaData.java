@@ -1,6 +1,5 @@
 /*
  * Created on Jun 12, 2003
- *
  */
 package org.pgj.jdbc.scratch;
 
@@ -8,8 +7,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 /**
+ * ResultSetMetadata.
+ * 
  * @author Laszlo Hornyak
- * ResultSetMetadata for 
  */
 public class PGJJDBCResultSetMetaData
 	implements ResultSetMetaData {

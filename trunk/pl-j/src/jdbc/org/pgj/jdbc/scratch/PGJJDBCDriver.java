@@ -1,8 +1,5 @@
 /*
  * Created on Jun 12, 2003
- *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
 package org.pgj.jdbc.scratch;
 
@@ -17,9 +14,10 @@ import org.apache.regexp.RESyntaxException;
 import org.pgj.NotImplementedException;
 
 /**
- * @author Laszlo Hornyak
  * Embeded JDBC driver for PGJ to communicat with the database backend without
  * creating new connection or transaction.
+ * 
+ * @author Laszlo Hornyak
  */
 public class PGJJDBCDriver implements Driver {
 

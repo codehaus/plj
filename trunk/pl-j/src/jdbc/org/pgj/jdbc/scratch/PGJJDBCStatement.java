@@ -17,10 +17,8 @@ import org.pgj.CommunicationException;
 import org.pgj.messages.SQLCursorOpenWithSQL;
 
 /**
- * @author bitfakk
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * @author Laszlo Hornyak
+ * 
  */
 public class PGJJDBCStatement implements Statement {
 

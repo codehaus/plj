@@ -4,9 +4,9 @@ import org.apache.avalon.excalibur.pool.*;
 import org.apache.avalon.framework.logger.*;
 
 /**
- * @author bitfakk
+ * @author Laszlo Hornyak
  *
- * I was too lazy to edit the comments.
+ * Factory for GLUE workers. This class is for adopting factoring to excalibur pool.
  */
 class GlueWorkerFactory implements ObjectFactory, LogEnabled {
 

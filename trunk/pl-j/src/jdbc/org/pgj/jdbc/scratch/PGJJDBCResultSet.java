@@ -1,8 +1,5 @@
 /*
  * Created on Jun 12, 2003
- *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
 package org.pgj.jdbc.scratch;
 
@@ -31,10 +28,7 @@ import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 
 /**
- * @author bitfakk
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * @author Laszlo Hornyak
  */
 public class PGJJDBCResultSet implements ResultSet {
 
