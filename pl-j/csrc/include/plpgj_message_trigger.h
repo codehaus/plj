@@ -36,6 +36,14 @@ typedef struct {
 
 typedef str_msg_trigger_callreq* trigger_callreq;
 
+typedef struct {
+	base_message_content;
+	char* tablename;
+	pparam* _tuple;
+}str_msg_trigger_tupleresult;
+
+typedef str_msg_trigger_tupleresult* trigger_tupleres;
+
 #ifdef __cplusplus
 }
 #endif

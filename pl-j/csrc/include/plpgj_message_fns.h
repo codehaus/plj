@@ -4,7 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
 #include "postgres.h"
 #include "plpgj_messages.h"
 #include "fmgr.h"
@@ -19,6 +19,7 @@ extern "C" {
 #define MT_SQL						3
 #define MT_LOG						4
 #define MT_TRIGREQ					5
+#define MT_TUPLRES					6
 
 /**
  * Crete a call structure.
