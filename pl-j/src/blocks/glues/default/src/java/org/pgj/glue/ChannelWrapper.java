@@ -42,6 +42,8 @@ public class ChannelWrapper implements Channel {
 	 * The JTA adapter.
 	 */
 	private JTAAdapter jtaadapter = null;
+	
+	private ClientWrapper clientWrapper = null;
 
 	/**
 	 *  
@@ -80,7 +82,7 @@ public class ChannelWrapper implements Channel {
 		 * easily cause a StackOverflowError.
 		 */
 		while (true) {
-			Message msg = realChannel.receiveFromRDBMS(client);
+			Message msg = realChannel.receiveFromRDBMS(clientWrapper.getRealClient());
 			if (msg instanceof CallRequest) {
 				executor.execute((CallRequest) msg);
 				continue;
@@ -99,6 +101,7 @@ public class ChannelWrapper implements Channel {
 				//and recursion to do the same.
 				continue;
 			}
+			msg.setClient(clientWrapper);
 			return msg;
 		}
 	}
@@ -109,7 +112,11 @@ public class ChannelWrapper implements Channel {
 	 * @see org.pgj.Channel#sendToRDBMS(org.pgj.messages.Message)
 	 */
 	public void sendToRDBMS(Message msg) throws CommunicationException {
+		msg.setClient(clientWrapper.getRealClient());
 		realChannel.sendToRDBMS(msg);
 	}
 
+	void setClientWrapper(ClientWrapper clientWrapper) {
+		this.clientWrapper = clientWrapper;
+	}
 }
