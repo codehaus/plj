@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
 import org.pgj.messages.SQL;
 import org.pgj.messages.SimpleSQL;
@@ -60,7 +61,7 @@ public class SQLMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#sendMessage(org.pgj.messages.Message, org.plj.chanells.febe.core.PGStream)
 	 */
 	public void sendMessage(Message msg, PGStream stream) throws IOException,
-			MappingException {
+			MappingException, CommunicationException{
 		SQL sql = (SQL) msg;
 		stream.SendChar(MESSAGE_HEADER_SQL);
 		String clname = msg.getClass().getName();
