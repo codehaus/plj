@@ -10,6 +10,7 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
 import org.pgj.messages.TriggerCallRequest;
+import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
 import org.pgj.typemapping.TypeMapper;
@@ -61,7 +62,11 @@ public class TriggerCallRequestMessageFactory implements MessageFactory {
 				byte[] bytes = stream.Receive(sz);
 				logger.debug("got the bytes");
 				String type = stream.ReceiveString(encoding);
-				typeMapper.map(bytes, type);
+				if (!type.equals(paramtypes[i]))
+					throw new MappingException(
+							"Ooops, there is something problem here!!");
+				Field fld = typeMapper.map(bytes, type);
+				tuple.addField(paramnames[i], fld);
 			}
 		}
 		tuple.setRelationName(relName);
