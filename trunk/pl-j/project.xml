@@ -9,7 +9,7 @@
       <name>The pl-j developer group</name>
       <url>http://plj.codehaus.org</url>
     </organization>
-    <siteAddress>http://plj.codehaus.org/</siteAddress>
+    <siteAddress>plj.codehaus.org</siteAddress>
     <siteDirectory>/home/projects/plj/public_html/</siteDirectory>
     <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10430</issueTrackingUrl>
     <repository>
