@@ -56,8 +56,8 @@ public class JavaExecutor extends ClassLoader
 
 	public static final String FN_UTILITIES_CLASS = "org.pgj.jexec.Utils";
 
-	String tempDirectory = null;
-	File tempDirectoryFile = null;
+	private String tempDirectory = null;
+	private File tempDirectoryFile = null;
 
 	public void enableLogging(Logger logger) {
 		this.logger = logger;
@@ -203,12 +203,13 @@ public class JavaExecutor extends ClassLoader
 	 */
 	public Message executeTrigger(TriggerCallRequest trigger) {
 		try {
-			logger.debug("executing trigger");
+			logger.debug("executing trigger --> ");
 
 			Tuple tpl = trigger.getReason() == TriggerCallRequest.TRIGGER_REASON_DELETE
 					? trigger.getOld()
 					: trigger.getNew();
 			Class pcl = tupleMapper.getMappedClass(tpl);
+			logger.debug("class" + pcl);
 			Class[] paramClasses = null;
 
 			switch (trigger.getReason()) {
