@@ -11,6 +11,7 @@ import org.pgj.Executor;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
+import org.pgj.tools.channelutil.ChannelUtils;
 
 /**
  * Glue worker thread.
@@ -33,23 +34,7 @@ public class GlueWorker
 	private Client client;
 	/** Are we asked to terminate? */
 	private boolean terminating = false;
-	/**
-	 * ThreadLocal variable to store the channel.
-	 */
-	private static ThreadLocal channelThread = new ThreadLocal() {
 
-		protected final Object initialValue() {
-			return null;
-		}
-	};
-
-	private static void setThreadChannel(Channel channel) {
-		channelThread.set(channel);
-	}
-
-	public final static Channel getThreadChannel() {
-		return (Channel) channelThread.get();
-	}
 	/**
 	 * ThreadLocal variable to store the client.
 	 */
@@ -60,14 +45,6 @@ public class GlueWorker
 		}
 	};
 
-	private static void setThreadClient(Client client) {
-		clientThread.set(client);
-	}
-
-	public final static Client getThreadClient() {
-		return (Client) clientThread.get();
-	}
-
 	public GlueWorker() {
 	}
 	/** Logger */
@@ -77,6 +54,7 @@ public class GlueWorker
 	 * @see Executable#execute()
 	 */
 	public void execute() {
+		ChannelUtils.setChannelforThread(chanell);
 		try {
 			while (true) {
 				Message msg = chanell.receiveFromRDBMS(client);
@@ -104,6 +82,8 @@ public class GlueWorker
 			client = null;
 			executor = null;
 			chanell = null;
+			//no funny tricks ;)
+			ChannelUtils.setChannelforThread(null);
 		}
 	}
 

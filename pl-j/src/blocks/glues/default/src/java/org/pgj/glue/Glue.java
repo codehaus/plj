@@ -14,7 +14,6 @@ import org.apache.avalon.framework.logger.Logger;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
-import org.apache.excalibur.threadcontext.ThreadContext;
 import org.pgj.Channel;
 import org.pgj.Executor;
 
@@ -56,7 +55,6 @@ public class Glue
 
 	public void initialize() throws Exception {
 		logger.debug("initializing");
-		ThreadContext ctx = ThreadContext.getThreadContext();
 		threadPool = new DefaultThreadPool("Glue pool", 10, 5);
 		((DefaultThreadPool) threadPool).enableLogging(logger);
 		gwfactory = new GlueWorkerFactory();
