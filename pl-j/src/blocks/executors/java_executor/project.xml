@@ -2,7 +2,7 @@
     <pomVersion>3</pomVersion>
     <artifactId>pl-j-javaexecutor</artifactId>
     <name>pl-j-javaexecutor</name>
-    <groupId>pl-j-javaexecutor</groupId>
+    <groupId>pl-j</groupId>
     <currentVersion>0.0.4</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <description>The java executor block. Executes a java method call using the reflection api.</description>
@@ -33,6 +33,20 @@
             <groupId>pl-j</groupId>
             <artifactId>pl-j-tools</artifactId>
             <version>0.0.4</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>pljava-public</artifactId>
+            <version>1.0.0b4</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
             <type>jar</type>
             <properties/>
         </dependency>
