@@ -1,7 +1,10 @@
 # ----------
 # configure.ac
 #
-#	Autoconf configuration file for Slony-I
+#	Autoconf configuration file for PL-J 
+#	(PostgreSQL call handler module)
+#
+#	It was rewritten from the Slony
 #
 #	Copyright (c) 2003-2004, PostgreSQL Global Development Group
 #	Author: Jan Wieck, Afilias USA INC.
@@ -11,7 +14,7 @@
 # Process this file with autoconf to produce a configure script.
 # ----------
 
-AC_INIT(slony1-engine, 20040330)
+AC_INIT(pl-pgj, 20040330)
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src])
