@@ -1,3 +1,4 @@
+
 /*-------------------------------------------------------------------------
  *
  * pqexpbuffer.c
@@ -99,7 +100,9 @@ termPQExpBuffer(PQExpBuffer str)
 		free(str->data);
 		str->data = NULL;
 	}
-	/* just for luck, make the buffer validly empty. */
+	/*
+	 * just for luck, make the buffer validly empty.
+	 */
 	str->maxlen = 0;
 	str->len = 0;
 }
@@ -164,7 +167,7 @@ enlargePQExpBuffer(PQExpBuffer str, size_t needed)
  * resetPQExpBuffer() followed by appendPQExpBuffer().
  */
 void
-printfPQExpBuffer(PQExpBuffer str, const char *fmt,...)
+printfPQExpBuffer(PQExpBuffer str, const char *fmt, ...)
 {
 	va_list		args;
 	size_t		avail;
@@ -183,8 +186,7 @@ printfPQExpBuffer(PQExpBuffer str, const char *fmt,...)
 		{
 			avail = str->maxlen - str->len - 1;
 			va_start(args, fmt);
-			nprinted = vsnprintf(str->data + str->len, avail,
-								 fmt, args);
+			nprinted = vsnprintf(str->data + str->len, avail, fmt, args);
 			va_end(args);
 
 			/*
@@ -194,12 +196,16 @@ printfPQExpBuffer(PQExpBuffer str, const char *fmt,...)
 			 */
 			if (nprinted >= 0 && nprinted < (int) avail - 1)
 			{
-				/* Success.  Note nprinted does not include trailing null. */
+				/*
+				 * Success.  Note nprinted does not include trailing null.
+				 */
 				str->len += nprinted;
 				break;
 			}
 		}
-		/* Double the buffer size and try again. */
+		/*
+		 * Double the buffer size and try again.
+		 */
 		if (!enlargePQExpBuffer(str, str->maxlen))
 			return;				/* oops, out of memory */
 	}
@@ -214,7 +220,7 @@ printfPQExpBuffer(PQExpBuffer str, const char *fmt,...)
  * strcat.
  */
 void
-appendPQExpBuffer(PQExpBuffer str, const char *fmt,...)
+appendPQExpBuffer(PQExpBuffer str, const char *fmt, ...)
 {
 	va_list		args;
 	size_t		avail;
@@ -231,8 +237,7 @@ appendPQExpBuffer(PQExpBuffer str, const char *fmt,...)
 		{
 			avail = str->maxlen - str->len - 1;
 			va_start(args, fmt);
-			nprinted = vsnprintf(str->data + str->len, avail,
-								 fmt, args);
+			nprinted = vsnprintf(str->data + str->len, avail, fmt, args);
 			va_end(args);
 
 			/*
@@ -242,12 +247,16 @@ appendPQExpBuffer(PQExpBuffer str, const char *fmt,...)
 			 */
 			if (nprinted >= 0 && nprinted < (int) avail - 1)
 			{
-				/* Success.  Note nprinted does not include trailing null. */
+				/*
+				 * Success.  Note nprinted does not include trailing null.
+				 */
 				str->len += nprinted;
 				break;
 			}
 		}
-		/* Double the buffer size and try again. */
+		/*
+		 * Double the buffer size and try again.
+		 */
 		if (!enlargePQExpBuffer(str, str->maxlen))
 			return;				/* oops, out of memory */
 	}
@@ -272,11 +281,15 @@ appendPQExpBufferStr(PQExpBuffer str, const char *data)
 void
 appendPQExpBufferChar(PQExpBuffer str, char ch)
 {
-	/* Make more room if needed */
+	/*
+	 * Make more room if needed
+	 */
 	if (!enlargePQExpBuffer(str, 1))
 		return;
 
-	/* OK, append the character */
+	/*
+	 * OK, append the character
+	 */
 	str->data[str->len] = ch;
 	str->len++;
 	str->data[str->len] = '\0';
@@ -291,11 +304,15 @@ appendPQExpBufferChar(PQExpBuffer str, char ch)
 void
 appendBinaryPQExpBuffer(PQExpBuffer str, const char *data, size_t datalen)
 {
-	/* Make more room if needed */
+	/*
+	 * Make more room if needed
+	 */
 	if (!enlargePQExpBuffer(str, datalen))
 		return;
 
-	/* OK, append the data */
+	/*
+	 * OK, append the data
+	 */
 	memcpy(str->data + str->len, data, datalen);
 	str->len += datalen;
 
