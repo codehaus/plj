@@ -12,7 +12,7 @@
 			<p>A less exact definition: PL-J is java stored procedures system for PostgreSQL. 
 			Even though it is much more than that, people like to simplify.</p>
 		</section>
-		<section name="">
+		<section name="Component interfaces">
 			<p>
 			PL-J is built from reusable/replacable components. We have our
 			implementations and the default deployment descriptor, but you
@@ -50,7 +50,7 @@
 				</p>
 			</subsection>
 		</section>
-		<section name="Components">
+		<section name="Components implementations">
 			<p>
 			The following components are implemented:
 			</p>
