@@ -1,6 +1,7 @@
 package org.pgj.jexec;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
@@ -108,6 +109,9 @@ public class JavaExecutor extends ClassLoader
 						new PGJClassLoaderAdapter(this.classloader));
 				obj = callm.invoke(callobj, paramobjs);
 				Thread.currentThread().setContextClassLoader(null);
+			} catch (InvocationTargetException t) {
+				org.pgj.messages.Error exc = createException(t.getCause());
+				return exc;
 			} catch (Throwable t) {
 				org.pgj.messages.Error exc = createException(t);
 				return exc;
@@ -131,7 +135,7 @@ public class JavaExecutor extends ClassLoader
 	private org.pgj.messages.Error createException(Throwable t) {
 		org.pgj.messages.Error exc = new org.pgj.messages.Error();
 
-		logger.debug("exception!");
+		logger.debug("exception!", t);
 
 		exc.setExceptionClassName(t.getClass().getName());
 		exc.setMessage(t.getMessage());
