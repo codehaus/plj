@@ -20,6 +20,7 @@ import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.messages.TriggerCallRequest;
+import org.pgj.messages.TupleResult;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Tuple;
@@ -181,23 +182,6 @@ public class JavaExecutor extends ClassLoader
 		}
 	}
 
-	private String compile(String text) {
-
-		return null;
-	}
-
-	private void compile_and_store(String[] text) {
-
-	}
-
-	private void compile_and_store(String text) {
-
-	}
-
-	private void store(String name, byte[] classdata) {
-		classloader.store(name, classdata);
-	}
-
 	/* (non-Javadoc)
 	 * @see org.pgj.TriggerExecutor#executeTrigger(org.pgj.messages.TriggerCallRequest)
 	 */
@@ -212,17 +196,22 @@ public class JavaExecutor extends ClassLoader
 			logger.debug("class" + pcl);
 			Class[] paramClasses = null;
 
-			switch (trigger.getReason()) {
-				case TriggerCallRequest.TRIGGER_REASON_UPDATE :
-					paramClasses = new Class[2];
-					paramClasses[0] = pcl;
-					paramClasses[1] = pcl;
-					break;
-				case TriggerCallRequest.TRIGGER_REASON_DELETE :
-				case TriggerCallRequest.TRIGGER_REASON_INSERT :
-					paramClasses = new Class[1];
-					paramClasses[0] = pcl;
-					break;
+			if (trigger.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW) {
+				switch (trigger.getReason()) {
+					case TriggerCallRequest.TRIGGER_REASON_UPDATE :
+						paramClasses = new Class[2];
+						paramClasses[0] = pcl;
+						paramClasses[1] = pcl;
+						break;
+					case TriggerCallRequest.TRIGGER_REASON_DELETE :
+					case TriggerCallRequest.TRIGGER_REASON_INSERT :
+						paramClasses = new Class[1];
+						paramClasses[0] = pcl;
+						break;
+				}
+			} else {
+				logger.debug("statement trigger");
+				paramClasses = new Class[0];
 			}
 
 			Class triggerClass = classloader.load(trigger.getClassname());
@@ -231,24 +220,36 @@ public class JavaExecutor extends ClassLoader
 			Object triggerObj = triggerClass.newInstance();
 			Object[] paramObjects = null;
 
-			switch (trigger.getReason()) {
-				case TriggerCallRequest.TRIGGER_REASON_UPDATE :
-					paramObjects = new Object[2];
-					paramObjects[0] = tupleMapper.mapTuple(trigger.getNew());
-					paramObjects[1] = tupleMapper.mapTuple(trigger.getOld());
-					break;
-				case TriggerCallRequest.TRIGGER_REASON_DELETE :
-					paramObjects = new Object[1];
-					paramObjects[0] = tupleMapper.mapTuple(trigger.getOld());
-					break;
-				case TriggerCallRequest.TRIGGER_REASON_INSERT :
-					paramObjects = new Object[1];
-					paramObjects[0] = tupleMapper.mapTuple(trigger.getNew());
-					break;
+			if (trigger.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW) {
+				switch (trigger.getReason()) {
+					case TriggerCallRequest.TRIGGER_REASON_UPDATE :
+						paramObjects = new Object[2];
+						paramObjects[0] = tupleMapper
+								.mapTuple(trigger.getNew());
+						paramObjects[1] = tupleMapper
+								.mapTuple(trigger.getOld());
+						break;
+					case TriggerCallRequest.TRIGGER_REASON_DELETE :
+						paramObjects = new Object[1];
+						paramObjects[0] = tupleMapper
+								.mapTuple(trigger.getOld());
+						break;
+					case TriggerCallRequest.TRIGGER_REASON_INSERT :
+						paramObjects = new Object[1];
+						paramObjects[0] = tupleMapper
+								.mapTuple(trigger.getNew());
+						break;
+				}
+			} else {
+				paramObjects = new Object[0];
 			}
 
 			Object retObj = triggerMethod.invoke(triggerObj, paramObjects);
-			Result res = typemapper.createResult(retObj);
+			Tuple t = tupleMapper.backMap(retObj, typemapper);
+
+			TupleResult res = new TupleResult();
+			res.setTuple(t);
+			res.setClient(trigger.getClient());
 			return res;
 		} catch (InvocationTargetException e) {
 			return createException(e);
