@@ -17,7 +17,7 @@ import org.plj.chanells.febe.core.PGStream;
  * Sends fetch message to RDBMS.
  * @author Laszlo Hornyak
  */
-public class FetchMessageFactory extends AbstractSQLMessageFactory {
+class FetchMessageFactory extends AbstractSQLMessageFactory {
 
 	/* (non-Javadoc)
 	 * @see org.plj.chanells.febe.msg.jdbc.AbstractSQLMessageFactory#getSQLType()

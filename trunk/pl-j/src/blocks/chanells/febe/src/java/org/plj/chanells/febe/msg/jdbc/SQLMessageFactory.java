@@ -16,6 +16,7 @@ import org.pgj.messages.SQLCursorClose;
 import org.pgj.messages.SQLExecute;
 import org.pgj.messages.SQLFetch;
 import org.pgj.messages.SQLPrepare;
+import org.pgj.messages.SQLUnPrepare;
 import org.pgj.messages.SimpleSQL;
 import org.pgj.typemapping.MappingException;
 import org.plj.chanells.febe.core.Encoding;
@@ -47,6 +48,7 @@ public class SQLMessageFactory implements MessageFactory {
 		map.put(SQLExecute.class.getName(), new PExecMessageFactory());
 		map.put(SQLFetch.class.getName(), new FetchMessageFactory());
 		map.put(SQLCursorClose.class.getName(), new SQLCursorCloseMessageFactory());
+		map.put(SQLUnPrepare.class.getName(), new UnPrepareMessageFactory());
 	}
 
 	/* (non-Javadoc)

@@ -57,8 +57,7 @@ public class PrepareMessageFactory extends AbstractSQLMessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getHandledClassname()
 	 */
 	public String getHandledClassname() {
-		// TODO Auto-generated method stub
-		return null;
+		return SQLPrepare.class.getName();
 	}
 
 }
