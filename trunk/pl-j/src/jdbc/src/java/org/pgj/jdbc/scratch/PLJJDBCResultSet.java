@@ -65,10 +65,11 @@ public class PLJJDBCResultSet implements ResultSet {
 	/**
 	 * 
 	 */
-	protected PLJJDBCResultSet(PLJJDBCConnection conn, String cursorName) {
+	protected PLJJDBCResultSet(PLJJDBCConnection conn, String cursorName) throws SQLException {
 		super();
 		this.conn = conn;
 		this.cursorName = cursorName;
+		this.fetchSize = conn.getIntFromConf("defaultFetchSize");
 	}
 
 	/* (non-Javadoc)
