@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 
 <project default="multiproject:artifact"
-	xmlns:maven="jelly:maven" >
+	xmlns:maven="jelly:maven"
+	xmlns:j="jelly:core">
 
 	<preGoal name="multiproject:artifact">
 		<attainGoal name="jar:install"/>
@@ -23,4 +24,34 @@
 		<!-- attainGoal name=""/ -->
 	</postGoal>
 	
+	<goal name="merlin-2-loom">
+		${systemScope.setProperty('javax.xml.transform.TransformerFactory','org.apache.xalan.processor.TransformerFactoryImpl')} 
+		<style 
+			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
+			out="${maven.build.dest}/assembly.xml" 
+			style="${basedir}/etc/loom/assembly.xslt" 
+			processor="trax"
+			force="true"/>
+		<style 
+			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
+			out="${maven.build.dest}/config.xml" 
+			style="${basedir}/etc/loom/config.xslt" 
+			processor="trax"
+			force="true"/>
+		<style 
+			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
+			out="${maven.build.dest}/include-classes.xml"
+			style="${basedir}/etc/loom/include-classes.xslt" 
+			processor="trax"
+			force="true"/>
+	</goal>
+
+	<preGoal name="loom:sar">
+		<attainGoal name="merlin-2-loom"/>
+		<!--
+			Now do something to REALLY load and RESOLVE the properties
+			from the generated file.
+			-->
+	</preGoal>
+
 </project>
