@@ -210,11 +210,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			}
 			exec.setPlanid(plan);
 			exec.setParams(flds);
-			conn.communicationChanell.sendToRDBMS(exec);
+			conn.doSendMessage(exec);
 		} catch (MappingException e) {
-			e.printStackTrace();
-			throw new SQLException(e.getMessage());
-		} catch (CommunicationException e) {
 			e.printStackTrace();
 			throw new SQLException(e.getMessage());
 		}
