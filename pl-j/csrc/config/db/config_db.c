@@ -1,6 +1,7 @@
 
 #include "module_config.h"
 #include "executor/spi.h"
+#include "utils/elog.h"
 
 const char* get_sql = 
 	"SELECT config_value FROM SQLJ.plj_config where config_key='%s'";
@@ -13,9 +14,9 @@ char* plj_get_configvalue_string(const char* paramName) {
 	//no SPI_connect, we are already connected.
 
 	sql = SPI_palloc(strlen(paramName) + strlen(get_sql) );
-	
-	sprintf(sql,get_sql, paramName);
 
+	sprintf(sql,get_sql, paramName);
+	
 	ret = SPI_exec(sql,1);
 	proc = SPI_processed;
 	if( ret == SPI_OK_SELECT && proc > 0){
@@ -24,6 +25,7 @@ char* plj_get_configvalue_string(const char* paramName) {
 		return SPI_getvalue(tuptable->vals[0], tupdesc, 1);
 	}
 
+	elog(WARNING,"config value not set");
 	return "";
 }
 
