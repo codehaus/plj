@@ -91,10 +91,10 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 #elif POSTGRES_VERSION == 80
 
 	func_src = DatumGetCString(DirectFunctionCall1(textout,
-												   SysCacheGetAttr(PROCOID,
-																   proctup,
-																   Anum_pg_proc_prosrc,
-																   &isnull)));
+							   SysCacheGetAttr(PROCOID,
+								   proctup,
+								   Anum_pg_proc_prosrc,
+								   &isnull)));
 
 
 #else
