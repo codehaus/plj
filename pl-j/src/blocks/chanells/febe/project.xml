@@ -2,7 +2,8 @@
 <project>
 
   <pomVersion>3</pomVersion>
-  <id>pl-j-febe</id>
+  <groupId>pl-j</groupId>
+  <artifactId>pl-j-febe</artifactId>
   <name>pl-j-febe</name>
   <currentVersion>0.0.1</currentVersion>
 
