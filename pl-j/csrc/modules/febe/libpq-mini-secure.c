@@ -119,11 +119,6 @@
 #endif
 #include <sys/stat.h>
 
-#ifdef USE_SSL
-#include <openssl/ssl.h>
-#include <openssl/dh.h>
-#endif   /* USE_SSL */
-
 #include <signal.h>
 
 /*pqsigfunc
