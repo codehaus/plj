@@ -437,7 +437,48 @@ sql_msg_prepapre febe_receive_sql_prepare(void){
 	return ret;
 }
 
+sql_pexecute febe_receive_sql_pexec(void){
+	sql_pexecute ret;
+	int i;
 
+	pljelog(DEBUG1,"febe_receive_sql_pexec");
+	ret = SPI_palloc(sizeof(struct str_sql_pexecute));
+	ret -> length = sizeof(struct str_sql_pexecute);
+	ret -> msgtype = MT_SQL;
+	ret -> sqltype = SQL_TYPE_PEXECUTE;
+	ret -> planid = febe_receive_integer_4();
+	ret -> action = febe_receive_integer_4();
+	ret -> nparams = febe_receive_integer_4();
+
+	if(ret -> nparams == 0){
+		ret -> params = NULL;
+	} else {
+		ret -> params = SPI_palloc( ret -> nparams * sizeof(struct fnc_param));
+	}
+	
+	for(i = 0; i < ret -> nparams; i++) {
+		char isnull;
+		pqGetc(&isnull, min_conn);
+		if(isnull == 'N') {
+			ret -> params[i].data.isnull = 1;
+			ret -> params[i].data.length = 0;
+		} else {
+			ret -> params[i].type = "-d-";
+			ret -> params[i].data.isnull = 0;
+			ret -> params[i].type = febe_receive_string();
+			ret -> params[i].data.length = febe_receive_integer_4();
+			ret -> params[i].data.data = 
+				ret -> params[i].data.length == 0 ?
+					NULL : SPI_palloc(ret -> params[i].data.length);
+			pqGetnchar(ret -> params[i].data.data, ret -> params[i].data.length, min_conn);
+		}
+	}
+	pljelog(DEBUG1,"febe_receive_sql_pexec end");
+	for(i = 0; i < ret -> nparams; i++) {
+		pljelog(DEBUG1, "[%d] type: %d", i, ret -> params[i].type);
+	}
+	return ret;
+}
 
 sql_msg
 febe_receive_sql(void)
@@ -451,6 +492,13 @@ febe_receive_sql(void)
 			return (sql_msg) febe_receive_sql_statement();
 		case SQL_TYPE_PREPARE:
 			return (sql_msg) febe_receive_sql_prepare();
+		case SQL_TYPE_PEXECUTE:{
+			sql_msg msg;
+			pljelog(DEBUG1, "====");
+			msg = (sql_msg) febe_receive_sql_pexec();
+			pljelog(DEBUG1, "====");
+			return msg;
+			}
 		default:
 			pljlogging_error = 1;
 			elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);
@@ -498,8 +546,13 @@ plpgj_channel_receive(void)
 			return (message) febe_receive_log();
 		case 'U':
 			return (message) febe_receive_tupres();
-		case 'S':
-			return (message) febe_receive_sql();
+		case 'S':{
+			message msg;
+			pljelog(DEBUG1, "-----");
+			msg = (message) febe_receive_sql();
+			pljelog(DEBUG1, "-----");
+			return msg;
+			}
 		default:
 			pljlogging_error = 1;
 			elog(ERROR, "message type unknown :%d", type);

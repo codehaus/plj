@@ -12,6 +12,7 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
 import org.pgj.messages.SQL;
+import org.pgj.messages.SQLExecute;
 import org.pgj.messages.SQLPrepare;
 import org.pgj.messages.SimpleSQL;
 import org.pgj.typemapping.MappingException;
@@ -41,6 +42,7 @@ public class SQLMessageFactory implements MessageFactory {
 		this.logger = logger;
 		map.put(SimpleSQL.class.getName(), new SimpleSQLMessageFactory());
 		map.put(SQLPrepare.class.getName(), new PrepareMessageFactory());
+		map.put(SQLExecute.class.getName(), new PExecMessageFactory());
 	}
 
 	/* (non-Javadoc)
