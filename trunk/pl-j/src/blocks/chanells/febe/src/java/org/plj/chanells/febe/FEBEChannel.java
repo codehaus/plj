@@ -27,6 +27,7 @@ import org.pgj.CommunicationException;
 import org.pgj.messages.Log;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
+import org.pgj.messages.TupleResult;
 import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.TypeMapper;
 import org.plj.chanells.febe.core.Encoding;
@@ -37,6 +38,7 @@ import org.plj.chanells.febe.msg.LogMessageFactory;
 import org.plj.chanells.febe.msg.MessageFactory;
 import org.plj.chanells.febe.msg.ResultMessageFactory;
 import org.plj.chanells.febe.msg.TriggerCallRequestMessageFactory;
+import org.plj.chanells.febe.msg.TupleResultMessageFactory;
 
 /**
  * A chanell built on FE/BE protocoll basing on the PostgreSQL JDBC team`s
@@ -163,6 +165,8 @@ public class FEBEChannel
 					type = new Character('R');
 				} else if (msg instanceof Log) {
 					type = new Character('L');
+				} else if (msg instanceof TupleResult) {
+					type = new Character('U');
 				}
 				if (type == null)
 					throw new CommunicationException(
@@ -225,6 +229,9 @@ public class FEBEChannel
 						new Character(
 								(char) TriggerCallRequestMessageFactory.MESSAGE_HEADER_TRIGGER),
 						new TriggerCallRequestMessageFactory(logger, typeMapper));
+		messageFactoryMap.put(new Character(
+				(char) TupleResultMessageFactory.MESSAGE_HEADER_TUPLERESULT),
+				new TupleResultMessageFactory());
 	}
 	private ServerSocketFactory serverSocketFactory;
 
