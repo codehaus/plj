@@ -11,7 +11,7 @@ import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.CommunicationException;
 import org.pgj.messages.Log;
-import org.pgj.tools.channelutil.ClientUtils;
+import org.pgj.tools.utils.ClientUtils;
 
 
 /**
