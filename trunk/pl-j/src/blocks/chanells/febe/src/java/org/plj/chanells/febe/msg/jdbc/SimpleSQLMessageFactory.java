@@ -18,7 +18,7 @@ import org.plj.chanells.febe.msg.MessageFactory;
  * Sends SQL messages to the RDBMS.
  * @author Laszlo Hornyak
  */
-class SimpleSQLMessageFactory implements MessageFactory {
+class SimpleSQLMessageFactory extends AbstractSQLMessageFactory {
 
 	public static final int MESSAGE_SQLHEADER_SIMPLE = 'S';
 
@@ -69,6 +69,13 @@ class SimpleSQLMessageFactory implements MessageFactory {
 	public String getHandledClassname() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.plj.chanells.febe.msg.jdbc.AbstractSQLMessageFactory#getSQLType()
+	 */
+	public int getSQLType() {
+		return SQLTYPE_STATEMENT;
 	}
 
 }

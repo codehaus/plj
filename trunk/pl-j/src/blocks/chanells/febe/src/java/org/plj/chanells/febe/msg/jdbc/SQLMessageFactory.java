@@ -7,8 +7,8 @@ package org.plj.chanells.febe.msg.jdbc;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import org.apache.avalon.framework.logger.Logger;
 import org.pgj.CommunicationException;
 import org.pgj.messages.Message;
 import org.pgj.messages.SQL;
@@ -30,7 +30,7 @@ public class SQLMessageFactory implements MessageFactory {
 	public static final int MESSAGE_HEADER_SQL = 'S';
 	private final Map map = new HashMap();
 
-	Logger logger = null;
+	private Logger logger = null;
 
 	/**
 	 * 
@@ -63,13 +63,12 @@ public class SQLMessageFactory implements MessageFactory {
 	public void sendMessage(Message msg, PGStream stream) throws IOException,
 			MappingException, CommunicationException{
 		SQL sql = (SQL) msg;
-		stream.SendChar(MESSAGE_HEADER_SQL);
 		String clname = msg.getClass().getName();
 		AbstractSQLMessageFactory msgf = (AbstractSQLMessageFactory) map.get(clname);
 		if(msgf == null){
 			throw new CommunicationException("sender method not implemented for "+clname);
 		}
-		stream.SendIntegerR(msgf.getSQLType(), 4);
+		stream.SendInteger(msgf.getSQLType(), 4);
 		msgf.sendMessage(msg, stream);
 	}
 
