@@ -13,7 +13,7 @@ import java.util.Set;
  * 
  * @author Laszlo Hornyak
  */
-public class PostgreSQLPLJ implements DbPlatform {
+public class PostgreSQLPLJ extends GenericDbPlatform {
 
 	public String createUdf(String clazz, String method, Set properties,
 			String comment, String udfName, String returns, List params) {
@@ -32,14 +32,15 @@ public class PostgreSQLPLJ implements DbPlatform {
 				first = false;
 			
 			buf.append(p.getName());
+//			buf.append(" ");
+//			switch(p.getMode()){
+//				case Parameter.mode_in:
+//					buf.append("in");
+//					break;
+//				default:
+//					//TODO throw exception here!
+//			}
 			buf.append(" ");
-			switch(p.getMode()){
-				case Parameter.mode_in:
-					buf.append("in");
-					break;
-				default:
-					//TODO throw exception here!
-			}
 			buf.append(p.getRdbmsType());
 			buf.append(" ");
 		}
@@ -53,21 +54,21 @@ public class PostgreSQLPLJ implements DbPlatform {
 		buf.append("\'\n");
 		buf.append(" LANGUAGE \'plj\' ");
 
-		buf.append(";");
+		buf.append(";\n\n");
 		return buf.toString();
 	}
 
 	public String deployJar(String jar, String jarname) {
 		StringBuffer buf = new StringBuffer("SELECT sqlj.deploy_jar(\'");
 		buf.append(jarname);
-		buf.append("\');\n");
+		buf.append("\');\n\n");
 		return buf.toString();
 	}
 
 	public String undeployJar(String jarname) {
 		StringBuffer buf = new StringBuffer("SELECT sqlj.remove_jar(\'");
 		buf.append(jarname);
-		buf.append("\');\n");
+		buf.append("\');\n\n");
 		return buf.toString();
 	}
 
@@ -75,6 +76,9 @@ public class PostgreSQLPLJ implements DbPlatform {
 	 * @see org.plj.devtools.base.DbPlatform#comment(java.lang.String)
 	 */
 	public String comment(String comment) {
-		return "--" + comment.replaceAll("\n", "\n--");
+		if(comment != null)
+			return "--" + comment.replaceAll("\n", "\n--") + "\n\n";
+		return "-- not documented\n\n";
 	}
+
 }
