@@ -9,16 +9,16 @@
 		<p>
 		<ul>
 			<li>
-				The bad old native CORBA implementation is replaced with a protocol based on PostgreSQL`s
-				frontend-backend (febe) protocol. The new implementation is more easy to develop, it is faster
-				and more relyable.
+				The bad old native CORBA implementation has been replaced with a protocol based on PostgreSQL`s
+				frontend-backend (FE/BE) protocol. The new implementation is more easy to develop, it is faster
+				and more reliable.
 			</li>
 			<li>
 				Build: maven. The old ant build system was replaced with maven.
 			</li>
 			<li>
 				Default container system: Merlin instead of Phoenix. The Avalon team decided to stop the 
-				developement of Phoenix, and go on with merlin. Hopefully Merlin will be soon as fullfeatured as
+				developement of Phoenix, and go on with merlin. Hopefully Merlin will soon be as full-featured as
 				phoenix was.
 			</li>
 		</ul>

@@ -7,10 +7,10 @@
 	<body>
 		<section name="Performance">
 			<p>
-			If you disable all loging both C and server side, the performance
+			If you disable all logging both C and server side, the performance
 			may increase significantly. A normal query with one java function call
 			may provide 33-50% of the speed of a native function call (kernel 2.4 with NPTL).
-			The overhead is becouse of TCP sockets and process change.
+			The overhead is because of TCP sockets and process change.
 			</p>
 		</section>
 	</body>

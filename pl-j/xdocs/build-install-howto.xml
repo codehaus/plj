@@ -8,16 +8,16 @@
 			<section name="Background">
 				<p>
 					To understand the way PL-J must be installed to
-					PostgreSQL, please read the section V and the
+					PostgreSQL, please read section V and the
 					documentation of SQL command CREATE LANG in
 					PostgreSQL documentation.
 				</p>
 			</section>
 			<section name="requirements">
 			<p>
-			You will need the following softwares installed:
+			You will need the following software installed:
 			</p>
-			<subsection name="softwares">
+			<subsection name="software">
 				<p>
 				<table>
 					<tr>
@@ -42,7 +42,7 @@
 						<td>PostgreSQL 7.4.x source code</td>
 						<td>NO</td>
 						<td>http://www.posgresql.org/</td>
-						<td>To build th postgresql method call handler.</td>
+						<td>To build the postgresql method call handler.</td>
 					</tr>
 					<tr>
 						<td>Java sdk 1.4</td>

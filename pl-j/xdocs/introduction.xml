@@ -63,13 +63,13 @@
 			</subsection>
 			<subsection name="C - FEBE channel">
 				<p>
-				The FEBE channel is built from the PostgreSQL groups frontend/backend protocol.
+				The FE/BE channel is built from the PostgreSQL groups frontend/backend protocol.
 				It contains a modified version of libpq.
 				</p>
 			</subsection>
 			<subsection name="C - table based configuration implementation">
 				<p>
-				The default (and by now the only one) implementation of the C side configuration
+				The default (and now the only) implementation of the C side configuration
 				api. It uses a table called 'sqlj.plj_config' to read configuration settings.
 				</p>
 			</subsection>
