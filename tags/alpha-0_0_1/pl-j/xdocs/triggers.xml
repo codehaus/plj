@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Trigger support in PL-J</title>
+		<author email="kocka at forgeahead dot hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+		<section name="Triggers">
+			<p>Yes, PL-J will soon have support for triggers written entirely 
+			in java (or other procedural languages, of course).
+			</p>
+			<p>
+			Unfortunately, triggers has no standardized API, not even java
+			triggers, so we are trying to provide all the available solutions
+			as API:
+			<ul>
+				<li>
+				PL/Java for PostgreSQL trigger API from Thomas Hallgren.
+				</li>
+				<li>
+				Object or Map based api with typemappers. (PL-J`s prefered solution)
+				</li>
+			</ul>
+			Most databases don`t support triggers written in java, you need to write
+			a java UDF, and a traditional trigger calling the java UDF.
+			</p>
+		</section>
+	</body>
+</document>
+

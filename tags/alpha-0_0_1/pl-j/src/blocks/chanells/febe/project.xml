@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+
+  <pomVersion>3</pomVersion>
+  <groupId>pl-j</groupId>
+  <artifactId>pl-j-febe</artifactId>
+  <name>pl-j-febe</name>
+  <currentVersion>0.0.1</currentVersion>
+
+  <!-- extend>${basedir}/../../../../project.xml</extend -->
+
+  <inceptionYear>2003</inceptionYear>
+  <logo>http://forgeahead.hu/images/plpgj-logo.png</logo>
+
+  <description>
+  The current channel built on TCP/IP sockets and the PostgreSQL group`s 
+  frontend-backend (shortly fe/be) protocol.
+  </description>
+  <shortDescription>Simple and quick channel implementation.</shortDescription>
+
+	<dependencies>
+		<dependency>
+		<id>ant</id>
+		<type>jar</type>
+		<artifactId>ant</artifactId>
+		<version>1.6</version>
+		</dependency>
+
+		<dependency>
+		<id>avalon-framework</id>
+		<type>jar</type>
+		<artifactId>avalon-framework</artifactId>
+		<version>4.1.5</version>
+		</dependency>
+
+		<dependency>
+		<id>cornerstone-sockets</id>
+		<type>jar</type>
+		<artifactId>cornerstone-sockets-api</artifactId>
+		<version>1.0</version>
+		</dependency>
+
+		<dependency>
+		<id>cornerstone-sockets</id>
+		<type>jar</type>
+		<artifactId>cornerstone-sockets-impl</artifactId>
+		<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+			<id>pl-j</id>
+			<type>jar</type>
+			<artifactId>pl-j-api</artifactId>
+			<version>0.0.1</version>
+			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+		<sourceDirectory>src/java</sourceDirectory>
+	</build>
+	
+	<reports>
+		<report>maven-faq-plugin</report>
+	</reports>
+	
+</project>

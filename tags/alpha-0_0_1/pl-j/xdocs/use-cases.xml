@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Some area where one may need </title>
+		<author email="kocka at forgeahead dot hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+		<section name="Advanced logic">
+			<p>
+			You can use stored procedures to implement advanced logic on the
+			database level, which can be very usefull in two tier systems.
+			</p>
+			<p>
+			Modern 3 and N tier systems can benefit from stored procedures by
+			reducing the number of database interactions. This saves time
+			and resources both on application and database server side.
+			</p>
+		</section>
+		<section name="More advanced logic">
+			<p>
+			There is a number of tasks a good stored procedure system can 
+			fullfill (a few idea):
+				<ul>
+					<li>Implementing database-independent database links. 
+					Integration with message queues.
+					This could only work after we could externalize the 
+					database`s transactional context to the stored procedure 
+					system.
+					</li>
+					<li>
+					We also have an idea to build a completely new and flexible
+					stored procedure system using drools, groovy, and BSF. PostgreSQL`s
+					class (as table) inheritance option may have also benefits
+					for java stored procedure programmers.
+					</li>
+				</ul>
+			</p>
+		</section>
+		<section name="What a stored procedure should not do">
+			<p>
+				A stored procedure should not:
+				<ul>
+					<li>Access non-transactional things like filesystems.</li>
+					<li>Open a new database session to current database, it is deadlock-prone.</li>
+					<li>Perform (or try to perform) transaction operations (commit, rollback, begin)</li>
+				</ul>
+			</p>
+		</section>
+	</body>
+</document>
+

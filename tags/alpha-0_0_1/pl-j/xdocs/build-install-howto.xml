@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<document>
+	<properties>
+		<title>Build and install howto</title>
+		<author email="kocka at forgeahead.hu">Laszlo Hornyak</author>
+	</properties>
+	<body>
+			<section name="Background">
+				<p>
+					To understand the way PL-J must be installed to
+					PostgreSQL, please read the section V and the
+					documentation of SQL command CREATE LANG in
+					PostgreSQL documentation.
+				</p>
+			</section>
+			<section name="requirements">
+			<p>
+			You will need the following softwares installed:
+			</p>
+			<subsection name="softwares">
+				<p>
+				<table>
+					<tr>
+						<th><p>software name</p></th>
+						<th><p>optional</p></th>
+						<th><p>URL</p></th>
+						<th><p>reason</p></th>
+					</tr>
+					<tr>
+						<td><p>maven</p></td>
+						<td><p>Yes, you can use ant if you want instead, if you generate ant build file with maven. So NO, you need maven.</p></td>
+						<td><p>http://maven.apache.org/</p></td>
+						<td><p>Build.</p></td>
+					</tr>
+					<tr>
+						<td>jakarta-ant</td>
+						<td>Yes, you can use maven instead.</td>
+						<td>http://ant.apache.org/</td>
+						<td>Build.</td>
+					</tr>
+					<tr>
+						<td>PostgreSQL 7.4.x source code</td>
+						<td>NO</td>
+						<td>http://www.posgresql.org/</td>
+						<td>To build th postgresql method call handler.</td>
+					</tr>
+					<tr>
+						<td>Java sdk 1.4</td>
+						<td>NO</td>
+						<td>http://java.sun.com/, http://www.ibm.com/</td>
+						<td>To compile java code</td>
+					</tr>
+				</table>
+				</p>
+			</subsection>
+			<subsection name="Java">
+				<p>
+				Java code is built by <a href="http://maven.apache.org/">maven</a>.
+				To build the java code with maven, you can use the 'maven build' command.
+				</p>
+				<p>
+				To run the java code, you need to install the generated jar files to the merlin repository.
+				This must be somewhere ~/.merlin/system/ . You can use the merlin deployment descriptor found in
+				etc/merlin to run PL-J, or you can write your own version, optionaly with new blocks.
+				</p>
+				<p>
+				By default the java process will start a FEBE channel, which will listen on port 1984.
+				Remember applying the same settings on the C side.
+				</p>
+			</subsection>
+			<subsection name="C">
+				<p>
+				To build the C code, run configure with the proper values. 
+				See configure --help for help.
+				</p>
+				<p>
+				You will find the scripts needed to install the language handler module in
+				etc/install. By default, the C side is built with a configuration module that reads 
+				settings from the table 'sqlj.plj_config'. To configure FEBE channel`s C side, run the SQL
+				script etc/install/plj_config.sql.
+				</p>
+			</subsection>
+			</section>
+	</body>
+</document>
+

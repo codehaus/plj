@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Scarab"
+        href="http://plj.codehaus.org/">
+
+  <title>PL-J</title>
+
+  <body>
+
+    <menu name="General Information">
+      <item name="Introduction"              href="introduction.html"/>
+      <item name="Build, and install howto"   href="build-install-howto.html"/>
+    </menu>
+
+    <menu name="Subprojects">
+      <item name="pl-j-febe"               href="/multiproject/pl-j-febe"/>
+      <item name="pl-j-postgres"           href="/multiproject/pl-j-postgres"/>
+      <item name="pl-j-javaexecutor"       href="/multiproject/pl-j-javaexecutor"/>
+      <item name="pl-j-glue"               href="/multiproject/pl-j-glue"/>
+      <item name="pl-j-tools"              href="/multiproject/pl-j-tools"/>
+    </menu>
+
+    <menu name="Documentation">
+      <item name="Current changes"				href="/current-changes.html"/>
+      <item name="JDBC"               			href="/jdbc.html"/>
+      <item name="Trigger support"				href="/triggers.html"/>
+      <item name="Use cases of stored procedures"   href="use-cases.html"/>
+      <item name="Performance"   href="performance.html"/>
+    </menu>
+
+    <links>
+      <item name="PostgreSQL ORDBMS"           href="http://www.postgresql.org/"/>
+      <item name="Codehaus"           href="http://www.codehaus.org/"/>
+    </links>
+
+  </body>
+</project>
