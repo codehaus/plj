@@ -16,7 +16,6 @@ public class MappingException extends Exception {
 	 */
 	public MappingException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -25,7 +24,6 @@ public class MappingException extends Exception {
 	 */
 	public MappingException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MappingException(String msg) {

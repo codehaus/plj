@@ -42,7 +42,7 @@ public class PostgresTypeMapper
 
 	/** Map classnames into rdbms types. */
 	private HashMap typeBackMap = new HashMap();
-	
+
 	/** Avalon logger */
 	private Logger logger = null;
 
@@ -272,9 +272,9 @@ public class PostgresTypeMapper
 	 * @see org.pgj.typemapping.TypeMapper#getRDBMSTypeFor(java.lang.Class)
 	 */
 	public String getRDBMSTypeFor(Class cl) throws MappingException {
-		String typ = (String)typeBackMap.get(cl.getName());
-		if(typ == null)
-			throw new MappingException("no backmapping for"+cl);
+		String typ = (String) typeBackMap.get(cl.getName());
+		if (typ == null)
+			throw new MappingException("no backmapping for" + cl);
 		return typ;
 	}
 }
