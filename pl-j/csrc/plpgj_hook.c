@@ -16,6 +16,7 @@
 #include "nodes/makefuncs.h"
 #include "parser/parse_type.h"
 #include "module_config.h"
+#include "commands/trigger.h"
 
 //
 //proto
