@@ -75,6 +75,7 @@ public class ReflectedTupleMapper
 			while (it.hasNext()) {
 				String fldName = (String) it.next();
 				org.pgj.typemapping.Field fld = (Field) fldMap.get(fldName);
+				//TODO: this shouldn`t work only with defaultget
 				BeanUtils.setProperty(obj, fldName, fld.defaultGet());
 			}
 			return obj;
