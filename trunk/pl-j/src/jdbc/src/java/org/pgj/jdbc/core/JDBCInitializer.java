@@ -16,6 +16,7 @@ import org.apache.avalon.framework.logger.Logger;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
+import org.pgj.jdbc.scratch.PlanPool;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.jdbc.JDBCConfigurator;
 
@@ -81,6 +82,7 @@ public class JDBCInitializer implements Configurable, LogEnabled,
 	 * @see org.pgj.tools.jdbc.JDBCConfigurator#getJDBCConfiguration()
 	 */
 	public Configuration getJDBCConfiguration() {
+		PlanPool.getPlanPool();
 		return conf;
 	}
 
