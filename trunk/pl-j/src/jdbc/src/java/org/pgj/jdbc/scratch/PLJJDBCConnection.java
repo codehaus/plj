@@ -322,7 +322,7 @@ public class PLJJDBCConnection implements Connection {
 		PLJJDBCStatement sta = new PLJJDBCStatement(client, this);
 		log.error("not implemented");
 		checkClosed();
-		return null;
+		return sta;
 	}
 
 	/*

@@ -11,7 +11,6 @@ import org.pgj.messages.SimpleSQL;
 import org.pgj.typemapping.MappingException;
 import org.plj.chanells.febe.core.Encoding;
 import org.plj.chanells.febe.core.PGStream;
-import org.plj.chanells.febe.msg.MessageFactory;
 
 
 /**

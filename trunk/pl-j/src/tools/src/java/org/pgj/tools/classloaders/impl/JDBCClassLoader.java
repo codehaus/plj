@@ -51,7 +51,7 @@ public class JDBCClassLoader extends ClassLoader
 	/**
 	 * @see PLJClassLoader#load(String)
 	 */
-	public Class load(String fqn) throws ClassNotFoundException {
+	public Class load(String fqn) throws ClassNotFoundException, ClassStoreException {
 
 		try {
 			return this.getClass().getClassLoader().loadClass(fqn);
@@ -306,6 +306,15 @@ public class JDBCClassLoader extends ClassLoader
 			} catch (SQLException e1) {
 				logger.error("", e1);
 			}
+		}
+	}
+
+	public Class loadClass(String name) throws ClassNotFoundException {
+		try {
+			return load(name);
+		} catch (ClassStoreException e) {
+			logger.error("Class store exception", e);
+			throw new ClassNotFoundException("Class store error", e);
 		}
 	}
 

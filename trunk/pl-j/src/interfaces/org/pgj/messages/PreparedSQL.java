@@ -5,7 +5,6 @@
 package org.pgj.messages;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Executes a prepared SQL statement with a given data.

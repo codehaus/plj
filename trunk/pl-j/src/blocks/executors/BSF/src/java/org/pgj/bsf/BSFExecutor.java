@@ -1,6 +1,7 @@
 /*
  * Created on Oct 13, 2004
  */
+
 package org.pgj.bsf;
 
 import java.io.File;
@@ -20,6 +21,7 @@ import org.pgj.Executor;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Error;
 import org.pgj.messages.Message;
+import org.pgj.tools.classloaders.PGJClassLoaderAdapter;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.typemapping.MappingException;
 
@@ -29,7 +31,12 @@ import org.pgj.typemapping.MappingException;
  * 
  * @author Laszlo Hornyak
  */
-public class BSFExecutor implements Executor, Configurable, Serviceable, Initializable{
+public class BSFExecutor
+		implements
+			Executor,
+			Configurable,
+			Serviceable,
+			Initializable {
 
 	HashMap managerMap = new HashMap();
 	ScriptRepository loader = null;
@@ -41,13 +48,14 @@ public class BSFExecutor implements Executor, Configurable, Serviceable, Initial
 	 */
 	public Message execute(CallRequest call) {
 		// TODO Auto-generated method stub
-		
+
 		Message result = null;
 		try {
 			Client cli = call.getClient();
-			BSFManager manager = (BSFManager)managerMap.get(cli);
+			BSFManager manager = (BSFManager) managerMap.get(cli);
 			Script script = loader.loadScript(call.getMethodname());
-			Object ret = manager.eval(script.getLanguage(), script.getSource(), 0, 0, null);
+			Object ret = manager.eval(script.getLanguage(), script.getSource(),
+					0, 0, null);
 			cli.getTypeMapper().backMap(ret);
 		} catch (ScriptNotFoundException e) {
 			result = throwableToErrorMsg(e);
@@ -56,21 +64,23 @@ public class BSFExecutor implements Executor, Configurable, Serviceable, Initial
 		} catch (MappingException e) {
 			result = throwableToErrorMsg(e);
 		}
-		
+
 		return result;
 	}
 
-	private Error throwableToErrorMsg(Throwable t){
+	private Error throwableToErrorMsg(Throwable t) {
 		Error error = new Error();
 		error.setMessage(t.getClass().getName() + " " + t.getMessage());
 		return error;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.pgj.Executor#initClientSession(org.pgj.Client)
 	 */
 	public void initClientSession(Client sessionClient) {
-		managerMap.put(sessionClient, new BSFManager());
+		BSFManager manager = new BSFManager();
+		manager.setClassLoader(new PGJClassLoaderAdapter(classLoader));
+		managerMap.put(sessionClient, manager);
 	}
 
 	/* (non-Javadoc)
@@ -85,14 +95,20 @@ public class BSFExecutor implements Executor, Configurable, Serviceable, Initial
 	 */
 	public void configure(Configuration arg0) throws ConfigurationException {
 		tempDir = arg0.getChild("tempDir").getValue();
+		Configuration[] seConfs = arg0.getChildren("installEngine");
+		for (int i = 0; i < seConfs.length; i++) {
+			BSFManager.registerScriptingEngine(seConfs[i].getChild("name")
+					.getValue(), seConfs[i].getChild("class").getValue(),
+					new String[]{});
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
-		loader = (ScriptRepository)arg0.lookup("scriptloader");
-		classLoader = (PLJClassLoader)arg0.lookup("classloader");
+		loader = (ScriptRepository) arg0.lookup("scriptloader");
+		classLoader = (PLJClassLoader) arg0.lookup("classloader");
 	}
 
 	/* (non-Javadoc)

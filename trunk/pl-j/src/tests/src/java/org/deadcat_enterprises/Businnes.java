@@ -114,7 +114,7 @@ public class Businnes {
 					logcat.warn("ooops", e);
 				}
 			}
-		};
+		}
 		LogThread[] logthreads = new LogThread[100];
 		for (int i = 0; i < 100; i++) {
 			logthreads[i] = new LogThread();
