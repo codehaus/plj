@@ -25,7 +25,7 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 		Startable {
 
 	/** the chanell we are dealing with */
-	private Channel chanell;
+	private Channel channel;
 
 	/** The executor object */
 	private Executor executor = null;
@@ -50,13 +50,15 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 	 */
 	public void execute() {
 
-		executor.initClientSession(client);
+		ChannelWrapper channelWrapper = new ChannelWrapper(logger, channel, executor);
+		ClientWrapper clientWrapper = new ClientWrapper(channelWrapper, client);
+		executor.initClientSession(clientWrapper);
 
 		try {
 			while (true) {
 
 				try {
-					Message msg = chanell.receiveFromRDBMS(client);
+					Message msg = channel.receiveFromRDBMS(client);
 					logger.debug("message in the glue");
 
 					Message ans = null;
@@ -77,7 +79,7 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 					if ((ans instanceof Result)
 							|| (ans instanceof org.pgj.messages.Error)
 							|| (ans instanceof TupleResult)) {
-						chanell.sendToRDBMS(ans);
+						channel.sendToRDBMS(ans);
 					} else {
 						logger
 								.fatalError("Result should be Exception, Result or TupleResult");
@@ -89,12 +91,12 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 		} catch (Throwable e) {
 			logger.error("problem:", e);
 		} finally {
-			executor.destroyClientSession(client);
+			executor.destroyClientSession(clientWrapper);
 
 			//cleanup, let gc do its work.
 			client = null;
 			executor = null;
-			chanell = null;
+			channel = null;
 		}
 	}
 
@@ -145,7 +147,7 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 	 *            The chanell to set
 	 */
 	public void setChanell(Channel chanell) {
-		this.chanell = chanell;
+		this.channel = chanell;
 	}
 
 	/**

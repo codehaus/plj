@@ -1,4 +1,3 @@
-
 package org.pgj.glue;
 
 import org.apache.avalon.excalibur.pool.DefaultPool;
@@ -16,37 +15,47 @@ import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.pgj.Channel;
+import org.pgj.Client;
+import org.pgj.CommunicationException;
+import org.pgj.ExecutionCancelException;
 import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
+import org.pgj.messages.CallRequest;
+import org.pgj.messages.Message;
+import org.pgj.messages.TriggerCallRequest;
 
 /**
- * Glue is the glue component, containing worker threads. 
+ * Glue is the glue component, containing worker threads.
+ * 
  * @avalon.component name="glue" lifestyle="singleton"
  */
-public class Glue
-		implements
-			Configurable,
-			Initializable,
-			Serviceable,
-			Startable,
-			LogEnabled {
+public class Glue implements Configurable, Initializable, Serviceable,
+		Startable, LogEnabled {
 
 	/** A Thread pool to enable pooling capabilities for workers. */
 	private ThreadPool threadPool = null;
+
 	/** the configured capacity of the Thread pool */
 	private int configThreadPoolCapacity = 10;
+
 	/** Workers are pooled here. */
 	private Pool workerPool = null;
+
 	/** Factory that creates workers */
 	private GlueWorkerFactory gwfactory = null;
+
 	/** flag to show if the component is terminating */
 	private boolean terminating = false;
+
 	/** The glue boss */
 	private GlueBoss gb;
+
 	/** The chanell we are dealing with */
 	private Channel chanell = null;
+
 	/** The executor we are dealing with */
 	private Executor executor = null;
+
 	/** The trigger executor, if it differs from the call executor */
 	private TriggerExecutor trigexecutor = null;
 
@@ -93,6 +102,7 @@ public class Glue
 			gb.notify();
 		}
 	}
+
 	//
 	//from LogEnabled
 	//
@@ -103,10 +113,11 @@ public class Glue
 	}
 
 	/**
-	 * @see Serviceable#service(ServiceManager) 
-	 * @avalon.dependency key="channel" type="org.pgj.Channel" 
+	 * @see Serviceable#service(ServiceManager)
+	 * @avalon.dependency key="channel" type="org.pgj.Channel"
 	 * @avalon.dependency key="executor" type="org.pgj.Executor"
-	 * @avalon.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor" optional="true"
+	 * @avalon.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor"
+	 *                    optional="true"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		chanell = (Channel) arg0.lookup("channel");
@@ -122,4 +133,5 @@ public class Glue
 		}
 		logger.debug("serviced");
 	}
+
 }
