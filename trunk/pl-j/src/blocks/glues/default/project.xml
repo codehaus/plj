@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+
+  <pomVersion>3</pomVersion>
+  <id>default-glue</id>
+  <name>default-glue</name>
+  
+  <extends>../../project.xml</extends>
+
+  <inceptionYear>2003</inceptionYear>
+
+  <description>Default glue.</description>
+  <shortDescription>Default GLUE component.</shortDescription>
+
+	<dependencies>
+		<dependency>
+			<id>ant</id>
+			<type>jar</type>
+			<artifactId>ant</artifactId>
+			<version>1.6</version>
+		</dependency>
+
+		<dependency>
+			<id>avalon-framework</id>
+			<type>jar</type>
+			<artifactId>avalon-framework</artifactId>
+			<version>4.1.5</version>
+		</dependency>
+
+		<dependency>
+			<id>excalibur-thread</id>
+			<type>jar</type>
+			<artifactId>excalibur-thread</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<id>excalibur-pool</id>
+			<type>jar</type>
+			<artifactId>excalibur-pool</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<id>excalibur</id>
+			<type>jar</type>
+			<artifactId>excalibur-threadcontext</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+	</build>
+
+</project>
