@@ -128,39 +128,137 @@ void plpgj_fill_callstruct(
 
 }
 
+pparam* plpgj_create_trigger_tuple(HeapTuple tuple, TupleDesc desc){
+	int i;
+
+	//I wonder if this protection is neccessary.
+	if(desc -> natts <= 0){
+		elog(WARNING, "tuple desc with zero attributes");
+		return NULL;
+	}
+
+	pparam* ret;
+	ret = SPI_palloc(desc -> natts * sizeof(pparam));
+	for(i = 0; i < desc -> natts; i++){
+		Datum binval;
+		Oid typeid;
+		bool isnull;
+		ret[i] = palloc( sizeof(struct fnc_param) );
+		elog(DEBUG1, "hello world :)");
+		elog(DEBUG1, "fname: %s", SPI_fname(desc, i+1) );
+		if(tuple != NULL){
+			binval = SPI_getbinval(tuple, desc, i+1, &isnull);
+			
+			ret[i] -> data.data = binval;
+			ret[i] -> data.isnull = isnull;
+			ret[i] -> data.length = datumGetSize(binval, 1, 0);
+			
+			ret[i] -> type = SPI_gettype(desc, i + 1);
+			elog(DEBUG1, "type: %s", ret[i] -> type);
+		} else {
+			elog(WARNING, "tupl is null");
+		}
+		elog(DEBUG1,"trace");
+		typeid = SPI_gettypeid(desc, i+1);
+		if(isnull){
+			elog(DEBUG1,"null");
+		} else {
+			elog(DEBUG1,"not null");
+		}
+		
+	}
+	return ret;
+}
+
+int plpgj_create_trigger_tuplekind(
+		trigger_callreq call,
+		TriggerData* tdata){
+
+	int i;
+	elog(DEBUG1, "plpgj_create_trigger_tuplekind");
+	if(tdata == NULL)
+		elog(ERROR, "tdata is null");
+	if(tdata -> tg_relation == NULL)
+		elog(ERROR, "tg_relation is null");
+	if(tdata -> tg_relation -> rd_att == NULL)
+		elog(ERROR, "rd_att is null");
+
+	call -> colcount = tdata -> tg_relation -> rd_att -> natts;
+	elog(DEBUG1, "call -> colcount = %d", call -> colcount);
+	call -> colnames = palloc(call -> colcount * sizeof(char*));
+	call -> coltypes = palloc(call -> colcount * sizeof(char*));
+	for(i = 0; i< call -> colcount; i++){
+		TupleDesc desc;
+		Form_pg_attribute attr;
+
+		desc = tdata -> tg_relation -> rd_att;
+		attr = desc -> attrs[i];
+		call -> colnames[i] = NameStr(attr -> attname);
+		call -> coltypes[i] = SPI_gettype(desc, i+1);
+	}
+	return 1;
+}
+
 trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS){
 	TriggerData* tdata;
 	trigger_callreq ret;
 	Form_pg_proc procStruct;
-
+	Oid relid;
 
 	ret = SPI_palloc(sizeof(str_msg_trigger_callreq));
 	ret -> msgtype = MT_TRIGREQ;
 	ret -> length = sizeof(str_msg_trigger_callreq);
 
 	tdata = (TriggerData*)fcinfo -> context;
-	if(TRIGGER_FIRED_AFTER(tdata)){
+	if(TRIGGER_FIRED_AFTER(tdata -> tg_event)){
 		ret -> actionorder = PLPGJ_TRIGGER_ACTIONORDER_AFTER;
 	} else {
 		ret -> actionorder = PLPGJ_TRIGGER_ACTIONORDER_BEFORE;
 	}
 
-	if(TRIGGER_FIRED_FOR_ROW(tdata)){
+	if(TRIGGER_FIRED_FOR_ROW(tdata -> tg_event)){
 		ret -> row = PLPGJ_TRIGGER_STARTED_FOR_ROW;
 	} else {
 		ret -> row = PLPGJ_TRIGGER_STARTED_FOR_STATEMENT;
 	}
 
-	if(TRIGGER_FIRED_BY_INSERT(tdata)){
+	//set relation name
+	ret -> tablename = SPI_getrelname ( tdata -> tg_relation );
+	elog(DEBUG1, "relation: %s", ret -> tablename);
+
+	if(tdata -> tg_trigtuple != NULL) {
+		plpgj_create_trigger_tuplekind(ret, tdata/* -> tg_trigtuple*/);
+	} else if (tdata -> tg_newtuple != NULL) {
+		plpgj_create_trigger_tuplekind(ret, tdata/* -> tg_newtuple*/);
+	}
+	
+	if(TRIGGER_FIRED_BY_INSERT(tdata -> tg_event)){
+		elog(DEBUG1, "insert trigger");
+		if(tdata -> tg_trigtuple == NULL){
+			elog(DEBUG1, "this is where trigtuple should not be null.");
+		} else {
+			elog(DEBUG1, "tg_trigtuple is not null!!");
+		}
 		ret -> reason = PLPGJ_TRIGGER_REASON_INSERT;
-	} else if (TRIGGER_FIRED_BY_UPDATE(tdata)){
+		ret -> _new = plpgj_create_trigger_tuple(
+			tdata -> tg_trigtuple,
+			tdata -> tg_relation -> rd_att);
+	} else if (TRIGGER_FIRED_BY_UPDATE(tdata -> tg_event)){
 		ret -> reason = PLPGJ_TRIGGER_REASON_UPDATE;
+		ret -> _old = plpgj_create_trigger_tuple(
+			tdata -> tg_trigtuple,
+			tdata -> tg_relation -> rd_att);
+		ret -> _new = plpgj_create_trigger_tuple(
+			tdata -> tg_newtuple,
+			tdata -> tg_relation -> rd_att);
+
 	} else {
 		ret -> reason = PLPGJ_TRIGGER_REASON_DELETE;
+		ret -> _old = plpgj_create_trigger_tuple(
+			tdata -> tg_trigtuple,
+			tdata -> tg_relation -> rd_att);
 	}
 
-	//get table name somehow...
-	ret -> tablename = "";
 
 	procStruct = glpgj_getproc(fcinfo);
 	plpgj_fill_callstruct(procStruct, ret -> classname, ret -> methodname);
