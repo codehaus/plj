@@ -1,7 +1,7 @@
 /**
  * file name:			plpgj_core.c
  * description:			PL/pgJ language handler module.
- * author:				Laszlo Hornyak
+ * author:			Laszlo Hornyak
  */
 
 #include "plpgj_channel.h"
