@@ -36,7 +36,11 @@
 
 //#include "postgres_fe.h"
 
+#ifndef LIBPQ_MIN_MISC_H
+#define LIBPQ_MIN_MISC_H
+
 #include "c.h"
+//#include "libpq-mini-secure.h"
 
 #include <errno.h>
 #include <signal.h>
@@ -1199,3 +1203,5 @@ libpq_gettext(const char *msgid)
 }
 
 #endif   /* ENABLE_NLS */
+
+#endif
