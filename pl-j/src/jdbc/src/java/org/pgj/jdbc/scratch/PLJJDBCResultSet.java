@@ -107,15 +107,15 @@ public class PLJJDBCResultSet implements ResultSet {
 				Field[] fld = new Field[colCnt];
 				for (int j = 0; j < colCnt; j++)
 					fld[j] = res.get(i, j);
-				int addto = this.rowsFrom + this.rows.size() + i;
+				int addto = this.rows.size();
+				//rows.set(addto, fld);
 				rows.add(addto, fld);
 			}
 
-		} else {
-			relRowIdx++;
 		}
-		fields = (Field[]) rows.get(rowsFrom - relRowIdx);
+		fields = (Field[]) rows.get(rowsFrom + relRowIdx);
 
+		relRowIdx++;
 		return fields != null;
 	}
 
