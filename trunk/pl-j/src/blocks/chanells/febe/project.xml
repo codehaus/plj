@@ -3,7 +3,7 @@
     <artifactId>pl-j-febe</artifactId>
     <name>pl-j-febe</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.4</currentVersion>
+    <currentVersion>0.0.5</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <description>
   The current channel built on TCP/IP sockets and the PostgreSQL group`s 
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5</version>
             <type>jar</type>
             <properties/>
         </dependency>

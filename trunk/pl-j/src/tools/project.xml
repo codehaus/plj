@@ -4,7 +4,7 @@
     <artifactId>pl-j-tools</artifactId>
     <name>pl-j-tools</name>
     <groupId>pl-j</groupId>
-    <currentVersion>0.0.4</currentVersion>
+    <currentVersion>0.0.5</currentVersion>
     <inceptionYear>2004</inceptionYear>
     <description>Tools and utilities for PL-J</description>
     <shortDescription>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>pl-j</groupId>
             <artifactId>pl-j-api</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5</version>
             <type>jar</type>
             <properties/>
         </dependency>
