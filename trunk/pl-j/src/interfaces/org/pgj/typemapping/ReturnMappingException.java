@@ -5,8 +5,9 @@ package org.pgj.typemapping;
 
 
 /**
- * @author Laszlo Hornyak
  * A Mapping Exception that is thrown when mapping the type back after a call.
+ * 
+ * @author Laszlo Hornyak
  */
 public class ReturnMappingException extends MappingException {
 
@@ -15,7 +16,6 @@ public class ReturnMappingException extends MappingException {
 	 */
 	public ReturnMappingException() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -23,7 +23,6 @@ public class ReturnMappingException extends MappingException {
 	 */
 	public ReturnMappingException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -32,7 +31,6 @@ public class ReturnMappingException extends MappingException {
 	 */
 	public ReturnMappingException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -40,7 +38,6 @@ public class ReturnMappingException extends MappingException {
 	 */
 	public ReturnMappingException(String msg) {
 		super(msg);
-		// TODO Auto-generated constructor stub
 	}
 
 }
