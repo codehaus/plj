@@ -399,6 +399,8 @@ pqCheckInBufferSpace(int bytes_needed, PGconn_min *conn)
 	int			newsize = conn->inBufSize;
 	char	   *newbuf;
 
+	elog(DEBUG1, "pqCheckInBufferSpace: needed %d now %d", bytes_needed, conn->inBufSize);
+
 	if (bytes_needed <= newsize)
 		return 0;
 
@@ -609,10 +611,12 @@ pqReadData(PGconn_min *conn)
 	}
 
 	/* Left-justify any data in the buffer to make room */
-	if (conn->inStart < conn->inEnd)
+	/*if (conn->inStart < conn->inEnd)
 	{
+		elog(WARNING," - ROOMMAKER -");
 		if (conn->inStart > 0)
 		{
+			elog(WARNING," - ROOMMAKER for real -");
 			memmove(conn->inBuffer, conn->inBuffer + conn->inStart,
 					conn->inEnd - conn->inStart);
 			conn->inEnd -= conn->inStart;
@@ -621,10 +625,10 @@ pqReadData(PGconn_min *conn)
 		}
 	}
 	else
-	{
+	{*/
 		/* buffer is logically empty, reset it */
 		conn->inStart = conn->inCursor = conn->inEnd = 0;
-	}
+	//}
 
 	/*
 	 * If the buffer is fairly full, enlarge it. We need to be able to
@@ -648,8 +652,8 @@ pqReadData(PGconn_min *conn)
 	}
 
 	/* OK, try to read some data */
-	elog(DEBUG1, "pqReadData: now calling pqsecure_read");
 retry3:
+	elog(DEBUG1, "pqReadData: now calling pqsecure_read");
 	nread = pqsecure_read(conn, conn->inBuffer + conn->inEnd,
 						  conn->inBufSize - conn->inEnd);
 	elog(DEBUG1, "pqReadData: pqsecure_read returned: %d", nread);
@@ -721,11 +725,6 @@ retry3:
 	 * layer to detect true EOF.
 	 */
 
-#ifdef USE_SSL
-	if (conn->ssl)
-		return 0;
-#endif
-
 	switch (pqReadReady(conn))
 	{
 		case 0:
@@ -743,6 +742,7 @@ retry3:
 	 * arrived.
 	 */
 retry4:
+	elog(DEBUG1, "pqsecure_read in retry4");
 	nread = pqsecure_read(conn, conn->inBuffer + conn->inEnd,
 						  conn->inBufSize - conn->inEnd);
 	if (nread < 0)
