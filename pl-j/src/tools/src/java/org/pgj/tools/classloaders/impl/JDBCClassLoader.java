@@ -19,8 +19,6 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 
-//TODO test this classLoader!
-
 /**
  * JDBC class loader component. It does not use a connection pool actualy, it is intended to use
  * with the internal driver, where a normal connection pool would fail at initialization.
