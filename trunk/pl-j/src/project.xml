@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+
+  <pomVersion>3</pomVersion>
+  <id>pl-j-java</id>
+  <name>pl-j-java</name>
+  
+  <extend>${basedir}/../project.xml</extend>
+
+  <inceptionYear>2003</inceptionYear>
+
+  <description>Java sources.</description>
+  <shortDescription>Sources for pl-j written in java.</shortDescription>
+
+	<dependencies>
+
+		<dependency>
+			<id>regexp</id>
+			<type>jar</type>
+			<artifactId>regexp</artifactId>
+			<version>1.3</version>
+		</dependency>
+
+		<dependency>
+			<id>junit</id>
+			<type>jar</type>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+		
+	</build>
+
+</project>
