@@ -1,3 +1,4 @@
+
 package org.pgj.glue;
 
 import org.apache.avalon.excalibur.pool.DefaultPool;
@@ -16,6 +17,7 @@ import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.pgj.Channel;
 import org.pgj.Executor;
+import org.pgj.TriggerExecutor;
 
 /**
  * Glue is the glue component, containing worker threads. 
@@ -42,9 +44,11 @@ public class Glue
 	/** The glue boss */
 	private GlueBoss gb;
 	/** The chanell we are dealing with */
-	Channel chanell = null;
+	private Channel chanell = null;
 	/** The executor we are dealing with */
-	Executor executor = null;
+	private Executor executor = null;
+	/** The trigger executor, if it differs from the call executor */
+	private TriggerExecutor trigexecutor = null;
 
 	//
 	//from Configurable
@@ -71,7 +75,8 @@ public class Glue
 			gb.setThreadPool(threadPool);
 			gb.setWorkerPool(workerPool);
 			gb.setExecutor(executor);
-			
+			gb.setTriggerExecutor(trigexecutor);
+
 			threadPool.execute(gb);
 
 			logger.debug("started");
@@ -98,13 +103,23 @@ public class Glue
 	}
 
 	/**
-	 * @see Serviceable#service(ServiceManager) @avalon.dependency
-	 *      key="channel" type="org.pgj.Channel" @avalon.dependency
-	 *      key="executor" type="org.pgj.Executor"
+	 * @see Serviceable#service(ServiceManager) 
+	 * @avalon.dependency key="channel" type="org.pgj.Channel" 
+	 * @avalon.dependency key="executor" type="org.pgj.Executor"
+	 * @avalon.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor" optional="true"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		chanell = (Channel) arg0.lookup("channel");
 		executor = (Executor) arg0.lookup("executor");
+		try {
+			trigexecutor = (TriggerExecutor) arg0.lookup("triggerexecutor");
+		} catch (ServiceException e) {
+			if (!(executor instanceof TriggerExecutor))
+				throw new ServiceException(
+						"triggerexecutor should be provided, or executor must implement TriggerExecutor",
+						"");
+			trigexecutor = (TriggerExecutor) executor;
+		}
 		logger.debug("serviced");
 	}
 }
