@@ -5,6 +5,7 @@
 package org.plj.chanells.febe.msg;
 
 import java.io.IOException;
+
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.typemapping.Field;
@@ -34,8 +35,7 @@ public class ResultMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessageHeader()
 	 */
 	public int getMessageHeader() {
-		// TODO Auto-generated method stub
-		return 0;
+		return MESSAGE_HEADER_RESULT;
 	}
 
 	/* (non-Javadoc)
@@ -53,9 +53,9 @@ public class ResultMessageFactory implements MessageFactory {
 			MappingException {
 		Result res = (Result) msg;
 		int rows = res.getRows();
-		stream.SendIntegerR(rows, 4);
+		stream.SendInteger(rows, 4);
 		int cols = res.getColumns();
-		stream.SendIntegerR(cols, 4);
+		stream.SendInteger(cols, 4);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				Field fld = res.get(i, j);
@@ -64,7 +64,7 @@ public class ResultMessageFactory implements MessageFactory {
 				} else {
 					stream.SendChar('D');
 					byte[] data = fld.get();
-					stream.SendIntegerR(data.length, 4);
+					stream.SendInteger(data.length, 4);
 					stream.Send(data);
 				}
 			}
