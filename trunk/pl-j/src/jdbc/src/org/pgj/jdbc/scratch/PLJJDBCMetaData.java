@@ -18,11 +18,13 @@ import org.apache.avalon.framework.configuration.ConfigurationException;
  */
 public class PLJJDBCMetaData implements DatabaseMetaData {
 
-	PLJJDBCMetaData(Configuration conf) {
+	protected PLJJDBCMetaData(Configuration conf, PLJJDBCConnection conn) {
+		this.conn = conn;
 		this.conf = conf;
 	}
 
 	private Configuration conf = null;
+	private PLJJDBCConnection conn = null;
 
 	private int getIntFromConf(String name) throws SQLException {
 		try {
@@ -37,12 +39,28 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 		try {
 			return conf.getChild(name).getValueAsBoolean();
 		} catch (ConfigurationException e) {
-			throw new SQLException("JDBC driver configuration not set properly for "
-					.concat(name));
+			throw new SQLException(
+					"JDBC driver configuration not set properly for "
+							.concat(name));
 		}
 	}
 
-	
+	private String getStringFromConf(String name) throws SQLException {
+		try {
+			return conf.getChild(name).getValue();
+		} catch (ConfigurationException e) {
+			throw new SQLException(
+					"JDBC driver configuration not set properly for "
+							.concat(name));
+		}
+	}
+
+	private ResultSet getResultSetFromConf(String name, Object[] params)
+			throws SQLException {
+		//TODO make me tricky implementation!
+		return null;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseMajorVersion()
 	 */
@@ -512,24 +530,21 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#supportsDifferentTableCorrelationNames()
 	 */
 	public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsDifferentTableCorrelationNames");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsExpressionsInOrderBy()
 	 */
 	public boolean supportsExpressionsInOrderBy() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsExpressionsInOrderBy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsExtendedSQLGrammar()
 	 */
 	public boolean supportsExtendedSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsExtendedSQLGrammar");
 	}
 
 	/* (non-Javadoc)
@@ -543,400 +558,350 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#supportsGetGeneratedKeys()
 	 */
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsGetGeneratedKeys");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGroupBy()
 	 */
 	public boolean supportsGroupBy() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsGroupBy");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGroupByBeyondSelect()
 	 */
 	public boolean supportsGroupByBeyondSelect() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsGroupByBeyondSelect");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsGroupByUnrelated()
 	 */
 	public boolean supportsGroupByUnrelated() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsGroupByUnrelated");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsIntegrityEnhancementFacility()
 	 */
 	public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsIntegrityEnhancementFacility");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsLikeEscapeClause()
 	 */
 	public boolean supportsLikeEscapeClause() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsLikeEscapeClause");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsLimitedOuterJoins()
 	 */
 	public boolean supportsLimitedOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsLimitedOuterJoins");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMinimumSQLGrammar()
 	 */
 	public boolean supportsMinimumSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsMinimumSQLGrammar");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMixedCaseIdentifiers()
 	 */
 	public boolean supportsMixedCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsMixedCaseIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMixedCaseQuotedIdentifiers()
 	 */
 	public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsMixedCaseQuotedIdentifiers");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMultipleOpenResults()
 	 */
 	public boolean supportsMultipleOpenResults() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsMultipleOpenResults");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMultipleResultSets()
 	 */
 	public boolean supportsMultipleResultSets() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsMultipleResultSets");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsMultipleTransactions()
 	 */
 	public boolean supportsMultipleTransactions() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsMultipleTransactions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsNamedParameters()
 	 */
 	public boolean supportsNamedParameters() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsNamedParameters");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsNonNullableColumns()
 	 */
 	public boolean supportsNonNullableColumns() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsNonNullableColumns");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenCursorsAcrossCommit()
 	 */
 	public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsOpenCursorsAcrossCommit");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenCursorsAcrossRollback()
 	 */
 	public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsOpenCursorsAcrossRollback");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenStatementsAcrossCommit()
 	 */
 	public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsOpenStatementsAcrossCommit");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOpenStatementsAcrossRollback()
 	 */
 	public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsOpenStatementsAcrossRollback");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOrderByUnrelated()
 	 */
 	public boolean supportsOrderByUnrelated() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsOrderByUnrelated");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsOuterJoins()
 	 */
 	public boolean supportsOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsOuterJoins");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsPositionedDelete()
 	 */
 	public boolean supportsPositionedDelete() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsPositionedDelete");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsPositionedUpdate()
 	 */
 	public boolean supportsPositionedUpdate() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsPositionedUpdate");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSavepoints()
 	 */
 	public boolean supportsSavepoints() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSavepoints");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInDataManipulation()
 	 */
 	public boolean supportsSchemasInDataManipulation() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSchemasInDataManipulation");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInIndexDefinitions()
 	 */
 	public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSchemasInIndexDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInPrivilegeDefinitions()
 	 */
 	public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSchemasInPrivilegeDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInProcedureCalls()
 	 */
 	public boolean supportsSchemasInProcedureCalls() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSchemasInProcedureCalls");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSchemasInTableDefinitions()
 	 */
 	public boolean supportsSchemasInTableDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSchemasInTableDefinitions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSelectForUpdate()
 	 */
 	public boolean supportsSelectForUpdate() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSelectForUpdate");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsStatementPooling()
 	 */
 	public boolean supportsStatementPooling() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsStatementPooling");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsStoredProcedures()
 	 */
 	public boolean supportsStoredProcedures() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsStoredProcedures");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInComparisons()
 	 */
 	public boolean supportsSubqueriesInComparisons() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSubqueriesInComparisons");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInExists()
 	 */
 	public boolean supportsSubqueriesInExists() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSubqueriesInExists");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInIns()
 	 */
 	public boolean supportsSubqueriesInIns() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSubqueriesInIns");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsSubqueriesInQuantifieds()
 	 */
 	public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsSubqueriesInQuantifieds");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsTableCorrelationNames()
 	 */
 	public boolean supportsTableCorrelationNames() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsTableCorrelationNames");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsTransactions()
 	 */
 	public boolean supportsTransactions() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsTransactions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsUnion()
 	 */
 	public boolean supportsUnion() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsUnion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsUnionAll()
 	 */
 	public boolean supportsUnionAll() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsUnionAll");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#usesLocalFilePerTable()
 	 */
 	public boolean usesLocalFilePerTable() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("usesLocalFilePerTable");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#usesLocalFiles()
 	 */
 	public boolean usesLocalFiles() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("usesLocalFiles");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#deletesAreDetected(int)
 	 */
 	public boolean deletesAreDetected(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("deletesAreDetected");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#insertsAreDetected(int)
 	 */
 	public boolean insertsAreDetected(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("insertsAreDetected");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#othersDeletesAreVisible(int)
 	 */
 	public boolean othersDeletesAreVisible(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("othersDeletesAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#othersInsertsAreVisible(int)
 	 */
 	public boolean othersInsertsAreVisible(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("othersInsertsAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#othersUpdatesAreVisible(int)
 	 */
 	public boolean othersUpdatesAreVisible(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("othersUpdatesAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#ownDeletesAreVisible(int)
 	 */
 	public boolean ownDeletesAreVisible(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("ownDeletesAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#ownInsertsAreVisible(int)
 	 */
 	public boolean ownInsertsAreVisible(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("ownInsertsAreVisible");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#ownUpdatesAreVisible(int)
 	 */
 	public boolean ownUpdatesAreVisible(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("ownUpdatesAreVisible");
 	}
 
 	/* (non-Javadoc)
@@ -944,16 +909,14 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsResultSetHoldability(int holdability)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsResultSetHoldability");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#supportsResultSetType(int)
 	 */
 	public boolean supportsResultSetType(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsResultSetType");
 	}
 
 	/* (non-Javadoc)
@@ -961,16 +924,14 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsTransactionIsolationLevel(int level)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsTransactionIsolationLevel");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#updatesAreDetected(int)
 	 */
 	public boolean updatesAreDetected(int type) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("updatesAreDetected");
 	}
 
 	/* (non-Javadoc)
@@ -978,8 +939,7 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsConvert(int fromType, int toType)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsConvert");
 	}
 
 	/* (non-Javadoc)
@@ -987,192 +947,169 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public boolean supportsResultSetConcurrency(int type, int concurrency)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return getBooleanFromConf("supportsResultSetConcurrency");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getCatalogSeparator()
 	 */
 	public String getCatalogSeparator() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("getCatalogSeparator");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getCatalogTerm()
 	 */
 	public String getCatalogTerm() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("catalogTerm");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseProductName()
 	 */
 	public String getDatabaseProductName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("databaseProductName");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDatabaseProductVersion()
 	 */
 	public String getDatabaseProductVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("databaseProductVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDriverName()
 	 */
 	public String getDriverName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("driverName");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getDriverVersion()
 	 */
 	public String getDriverVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("driverVersion");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getExtraNameCharacters()
 	 */
 	public String getExtraNameCharacters() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("extraNameCharacters");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getIdentifierQuoteString()
 	 */
 	public String getIdentifierQuoteString() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("identifierQuoteString");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getNumericFunctions()
 	 */
 	public String getNumericFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("numericFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getProcedureTerm()
 	 */
 	public String getProcedureTerm() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("procedureTerm");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSQLKeywords()
 	 */
 	public String getSQLKeywords() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("SQLKeywords");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSchemaTerm()
 	 */
 	public String getSchemaTerm() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("schemaTerm");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSearchStringEscape()
 	 */
 	public String getSearchStringEscape() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("searchStringEscape");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getStringFunctions()
 	 */
 	public String getStringFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("stringFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSystemFunctions()
 	 */
 	public String getSystemFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("systemFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getTimeDateFunctions()
 	 */
 	public String getTimeDateFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("timeDateFunctions");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getURL()
 	 */
 	public String getURL() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getStringFromConf("URL");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getUserName()
 	 */
 	public String getUserName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		//this is worng here...
+		return getStringFromConf("userName");
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getConnection()
 	 */
 	public Connection getConnection() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return conn;
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getCatalogs()
 	 */
 	public ResultSet getCatalogs() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("catalogs", null);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSchemas()
 	 */
 	public ResultSet getSchemas() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("schemas", null);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getTableTypes()
 	 */
 	public ResultSet getTableTypes() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("tableTypes", null);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getTypeInfo()
 	 */
 	public ResultSet getTypeInfo() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("typeInfo", null);
 	}
 
 	/* (non-Javadoc)
@@ -1180,8 +1117,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getExportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("exportedKeys", new Object[]{catalog,
+				schema, table});
 	}
 
 	/* (non-Javadoc)
@@ -1189,8 +1126,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getImportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("importedKeys", new Object[]{catalog,
+				schema, table});
 	}
 
 	/* (non-Javadoc)
@@ -1198,8 +1135,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getPrimaryKeys(String catalog, String schema, String table)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("primaryKeys", new Object[]{catalog,
+				schema, table});
 	}
 
 	/* (non-Javadoc)
@@ -1207,8 +1144,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getProcedures(String catalog, String schemaPattern,
 			String procedureNamePattern) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("procedures", new Object[]{catalog,
+				schemaPattern, procedureNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1216,8 +1153,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getSuperTables(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("superTables", new Object[]{catalog,
+				schemaPattern, tableNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1225,8 +1162,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getSuperTypes(String catalog, String schemaPattern,
 			String typeNamePattern) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("superTypes", new Object[]{catalog,
+				schemaPattern, typeNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1234,8 +1171,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getTablePrivileges(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("tablePrivileges", new Object[]{catalog,
+				schemaPattern, tableNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1243,8 +1180,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getVersionColumns(String catalog, String schema,
 			String table) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("versionColumns", new Object[]{schema,
+				table});
 	}
 
 	/* (non-Javadoc)
@@ -1252,8 +1189,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getBestRowIdentifier(String catalog, String schema,
 			String table, int scope, boolean nullable) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("bestRowIdentifier", new Object[]{catalog,
+				schema, table, new Integer(scope), new Boolean(nullable)});
 	}
 
 	/* (non-Javadoc)
@@ -1261,8 +1198,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getIndexInfo(String catalog, String schema, String table,
 			boolean unique, boolean approximate) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("indexInfo", new Object[]{catalog, schema,
+				table, new Boolean(unique), new Boolean(approximate)});
 	}
 
 	/* (non-Javadoc)
@@ -1270,8 +1207,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getUDTs(String catalog, String schemaPattern,
 			String typeNamePattern, int[] types) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("UDTs", new Object[]{catalog,
+				schemaPattern, typeNamePattern, types});
 	}
 
 	/* (non-Javadoc)
@@ -1280,8 +1217,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getAttributes(String catalog, String schemaPattern,
 			String typeNamePattern, String attributeNamePattern)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("attributes", new Object[]{catalog,
+				schemaPattern, typeNamePattern, attributeNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1289,8 +1226,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getColumnPrivileges(String catalog, String schema,
 			String table, String columnNamePattern) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("columnPrivileges", new Object[]{catalog,
+				schema, table, columnNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1299,8 +1236,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getColumns(String catalog, String schemaPattern,
 			String tableNamePattern, String columnNamePattern)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("columns", new Object[]{catalog,
+				schemaPattern, tableNamePattern, columnNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1309,8 +1246,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getProcedureColumns(String catalog, String schemaPattern,
 			String procedureNamePattern, String columnNamePattern)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("procedureColumns", new Object[]{catalog,
+				schemaPattern, procedureNamePattern, columnNamePattern});
 	}
 
 	/* (non-Javadoc)
@@ -1318,8 +1255,8 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getTables(String catalog, String schemaPattern,
 			String tableNamePattern, String[] types) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("tables", new Object[]{catalog,
+				schemaPattern, tableNamePattern, types});
 	}
 
 	/* (non-Javadoc)
@@ -1328,16 +1265,16 @@ public class PLJJDBCMetaData implements DatabaseMetaData {
 	public ResultSet getCrossReference(String primaryCatalog,
 			String primarySchema, String primaryTable, String foreignCatalog,
 			String foreignSchema, String foreignTable) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getResultSetFromConf("crossReference", new Object[]{
+				primaryCatalog, primarySchema, primaryTable, foreignCatalog,
+				foreignSchema, foreignTable});
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSQLStateType()
 	 */
 	public int getSQLStateType() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return getIntFromConf("getSQLStateType");
 	}
 
 }
