@@ -63,7 +63,7 @@ public class CallMessageFactory implements MessageFactory {
 			request.addParam(fld);
 		}
 
-		return null;
+		return request;
 	}
 
 	/* (non-Javadoc)
