@@ -5,9 +5,10 @@ import java.io.IOException;
 /**
  * Sent to the backend to initialize a newly created connection.
  *
- * $Id: StartupPacket.java,v 1.1 2004-03-27 08:02:36 kocka Exp $
+ * $Id: StartupPacket.java,v 1.2 2004-04-01 22:04:04 kocka Exp $
  */
 
+/** @deprecated there is no startup */
 public class StartupPacket
 {
 	private static final int SM_DATABASE = 64;
