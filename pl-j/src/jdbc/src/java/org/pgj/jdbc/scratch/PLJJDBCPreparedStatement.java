@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Vector;
 
-import org.pgj.CommunicationException;
-import org.pgj.ExecutionCancelException;
 import org.pgj.messages.Result;
 import org.pgj.messages.SQLExecute;
 import org.pgj.messages.SQLPrepare;
@@ -177,6 +175,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		this.conn = conn;
 		this.statement = statement;
 		parse();
+		fetchSize = conn.getIntFromConf("defaultFetchSize");
+		userFetchSizeOverride = conn.getBooleanFromConf("canUserOverrideFetchSize");
 	}
 
 	/*
@@ -610,15 +610,23 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 	}
 
+	/** Fetch direction */
+	private int fetchdirection = ResultSet.FETCH_FORWARD;
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.sql.Statement#getFetchDirection()
 	 */
 	public int getFetchDirection() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return fetchdirection;
 	}
+
+	/** Fetch size of the cursor to open. */
+	private int fetchSize = 0;
+
+	/** Can the user code override fetch size? */
+	private boolean userFetchSizeOverride = false;
 
 	/*
 	 * (non-Javadoc)
@@ -626,8 +634,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.Statement#getFetchSize()
 	 */
 	public int getFetchSize() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return fetchSize;
 	}
 
 	/*
@@ -640,14 +647,15 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		return 0;
 	}
 
+	private int maxRows = 0;
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.sql.Statement#getMaxRows()
 	 */
 	public int getMaxRows() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return maxRows;
 	}
 
 	/*
@@ -776,8 +784,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.Statement#setFetchSize(int)
 	 */
 	public void setFetchSize(int rows) throws SQLException {
-		// TODO Auto-generated method stub
-
+		if(userFetchSizeOverride)
+			fetchSize = rows;
 	}
 
 	/*
@@ -796,8 +804,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.Statement#setMaxRows(int)
 	 */
 	public void setMaxRows(int max) throws SQLException {
-		// TODO Auto-generated method stub
-
+		maxRows = max;
 	}
 
 	/*

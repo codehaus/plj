@@ -35,7 +35,7 @@ public class PLJJDBCResultSet implements ResultSet {
 
 	/**  */
 	private PLJJDBCConnection conn = null;
-	
+
 	/** We can communicate with the RDBMS across this chanell. */
 	private Channel chanell = null;
 	/** fetch size */
@@ -476,7 +476,7 @@ public class PLJJDBCResultSet implements ResultSet {
 			Field fld = fields[columnIndex - 1];
 			return fld.defaultGet();
 		} catch (MappingException e) {
-			doTypeException(String.class, e);
+			doTypeException(Object.class, e);
 			//this will never run.
 			return null;
 		}
@@ -493,40 +493,39 @@ public class PLJJDBCResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#findColumn(java.lang.String)
 	 */
 	public int findColumn(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		for (int i = 0; i < column_names.length; i++) {
+			if (columnName.equals(column_names[i]))
+				return i + 1;
+		}
+		return -1;
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getCharacterStream(int)
 	 */
 	public Reader getCharacterStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (Reader)getFieldAs(Reader.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getCharacterStream(java.lang.String)
 	 */
 	public Reader getCharacterStream(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getCharacterStream(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getBigDecimal(int)
 	 */
 	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (BigDecimal)getFieldAs(BigDecimal.class, columnIndex, false);
 	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#getBigDecimal(java.lang.String)
 	 */
 	public BigDecimal getBigDecimal(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getBigDecimal(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
@@ -1306,6 +1305,24 @@ public class PLJJDBCResultSet implements ResultSet {
 	private void checkIfClosed() throws SQLException {
 		if (chanell == null)
 			throw new SQLException("This Resultset is already closed.");
+	}
+
+	private Object getFieldAs(Class clazz, int col, boolean errorIfNull)
+			throws SQLException {
+		if (fields.length + 1 < col)
+			throw new SQLException("");
+		if (fields[col - 1] == null || fields[col - 1].isNull())
+			if (!errorIfNull) {
+				return null;
+			} else {
+				throw new SQLException("Field " + col + " is null.");
+			}
+		try {
+			return fields[col - 1].get(clazz);
+		} catch (MappingException e) {
+			throw new SQLException("Field " + col + " cannot be mapped to "
+					+ clazz.getName());
+		}
 	}
 
 }
