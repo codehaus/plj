@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="PL-J"
+        href="http://plj.codehaus.org/">
+
+  <title>PL-J</title>
+
+  <body>
+
+    <menu name="General Information">
+      <item name="Introduction"					href="introduction.html"/>
+      <item name="Build and install howto"				href="http://docs.codehaus.org/display/PLJ/Build+and+install+howto"/>
+    </menu>
+
+    <menu name="Documentation">
+      <item name="Current changes"				href="/current-changes.html"/>
+      <item name="JDBC"               			href="/jdbc.html"/>
+      <item name="Trigger support"				href="/triggers.html"/>
+      <item name="Use cases of stored procedures"   href="use-cases.html"/>
+      <item name="Performance"   href="performance.html"/>
+      <item name="More documentation"   href="more-docs.html"/>
+    </menu>
+
+    <links>
+      <item name="PostgreSQL ORDBMS"           href="http://www.postgresql.org/"/>
+      <item name="Codehaus"           href="http://www.codehaus.org/"/>
+    </links>
+
+  </body>
+</project>
