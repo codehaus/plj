@@ -13,6 +13,7 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import org.pgj.Channel;
+import org.pgj.Client;
 import org.pgj.CommunicationException;
 import org.pgj.messages.SQLCursorOpenWithSQL;
 
@@ -20,17 +21,19 @@ import org.pgj.messages.SQLCursorOpenWithSQL;
  * @author Laszlo Hornyak
  * 
  */
-public class PGJJDBCStatement implements Statement {
+public class PLJJDBCStatement implements Statement {
 
 	private Channel channel = null;
-	private PGJJDBCConnection connection = null;
+	private Client client = null;
+	private PLJJDBCConnection connection = null;
 
 	/**
 	 * 
 	 */
-	public PGJJDBCStatement(Channel channel, PGJJDBCConnection connection) {
+	public PLJJDBCStatement(Client client, PLJJDBCConnection connection) {
 		super();
-		this.channel = channel;
+		this.client = client;
+		this.channel = client.getChannel();
 	}
 
 	/* (non-Javadoc)
@@ -53,7 +56,7 @@ public class PGJJDBCStatement implements Statement {
 		}
 
 		// TODO this method needs testing
-		return new PGJJDBCResultSet(channel, cursorName);
+		return new PLJJDBCResultSet(channel, cursorName);
 	}
 
 	/* (non-Javadoc)

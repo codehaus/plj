@@ -20,7 +20,7 @@ import org.pgj.NotImplementedException;
  * 
  * @author Laszlo Hornyak
  */
-public class PGJJDBCDriver implements Driver {
+public class PLJJDBCDriver implements Driver {
 
 	public static final int MAJOR_VERSION = 0;
 	public static final int MINOR_VERSION = 1;
@@ -47,7 +47,7 @@ public class PGJJDBCDriver implements Driver {
 	/**
 	 * 
 	 */
-	public PGJJDBCDriver() {
+	public PLJJDBCDriver() {
 		super();
 	}
 

@@ -12,20 +12,20 @@ import java.sql.SQLException;
  * 
  * @author Laszlo Hornyak
  */
-public class PGJJDBCResultSetMetaData implements ResultSetMetaData {
+public class PLJJDBCResultSetMetaData implements ResultSetMetaData {
 
 	private int column_count = 0;
 	boolean[] autoincrement = null;
 	boolean[] casesensitive = null;
 	boolean[] searchable = null;
 	boolean[] nullable = null;
-	PGJJDBCResultSet resultSet = null;
+	PLJJDBCResultSet resultSet = null;
 
 	/**
 	 * @param chanell
 	 * @param cursorName
 	 */
-	public PGJJDBCResultSetMetaData(PGJJDBCResultSet resultSet) {
+	public PLJJDBCResultSetMetaData(PLJJDBCResultSet resultSet) {
 		this.resultSet = resultSet;
 	}
 
