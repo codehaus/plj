@@ -43,7 +43,27 @@ public class ResultMessageFactory implements MessageFactory {
 	 */
 	public Message getMessage(PGStream stream, Encoding encoding)
 			throws IOException, MappingException {
-		return null;
+		Result res = new Result();
+		int rows = stream.ReceiveIntegerR(4);
+		int cols = stream.ReceiveIntegerR(4);
+		res.setSize(rows, cols);
+		for (int i = 0; i < rows; i++) {
+
+			for (int j = 0; j < cols; j++) {
+				char isnull = (char) stream.ReceiveChar();
+				if (isnull == 'N') {
+					res.set(i, j, null);
+				} else {
+					int len = stream.ReceiveIntegerR(4);
+					byte[] data = new byte[len];
+					stream.Receive(data, 0, len);
+					String type = stream.ReceiveString(encoding);
+					Field field = mapper.map(data, type);
+					res.set(i, j, field);
+				}
+			}
+		}
+		return res;
 	}
 
 	/* (non-Javadoc)
