@@ -23,6 +23,8 @@
       <item name="Current changes"				href="/current-changes.html"/>
       <item name="JDBC"               			href="/jdbc.html"/>
       <item name="Trigger support"				href="/triggers.html"/>
+      <item name="Use cases of stored procedures"   href="use-cases.html"/>
+      <item name="Performance"   href="performance.html"/>
     </menu>
 
     <links>
