@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.log4j.Category;
+
 /**
  * A little collection of very stupid methods that can be java UDFs.
  * 
@@ -78,6 +80,12 @@ public class Businnes {
 
 	public String testString0(String str) {
 		return str.toLowerCase();
+	}
+
+	public String logTest(String logThis) {
+		Category category = Category.getInstance(Businnes.class);
+		category.error(logThis);
+		return "logged: ".concat(logThis);
 	}
 
 }
