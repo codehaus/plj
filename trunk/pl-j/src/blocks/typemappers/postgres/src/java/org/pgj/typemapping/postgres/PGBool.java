@@ -4,11 +4,13 @@ import org.pgj.typemapping.MappingException;
 
 /**
  * PostgreSQL 'bool' datatype mapper.
+ * 
+ * @author Laszlo Hornyak
  */
 public class PGBool extends AbstractPGField {
-	
+
 	static final Class[] classes = {Boolean.class};
-	
+
 	/**
 	 * Constructor for PGBool.
 	 */
@@ -34,11 +36,11 @@ public class PGBool extends AbstractPGField {
 	 * @see Field#get(Class)
 	 */
 	public Object get(Class clazz) throws MappingException {
-		if(!clazz.equals(Boolean.class))
+		if (!clazz.equals(Boolean.class))
 			throw new MappingException("Data type not supperted");
-		if(raw.length != 1)
+		if (raw.length != 1)
 			throw new MappingException("Illegal data length");
-		return new Boolean( raw[0] != 0 );
+		return new Boolean(raw[0] != 0);
 	}
 
 	/**
