@@ -5,6 +5,7 @@ package org.plj.chanells.febe.msg;
 
 import java.io.IOException;
 
+import org.apache.avalon.framework.logger.Logger;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.typemapping.Field;
@@ -22,8 +23,11 @@ public class CallMessageFactory implements MessageFactory {
 
 	TypeMapper typeMapper = null;
 
-	public CallMessageFactory(TypeMapper typeMapper) {
+	Logger logger = null;
+	
+	public CallMessageFactory(TypeMapper typeMapper, Logger logger) {
 		this.typeMapper = typeMapper;
+		this.logger = logger;
 	}
 
 	public static final int MESSAGE_HEADER_CALL = 'C';
@@ -44,7 +48,12 @@ public class CallMessageFactory implements MessageFactory {
 		CallRequest request = new CallRequest();
 		request.setClassname(stream.ReceiveString(encoding));
 		request.setMethodname(stream.ReceiveString(encoding));
+		request.setExpect(stream.ReceiveString(encoding));
+		logger.debug("classname:"+request.getClassname());
+		logger.debug("method:"+request.getMethodname());
+		logger.debug("expects:"+request.getExpect());
 		int paramcount = stream.ReceiveInteger(4);
+		logger.debug("count of params: "+paramcount);
 
 		for (int i = 0; i < paramcount; i++) {
 			String paramType = stream.ReceiveString(encoding);
