@@ -7,6 +7,7 @@ package org.pgj.jdbc.scratch;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -22,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Vector;
@@ -111,7 +113,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 */
 	private void doPrepare() throws SQLException {
 
-		if(prepared)
+		if (prepared)
 			return;
 
 		Class[] args = new Class[paramClasses.size()];
@@ -176,7 +178,8 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 		this.statement = statement;
 		parse();
 		fetchSize = conn.getIntFromConf("defaultFetchSize");
-		userFetchSizeOverride = conn.getBooleanFromConf("canUserOverrideFetchSize");
+		userFetchSizeOverride = conn
+				.getBooleanFromConf("canUserOverrideFetchSize");
 	}
 
 	/*
@@ -234,7 +237,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			exec.setPlanid(plan);
 			exec.setParams(flds);
 			exec.setAction(SQLExecute.ACTION_EXECUTE);
-			Result res = (Result)conn.doSendReceive(exec);
+			Result res = (Result) conn.doSendReceive(exec);
 		} catch (MappingException e) {
 			e.printStackTrace();
 			throw new SQLException(e.getMessage());
@@ -252,7 +255,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 			paramClasses.setSize(i + 1);
 			prepared = false;
 		} else {
-			if(paramClasses.get(i) != clazz)
+			if (paramClasses.get(i) != clazz)
 				prepared = false;
 		}
 		paramClasses.set(i, clazz);
@@ -300,9 +303,57 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setNull(int, int)
 	 */
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
+		if (parameterIndex > this.paramcnt)
+			throw new SQLException("Number of parameters from SQL: " + paramcnt);
+		if (params.size() < paramcnt)
+			params.setSize(paramcnt);
+
 		params.set(parameterIndex - 1, null);
 		switch (sqlType) {
-
+			case Types.VARCHAR :
+				paramClasses.set(parameterIndex - 1, String.class);
+				break;
+			case Types.BIGINT :
+				paramClasses.set(parameterIndex - 1, BigInteger.class);
+				break;
+			case Types.BINARY:
+				paramClasses.set(parameterIndex - 1, byte[].class);
+				break;
+			case Types.BIT:
+				paramClasses.set(parameterIndex - 1, Boolean.class);
+				break;
+			case Types.BLOB:
+				paramClasses.set(parameterIndex - 1, byte[].class);
+				break;
+			case Types.BOOLEAN:
+				paramClasses.set(parameterIndex - 1, Boolean.class);
+				break;
+			case Types.CHAR:
+				paramClasses.set(parameterIndex - 1, Character.class);
+				break;
+			case Types.CLOB:
+				paramClasses.set(parameterIndex - 1, byte[].class);
+				break;
+			case Types.DATE:
+				paramClasses.set(parameterIndex - 1, Date.class);
+				break;
+			case Types.DECIMAL:
+				paramClasses.set(parameterIndex - 1, Number.class);
+				break;
+			case Types.DOUBLE:
+				paramClasses.set(parameterIndex - 1, Double.class);
+				break;
+			case Types.FLOAT:
+				paramClasses.set(parameterIndex - 1, Float.class);
+				break;
+			case Types.INTEGER:
+				paramClasses.set(parameterIndex - 1, Integer.class);
+				break;
+			case Types.JAVA_OBJECT:
+				paramClasses.set(parameterIndex - 1, byte[].class);
+				break;
+			default:
+				throw new SQLException("Unhandled type:"+sqlType);
 		}
 	}
 
@@ -341,8 +392,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.PreparedStatement#setBytes(int, byte[])
 	 */
 	public void setBytes(int parameterIndex, byte[] x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		setParam(parameterIndex, byte[].class, x);
 	}
 
 	/*
@@ -537,8 +587,9 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 
 			Result ansver = (Result) conn.doSendReceive(exec);
 
-			
-			PLJJDBCResultSet res = new PLJJDBCResultSet(conn, (String) ansver.get(0, 0).get(String.class));
+
+			PLJJDBCResultSet res = new PLJJDBCResultSet(conn, (String) ansver
+					.get(0, 0).get(String.class));
 
 			return res;
 		} catch (MappingException e) {
@@ -649,7 +700,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	}
 
 	private int maxRows = 0;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -785,7 +836,7 @@ public class PLJJDBCPreparedStatement implements PreparedStatement {
 	 * @see java.sql.Statement#setFetchSize(int)
 	 */
 	public void setFetchSize(int rows) throws SQLException {
-		if(userFetchSizeOverride)
+		if (userFetchSizeOverride)
 			fetchSize = rows;
 	}
 
