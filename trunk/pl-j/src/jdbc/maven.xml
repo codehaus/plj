@@ -1,12 +1,9 @@
 <?xml version="1.0"?>
 
 <project>
-	<preGoal name="java:compile">
-		<attainGoal name="avalon:meta"/>
-	</preGoal>
 
-	<preGoal name="build:end">
-		<attainGoal name="jar:install"/>
+	<preGoal name="jar:jar">
+		<attainGoal name="loom:metagenerate"/>
 	</preGoal>
 
 </project>

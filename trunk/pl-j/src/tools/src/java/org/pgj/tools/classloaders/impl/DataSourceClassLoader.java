@@ -41,8 +41,6 @@ public class DataSourceClassLoader extends JDBCClassLoader implements Serviceabl
 	/**
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
 	 * 
-	 * //@avalon.dependency key="" type=""
-	 * 
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		

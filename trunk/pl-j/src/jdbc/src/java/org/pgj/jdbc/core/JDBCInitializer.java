@@ -89,8 +89,10 @@ public class JDBCInitializer implements Configurable, LogEnabled,
 	 * 
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
 	 * 
-	 * @avalon.dependency type="org.pgj.tools.classloaders.PLJClassLoader"
-	 *                    key="classloader"
+	 * @avalon.dependency type="org.pgj.tools.classloaders.PLJClassLoader" key="classloader"
+	 * 
+	 * @dna.dependency type="org.pgj.tools.classloaders.PLJClassLoader" key="classloader"
+	 * 
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classLoader = (PLJClassLoader) arg0.lookup("classloader");

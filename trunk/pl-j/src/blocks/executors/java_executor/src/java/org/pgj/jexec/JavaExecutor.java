@@ -157,6 +157,7 @@ public class JavaExecutor extends ClassLoader
 	}
 
 	/**
+	 * 
 	 * @see Serviceable#service(ServiceManager)
 	 * @avalon.dependency key="classloader"
 	 *                    type="org.pgj.tools.classloaders.PLJClassLoader"
@@ -169,6 +170,13 @@ public class JavaExecutor extends ClassLoader
 	 *                    type="org.pgj.tools.jdbc.JDBCConfigurator"
 	 * @avalon.dependency key="method-finder"
 	 *                    type="org.pgj.tools.methodfinder.MethodFinder"
+	 * 
+	 * @dna.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
+	 * @dna.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
+	 * @dna.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper" optional="true"
+	 * @dna.dependency key="jdbc-configurator" type="org.pgj.tools.jdbc.JDBCConfigurator"
+	 * @dna.dependency key="method-finder" type="org.pgj.tools.methodfinder.MethodFinder"
+	 * 
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classloader = (PLJClassLoader) arg0.lookup("classloader");

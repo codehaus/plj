@@ -30,7 +30,7 @@ import org.pgj.tools.classloaders.PLJClassLoader;
  * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
  * 
  * @dna.component
- * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
+ * @dna.service type="org.pgj.tools.classloaders.PLJClassLoader"
  * 
  */
 public class JDBCClassLoader extends ClassLoader
