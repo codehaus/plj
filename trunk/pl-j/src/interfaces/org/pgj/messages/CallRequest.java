@@ -1,87 +1,79 @@
 package org.pgj.messages;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 
 import org.pgj.typemapping.Field;
 
 /**
- * Describes a object oriented method call on an object.
+ * Describes a object oriented method call on an object.<br>
+ * <br>
+ * In general about a call: A call has 
  * 
  * @author Laszlo Hornyak
  * @since 0.1
  */
 public class CallRequest extends AbstractCall {
 
-	/**
-	 * Parameter vector.
-	 */
-	private Vector params = null;
+	/** Parameter vector. */
+	private List params = null;
 	/** Expected return type */
 	private String expect = null;
 	/** is oneway */
 	private boolean oneWay;
-	public final static int INSTATNTIATION_SESSION = 1;
-	public final static int INSTATNTIATION_CALL = 2;
-	public final static int INSTATNTIATION_GLOBAL = 3;
-	/** instantiation of the object. By default INSTATNTIATION_CALL*/
-	private int instantiation = INSTATNTIATION_CALL;
-
 	/**
 	 * Add a parameter to the call.
 	 * @param param pam-param :)
 	 */
 	public void addParam(Field param) {
 		if(params == null)
-			params = new Vector();
+			params = new ArrayList();
 		params.add(param);
 	}
 
 	/**
 	 * 
+	 * @return
 	 */
-	public Vector getParams() {
+	public List getParams() {
 		if(params == null)
 			params = new Vector();
 		return params;
 	}
 
 	/**
-	 * Get the @link #expect
-	 * 
+	 * Get the expected result type.
+	 * @return the expected result type (RDBMS type name)
 	 */
 	public String getExpect() {
 		return expect;
 	}
 
-	public void setExpect(String e) {
-		expect = e;
+	/**
+	 * Set the expected result type (RDBMS type name).
+	 * @param expected the expected result type
+	 */
+	public void setExpect(String expected) {
+		expect = expected;
 	}
 
 	/**
-	 * @return
+	 * Oneway call.
+	 * @return true if the call is oneway.
 	 */
 	public boolean isOneWay() {
 		return oneWay;
 	}
 
 	/**
-	 * @param b
+	 * Set oneway call.
+	 * @param oneWay
 	 */
-	public void setOneWay(boolean b) {
-		oneWay = b;
+	public void setOneWay(boolean oneWay) {
+		this.oneWay = oneWay;
 	}
 
-	/**
-	 * @return
-	 */
-	public int getInstantiation() {
-		return instantiation;
-	}
-
-	/**
-	 * @param i
-	 */
-	public void setInstantiation(int i) {
-		instantiation = i;
-	}
 }
