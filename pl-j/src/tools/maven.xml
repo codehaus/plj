@@ -5,4 +5,8 @@
 		<attainGoal name="avalon:meta"/>
 	</preGoal>
 
+	<preGoal name="build:end">
+		<attainGoal name="jar:install"/>
+	</preGoal>
+
 </project>
