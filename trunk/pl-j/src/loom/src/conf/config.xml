@@ -114,6 +114,7 @@
 					isolation level called when fireing up the UDF.
 					-->
 				<DefaultTransactionIsolation>8</DefaultTransactionIsolation>
+				<!--
 					-->
 				<DriverMajorVersion>0</DriverMajorVersion>
 				<DriverMinorVersion>1</DriverMinorVersion>
@@ -125,22 +126,23 @@
 	<tuplemapper>
 		<relation name="plj_testtable" class="org.deadcat_enterprises.TestTableRecord"/>
 		<relation name="plj_testable2" class="org.deadcat_enterprises.TestTableRecord"/>
-		</tuplemapper>
-<!--
-		<log4j-init>
+	</tuplemapper>
+
+	<log4j-init>
 		<properties>
+			<!--
 			The root logger is the PLJAppender, so all log categories
 			not configured here will go to RDBMS (or at least try to go there)
+			-->
 			<property name="log4j.rootLogger" value="INFO, plj"/>
 			<property name="log4j.appender.plj" value="org.pgj.tools.log4j.PLJAppender"/>
 			<property name="log4j.appender.plj.layout" value="org.apache.log4j.PatternLayout"/>
 			<property name="log4j.appender.plj.layout.conversionPattern" value=" %d [%t] %-5p %c{1} - %m%n"/>
-				
+			<!--
 				These entries are for the PostgreSQL typemapper`s 
 				Field implementations. (it uses log4j). Its logs should remain
 				local.
-				
+			-->
 		</properties>
 	</log4j-init>
-	-->
 </config>

@@ -54,4 +54,8 @@
 	<block name="log4j-init" class="org.pgj.tools.log4j.Log4jInitComponent">
 	</block>
 	-->
+	<block name="log4j-init" class="org.pgj.tools.log4j.Log4jInitComponent">
+		<provide name="classloader" role="classloader" alias="classloader"/>
+		<proxy disable="true"/>
+	</block>
 </assembly>
