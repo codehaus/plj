@@ -320,6 +320,7 @@ message febe_receive_tupres() {
 
 	res -> tablename = febe_receive_string();
 	res -> colcount = febe_receive_integer_4();
+	res -> colnames = res -> colcount > 0 ? SPI_palloc(res -> colcount * sizeof(char*) ) : NULL;
 	if(res -> colcount > 0){
 		res -> _tuple = SPI_palloc(sizeof(pparam) * res -> colcount);
 	} else {
@@ -330,6 +331,7 @@ message febe_receive_tupres() {
 		char* name;
 		char isnull;
 		name = febe_receive_string();
+		res -> colnames[i] = name;
 		res -> _tuple[i] = SPI_palloc(sizeof(struct fnc_param));
 		pqGetc(&isnull, min_conn);
 		if(isnull == 'n'){
