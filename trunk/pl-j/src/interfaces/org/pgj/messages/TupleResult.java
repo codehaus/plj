@@ -1,6 +1,7 @@
 /*
  * Created on May 10, 2004
  */
+
 package org.pgj.messages;
 
 import org.pgj.typemapping.Tuple;
@@ -12,13 +13,16 @@ import org.pgj.typemapping.Tuple;
  * @author Laszlo Hornyak
  */
 public class TupleResult extends Message {
+
 	private Tuple tuple = null;
+
 	/**
 	 * @return Returns the tuple.
 	 */
 	public Tuple getTuple() {
 		return tuple;
 	}
+
 	/**
 	 * @param tuple The tuple to set.
 	 */
