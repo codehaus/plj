@@ -11,7 +11,6 @@
 #include "plpgj_channel.h"
 #include "plpgj_message_fns.h"
 #include "plpgj_core.h"
-#include "planstore.h"
 
 #include "utils/portal.h"
 #include "lib/stringinfo.h"
@@ -24,7 +23,7 @@
 #include "utils/memutils.h"
 #include "access/xact.h"
 #include "pljelog.h"
-
+#include "plantable.h"
 
 /*	*/
 

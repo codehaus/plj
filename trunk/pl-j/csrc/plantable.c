@@ -1,5 +1,7 @@
-#include "plantable.h"
+#include "executor/spi.h"
 #include "pljelog.h"
+
+#include "plantable.h"
 
 void** plantable;
 int plantable_size = -1;
