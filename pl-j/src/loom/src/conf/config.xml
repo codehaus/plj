@@ -7,6 +7,10 @@
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
 				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
 				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
+				<!--
+					This is a very strange type here, it should be mapped to any kind.
+					-->
+				<type db="unknown" class="org.pgj.typemapping.postgres.PGBytea"/>
 				<type db="text" class="org.pgj.typemapping.postgres.PGText"/>
 			</map>
 			<backmap>
@@ -82,10 +86,13 @@
 				<canUserOverrideFetchSize>false</canUserOverrideFetchSize>
 				<!--
 					Use the plan pool feature.
+					I cant tell a reason why you would disable it, but if you like...
 					-->
 				<usePlanPool>true</usePlanPool>
 				<!--
-					Client threads enabled
+					Client threads enabled.
+					This will make all the calls to the database synchronized, which is an overhead on the call.
+					Set to true if any of your triggers or stored procedures use multithreading.
 					-->
 				<clientThreadingEnabled>false</clientThreadingEnabled>
 				<!--
@@ -107,7 +114,6 @@
 					isolation level called when fireing up the UDF.
 					-->
 				<DefaultTransactionIsolation>8</DefaultTransactionIsolation>
-				<!--
 					-->
 				<DriverMajorVersion>0</DriverMajorVersion>
 				<DriverMinorVersion>1</DriverMinorVersion>
