@@ -1,7 +1,7 @@
 <project>
     <pomVersion>3</pomVersion>
     <groupId>pl-j</groupId>
-    <artifactId>pl-j</artifactId>
+    <artifactId>pl-j-api</artifactId>
     <id>pl-j-api</id>
     <name>pl-j</name>
     <currentVersion>0.0.1</currentVersion>
@@ -87,5 +87,7 @@
         <report>maven-changes-plugin</report>
         <report>maven-javadoc-plugin</report>
         <report>maven-multiproject-plugin</report>
+        <report>maven-file-activity-plugin</report>
+        <report>maven-statcvs-plugin</report>
     </reports>
 </project>
