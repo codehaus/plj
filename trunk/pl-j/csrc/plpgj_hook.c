@@ -29,6 +29,8 @@ void plpgj_sql_do(sql_msg msg);
  */
 Datum plpgj_result_do(plpgj_result);
 
+void plpgj_log_do(log_message);
+
 //
 //impl
 //
@@ -57,7 +59,7 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 		message_type = plpgj_message_type(ansver);
 		switch(message_type){
 			case MT_RESULT:
-					elog(DEBUG1, "result received bla.");
+					elog(DEBUG1, "result received.");
 					
 					break;
 			case MT_EXCEPTION:
@@ -69,6 +71,9 @@ Datum plpgj_call_hook(PG_FUNCTION_ARGS){
 					elog(DEBUG1, "sql received.");
 					plpgj_sql_do(ansver);
 					}
+					break;
+			case MT_LOG:
+					plpgj_log_do((log_message)ansver);
 					break;
 			default:
 				elog(FATAL, "received: unknown message.");
@@ -165,3 +170,23 @@ void plpgj_exception_do(error_message msg){
 	elog(ERROR,"Java side exception occured: \n %s : %s \n ", msg->classname, msg->message );
 }
 
+void plpgj_log_do(log_message log){
+	int level = DEBUG1;
+	if(log == NULL)
+		return;
+	switch(log -> level){
+		case 1:
+			level = DEBUG5;
+			break;
+		case 2:
+			level = WARNING;
+			break;
+		case 3:
+			level = INFO;
+			break;
+		case 5: level = INFO;
+	}
+
+	elog(level,"");
+
+}
