@@ -197,6 +197,14 @@ as '
 	method=doPreparedQueryTest1
 ' language 'plj';
 
+create or replace function plj_test_exec_statement(text)
+returns text
+as '
+	class=org.deadcat.jdbctests.ErrorTest
+	method=execSql
+' language 'plj';
+
+
 
 -- int4 tests
 
