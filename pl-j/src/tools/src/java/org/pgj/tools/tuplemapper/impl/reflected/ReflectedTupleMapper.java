@@ -26,7 +26,6 @@ import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
 import org.pgj.typemapping.TypeMapper;
 
-
 /**
  * A typemapper that operates with reflection.
  * @author Laszlo Hornyak
@@ -42,8 +41,8 @@ public class ReflectedTupleMapper
 			Serviceable {
 
 	Logger logger = null;
-	Map classmap = new HashMap();
-	Map backMap = new HashMap();
+	Map classNameMap = new HashMap();
+	Map classNameBackMap = new HashMap();
 	PLJClassLoader classLoader = null;
 
 	/* (non-Javadoc)
@@ -57,18 +56,12 @@ public class ReflectedTupleMapper
 	 * @see org.apache.avalon.framework.configuration.Configurable#configure(org.apache.avalon.framework.configuration.Configuration)
 	 */
 	public void configure(Configuration arg0) throws ConfigurationException {
-		try {
 			Configuration[] confs = arg0.getChildren("relation");
 			for (int i = 0; i < confs.length; i++) {
 				String name = confs[i].getAttribute("name");
-				Class cls = classLoader.load((confs[i].getAttribute("class")));
-				logger.debug("Assigning " + name + " to " + cls.getName());
-				classmap.put(name, cls);
-				backMap.put(cls.getName(), name);
+				String cls = confs[i].getAttribute("class");
+				classNameMap.put(name, cls);
 			}
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationException("Class not found.", arg0, e);
-		}
 	}
 
 	/* (non-Javadoc)
@@ -76,7 +69,7 @@ public class ReflectedTupleMapper
 	 */
 	public Object mapTuple(Tuple tuple) throws MappingException {
 		try {
-			Class cls = (Class) classmap.get(tuple.getRelationName());
+			Class cls = classLoader.load((String)classNameMap.get(tuple.getRelationName()));
 			Object obj = cls.newInstance();
 			Map fldMap = tuple.getFieldMap();
 			Iterator it = fldMap.keySet().iterator();
@@ -93,6 +86,8 @@ public class ReflectedTupleMapper
 			throw new MappingException(e);
 		} catch (InvocationTargetException e) {
 			throw new MappingException(e);
+		} catch (ClassNotFoundException e) {
+			throw new MappingException(e);
 		}
 	}
 
@@ -105,7 +100,12 @@ public class ReflectedTupleMapper
 			return null;
 		}
 		logger.debug(tuple.getRelationName());
-		Class ret = (Class) classmap.get(tuple.getRelationName());
+		Class ret;
+		try {
+			ret = classLoader.load((String)classNameMap.get(tuple.getRelationName()));
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
 		logger.debug("class: " + ret);
 		return ret;
 	}
@@ -131,7 +131,7 @@ public class ReflectedTupleMapper
 		try {
 			Tuple t = new Tuple();
 			String clname = obj.getClass().getName();
-			String relname = (String) backMap.get(clname);
+			String relname = (String) classNameBackMap.get(clname);
 
 			t.setRelationName(relname);
 			Map desc = BeanUtils.describe(obj);
