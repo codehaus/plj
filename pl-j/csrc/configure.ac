@@ -106,19 +106,19 @@ fi
 # ----
 save_CFLAGS="$CFLAGS"
 save_LIBS="$LIBS"
-CFLAGS="-I${with_pgsourcetree}/src/interfaces/libpq -I${with_pgsourcetree}/src/include $CFLAGS"
-LIBS="-L${with_pgsourcetree}/src/interfaces/libpq -lpq $LIBS"
+# CFLAGS="-I${with_pgsourcetree}/src/interfaces/libpq -I${with_pgsourcetree}/src/include $CFLAGS"
+# LIBS="-L${with_pgsourcetree}/src/interfaces/libpq -lpq $LIBS"
 
 # PQfreemem()
-AC_MSG_CHECKING([for PQfreemem() in libpq])
-have_pqfreemem=no
-AC_TRY_LINK([#include <libpq-fe.h>],
-	   [PQfreemem(NULL);],
-	   [have_pqfreemem=yes])
-AC_MSG_RESULT($have_pqfreemem)
-if test $have_pqfreemem = yes ; then
-	AC_DEFINE(HAVE_PQFREEMEM,1,)
-fi
+#AC_MSG_CHECKING([for PQfreemem() in libpq])
+#have_pqfreemem=no
+#AC_TRY_LINK([#include <libpq-fe.h>],
+#	   [PQfreemem(NULL);],
+#	   [have_pqfreemem=yes])
+#AC_MSG_RESULT($have_pqfreemem)
+#if test $have_pqfreemem = yes ; then
+#	AC_DEFINE(HAVE_PQFREEMEM,1,)
+#fi
 
 # PQputCopyData()
 AC_MSG_CHECKING([for PQputCopyData() in libpq])
