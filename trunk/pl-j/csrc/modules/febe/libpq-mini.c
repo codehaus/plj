@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+#include "executor/spi.h"
+
 PGconn_min* pq_min_connect(){
 
 	//believe me, it was not my failure
