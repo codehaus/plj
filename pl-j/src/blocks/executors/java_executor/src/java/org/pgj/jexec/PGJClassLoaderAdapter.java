@@ -4,6 +4,7 @@
 
 package org.pgj.jexec;
 
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 
 
@@ -18,7 +19,11 @@ class PGJClassLoaderAdapter extends ClassLoader {
 	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
 	 */
 	public Class loadClass(String name) throws ClassNotFoundException {
-		return cl.load(name);
+		try {
+			return cl.load(name);
+		} catch (ClassStoreException e) {
+			throw new ClassNotFoundException("Class store exception", e);
+		}
 	}
 
 	private PLJClassLoader cl = null;

@@ -19,6 +19,7 @@ import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Field;
@@ -89,6 +90,8 @@ public class ReflectedTupleMapper
 			throw new MappingException(e);
 		} catch (ClassNotFoundException e) {
 			throw new MappingException(e);
+		} catch (ClassStoreException e) {
+			throw new MappingException("Error loading class",e);
 		}
 	}
 
@@ -105,6 +108,10 @@ public class ReflectedTupleMapper
 		try {
 			ret = classLoader.load((String)classNameMap.get(tuple.getRelationName()));
 		} catch (ClassNotFoundException e) {
+			logger.error("getMappedClass: class not found", e);
+			return null;
+		} catch (ClassStoreException e) {
+			logger.error("getMappedClass: class store problem", e);
 			return null;
 		}
 		logger.debug("class: " + ret);

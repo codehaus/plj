@@ -13,6 +13,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.pgj.messages.CallRequest;
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.typemapping.Field;
 
@@ -47,7 +48,7 @@ public class InstallJar extends BasicPrivilegedJSProc {
 	}
 
 	static Object doInstallJar(PLJClassLoader classLoader, String jarName,
-			String fileName) throws IOException {
+			String fileName) throws IOException, ClassStoreException {
 
 		JarFile jarFile = new JarFile(fileName);
 		Enumeration e = jarFile.entries();

@@ -5,6 +5,7 @@
 package org.pgj.jexec;
 
 import org.pgj.messages.CallRequest;
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.typemapping.Field;
 
@@ -38,7 +39,7 @@ public class RemoveJar extends BasicPrivilegedJSProc {
 		return doRemoveJar(javaExecutor.classloader, jar);
 	}
 
-	static Object doRemoveJar(PLJClassLoader classLoader, String jar) {
+	static Object doRemoveJar(PLJClassLoader classLoader, String jar) throws ClassStoreException {
 		classLoader.removeJar(jar);
 		return null;
 	}

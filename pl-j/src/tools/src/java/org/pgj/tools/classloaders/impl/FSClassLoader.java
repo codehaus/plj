@@ -24,6 +24,7 @@ import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.logger.LogEnabled;
 import org.apache.avalon.framework.logger.Logger;
+import org.pgj.tools.classloaders.ClassStoreException;
 import org.pgj.tools.classloaders.PLJClassLoader;
 
 /**
@@ -61,7 +62,8 @@ public class FSClassLoader extends SecureClassLoader
 	/**
 	 * @see PLJClassLoader#load(String)
 	 */
-	public Class load(String fqn) throws ClassNotFoundException {
+	public Class load(String fqn) throws ClassNotFoundException,
+			ClassStoreException {
 
 		try {
 			return this.getClass().getClassLoader().loadClass(fqn);
@@ -143,7 +145,15 @@ public class FSClassLoader extends SecureClassLoader
 		Configuration[] preload = arg0.getChildren("preload");
 		for (int i = 0; i < preload.length; i++) {
 			try {
-				this.load(preload[i].getValue());
+				try {
+					this.load(preload[i].getValue());
+				} catch (ClassStoreException e1) {
+					throw new ConfigurationException(
+							"preload class "
+									+ preload[i].getValue()
+									+ " could not be loaded becouse of class store errors",
+							e1);
+				}
 			} catch (ClassNotFoundException e) {
 				logger.warn("preload class could not be loaded.", e);
 				logger
@@ -271,7 +281,7 @@ public class FSClassLoader extends SecureClassLoader
 	 * @throws ClassNotFoundException
 	 * @phoenix:mx-operation @phoenix:mx-description Reloads a class.
 	 */
-	public void reloadClass(String fqn) throws ClassNotFoundException {
+	public void reloadClass(String fqn) throws ClassNotFoundException, ClassStoreException {
 		Class cl = (Class) map.get(fqn);
 		load(fqn);
 	}
@@ -282,7 +292,12 @@ public class FSClassLoader extends SecureClassLoader
 	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
 	 */
 	public Class loadClass(String name) throws ClassNotFoundException {
-		return load(name);
+		try {
+			return load(name);
+		} catch (ClassStoreException e) {
+			logger.error("Class store exception", e);
+			throw new ClassNotFoundException("Class store error", e);
+		}
 	}
 
 	/*
