@@ -3,7 +3,10 @@ package org.pgj.jexec;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.avalon.framework.activity.Initializable;
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
@@ -44,19 +47,22 @@ public class JavaExecutor extends ClassLoader
 			TriggerExecutor,
 			Configurable,
 			Serviceable,
-			LogEnabled {
+			LogEnabled,
+			Initializable {
+
+	private Map privilegedCalls = new HashMap();
 
 	/** avalon logger object */
 	private Logger logger = null;
 
 	/** class loader block */
-	private PLJClassLoader classloader = null;
+	protected PLJClassLoader classloader = null;
 
 	/** reference to the type mapper block */
 	private TypeMapper typemapper = null;
 
 	private TupleMapper tupleMapper = null;
-	
+
 	private MethodFinder methodFinder = null;
 
 	public static final String FN_UTILITIES_CLASS = "org.pgj.jexec.Utils";
@@ -74,22 +80,36 @@ public class JavaExecutor extends ClassLoader
 
 	public Message execute(CallRequest c) {
 
-		Object obj;
+		Object obj = null;
 		try {
-			Class callclass = classloader.load(c.getClassname());
 
-			Method callm = methodFinder.findMethod(c, callclass);
-			Object[] paramobjs = methodFinder.createParameters(c, callm);
-			Thread.currentThread().setContextClassLoader(
-					new PGJClassLoaderAdapter(this.classloader));
-			obj = callm.invoke(null, paramobjs);
+			//privileged call execution
+			if ("#privileged-class".equals(c.getClassname())) {
+				PrivilegedJSProc proc = (PrivilegedJSProc) this.privilegedCalls
+						.get(c.getMethodname());
+				if (proc == null)
+					throw new NoSuchMethodError(
+							"privileged call not supported:"
+									+ c.getMethodname());
+				proc.perform(c);
+				obj = "OK";
+			} else {
+				Class callclass = classloader.load(c.getClassname());
 
-			Thread.currentThread().setContextClassLoader(null);
+				Method callm = methodFinder.findMethod(c, callclass);
+				Object[] paramobjs = methodFinder.createParameters(c, callm);
+				Thread.currentThread().setContextClassLoader(
+						new PGJClassLoaderAdapter(this.classloader));
+				obj = callm.invoke(null, paramobjs);
+
+				Thread.currentThread().setContextClassLoader(null);
+			}
 			logger.debug("<----creating result");
 			Result ret = typemapper.createResult(obj);
 			logger.debug("---->created result");
 			ret.setClient(c.getClient());
 			return ret;
+
 		} catch (InvocationTargetException t) {
 			Throwable cause = t.getTargetException();
 			if (cause instanceof ExecutionCancelException) {
@@ -147,7 +167,7 @@ public class JavaExecutor extends ClassLoader
 	public void service(ServiceManager arg0) throws ServiceException {
 		classloader = (PLJClassLoader) arg0.lookup("classloader");
 		typemapper = (TypeMapper) arg0.lookup("type-mapper");
-		methodFinder = (MethodFinder)arg0.lookup("method-finder");
+		methodFinder = (MethodFinder) arg0.lookup("method-finder");
 		try {
 			tupleMapper = (TupleMapper) arg0.lookup("tuple-mapper");
 		} catch (ServiceException e) {
@@ -167,8 +187,10 @@ public class JavaExecutor extends ClassLoader
 			logger.debug("executing trigger --> ");
 
 			Class triggerClass = classloader.load(trigger.getClassname());
-			Method triggerMethod = methodFinder.findMethod(trigger, triggerClass);
-			Object[] paramObjects = methodFinder.createParameters(trigger, triggerMethod);
+			Method triggerMethod = methodFinder.findMethod(trigger,
+					triggerClass);
+			Object[] paramObjects = methodFinder.createParameters(trigger,
+					triggerMethod);
 
 			Object retObj = triggerMethod.invoke(null, paramObjects);
 			Tuple t = tupleMapper.backMap(retObj, typemapper);
@@ -209,6 +231,16 @@ public class JavaExecutor extends ClassLoader
 	public void destroyClientSession(Client sessionClient) {
 		ClientUtils.setClientforThread(null);
 		org.pgj.tools.utils.JDBCUtil.setConfiguration(null);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.avalon.framework.activity.Initializable#initialize()
+	 */
+	public void initialize() throws Exception {
+		privilegedCalls.put("install_jar", null);
+		privilegedCalls.put("replace_jar", null);
+		privilegedCalls.put("remove_jar", null);
+		privilegedCalls.put("alter_java_path", null);
 	}
 
 }
