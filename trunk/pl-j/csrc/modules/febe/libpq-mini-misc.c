@@ -112,6 +112,17 @@ int		pqWaitTimed(int forRead, int forWrite, PGconn_min * conn,
 			                        time_t finish_time);
 
 
+int
+pqGetSome(PGconn_min *conn) {
+	int ret;
+	pqCheckInBufferSpace(1024, conn);
+	ret = read(conn -> sock, conn -> inBuffer + conn -> inCursor, 1024);
+	conn -> inEnd += ret;
+//	elog(DEBUG1, "pqGetSome: got %d bytes", ret);
+	return ret;
+}
+
+
 /*
  * pqGetc: get 1 character from the connection
  *
@@ -122,14 +133,17 @@ int		pqWaitTimed(int forRead, int forWrite, PGconn_min * conn,
 int
 pqGetc(char *result, PGconn_min * conn)
 {
-	if (conn->inCursor >= conn->inEnd)
-		return EOF;
+	if (conn->inCursor >= conn->inEnd){
+		//return EOF;
+		if(pqGetSome(conn) == 0)
+			return EOF;
+	}
 
 	*result = conn->inBuffer[conn->inCursor++];
-
-	if (conn->Pfdebug)
-		fprintf(conn->Pfdebug, "From backend> %c\n", *result);
-
+	if (conn->Pfdebug){
+		fprintf(conn->Pfdebug, "From backend> %d\n", (unsigned char)*result);
+		fflush(conn->Pfdebug);
+	}
 	return 0;
 }
 
@@ -210,9 +224,25 @@ pqPuts(const char *s, PGconn_min * conn)
 int
 pqGetnchar(char *s, size_t len, PGconn_min * conn)
 {
+	elog(DEBUG1, "pqGetnchar: %d", len);
 	if (len < 0 || len > (size_t) (conn->inEnd - conn->inCursor))
 	{
-		return EOF;
+		int ret;
+		int r;
+		//ret = pqReadData(conn);
+		ret = pqCheckInBufferSpace(len, conn);
+		//elog(DEBUG1, "pqCheckInBufferSpace: %d", ret);
+		
+		r = conn->inEnd - conn->inCursor;
+		while(r < len){
+			ret = //pqsecure_read(conn, conn -> inBuffer + conn -> inCursor, len);
+				read(conn->sock, conn -> inBuffer + conn -> inCursor + r, len - r);
+			r += ret;
+		}
+		
+		if( ret == -1) {
+			return EOF;
+		}
 	}
 
 	memcpy(s, conn->inBuffer + conn->inCursor, len);
@@ -221,6 +251,10 @@ pqGetnchar(char *s, size_t len, PGconn_min * conn)
 	 */
 
 	conn->inCursor += len;
+	
+	if(conn -> inCursor > conn -> inEnd){
+		conn -> inEnd = conn -> inCursor;
+	}
 
 	if (conn->Pfdebug)
 	{
@@ -262,13 +296,13 @@ pqGetInt(int *result, size_t bytes, PGconn_min * conn)
 		case 2:
 			if (conn->inCursor + 2 > conn->inEnd)
 				return EOF;
-			memcpy(&tmp2, conn->inBuffer + conn->inCursor, 2);
 			conn->inCursor += 2;
+			memcpy(&tmp2, conn->inBuffer + conn->inCursor, 2);
 			*result = (int) ntohs(tmp2);
 			break;
 		case 4:
-			memcpy(&tmp4, conn->inBuffer + conn->inCursor, 4);
 			conn->inCursor += 4;
+			memcpy(&tmp4, conn->inBuffer + conn->inCursor, 4);
 			*result = (int) ntohl(tmp4);
 			break;
 		default:
@@ -289,6 +323,15 @@ pqGetInt(int *result, size_t bytes, PGconn_min * conn)
 
 	return 0;
 }
+
+void
+pqMessageRecvd(PGconn_min *conn) {
+	memset(conn -> inBuffer, 0, conn -> inBufSize);
+	realloc(conn -> inBuffer, 8192);
+	conn -> inBufSize = 8192;
+	conn -> inCursor = 0;
+	conn -> inEnd = 0;
+};
 
 /*
  * pqPutInt
@@ -1142,6 +1185,8 @@ pqSocketCheck(PGconn_min * conn, int forRead, int forWrite,
 
 	return result;
 }
+
+
 
 
 /*

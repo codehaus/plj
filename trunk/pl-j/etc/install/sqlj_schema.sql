@@ -11,7 +11,7 @@ create table sqlj.plj_classes(
 	classcode	bytea not null,
 	created		timestamp not null default now(),
 	lmodified	timestamp,
-	cuser		varchar not null default current_user,
+	cuser		varchar not null default session_user,
 	lmod		varchar
 );
 
@@ -32,19 +32,19 @@ create or replace function sqlj.install_jar(varchar, varchar, int4) returns void
 	method=install_jar
 ' language 'plj' security definer;
 
-create function sqlj.replace_jar(varchar, varchar) returns void as
+create or replace function sqlj.replace_jar(varchar, varchar) returns void as
 '
 	class=#privileged-class
 	method=replace_jar
 ' language 'plj' security definer;
 
-create function sqlj.remove_jar(varchar, int4) returns void as
+create or replace function sqlj.remove_jar(varchar, int4) returns void as
 '
 	class=#privileged-class
 	method=remove_jar
 ' language 'plj' security definer;
 
-create function sqlj.alter_java_path(varchar, varchar) returns void as
+create or replace function sqlj.alter_java_path(varchar, varchar) returns void as
 '
 	class=#privileged-class
 	method=alter_java_path

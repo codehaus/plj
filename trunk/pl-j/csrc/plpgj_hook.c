@@ -88,14 +88,10 @@ void reg_error_callback() {
 	ErrorContextCallback *mycallback;
 		mycallback = SPI_palloc(sizeof(ErrorContextCallback));
 		mycallback->previous = error_context_stack;
-		pljelog(DEBUG1, "1");
 		mycallback->callback = plpgj_ErrorContextCallback;
-		pljelog(DEBUG1, "2");
 		mycallback->arg = "hello world!";
-		pljelog(DEBUG1, "3");
 
 		error_context_stack = mycallback;
-		pljelog(DEBUG1, "4");
 
 	callbacks_init = 1;
 	}
@@ -152,13 +148,10 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		&& plj_get_configvalue_boolean("plpgj.core.usetriggers"))
 	{
 		req = (message) plpgj_create_trigger_call(fcinfo);
-		pljelog(DEBUG1, "8");
 	}
 	else
 	{
-		pljelog(DEBUG1, "9");
 		req = (message) plpgj_create_call(fcinfo);
-		pljelog(DEBUG1, "10");
 	}
 
 	plpgj_channel_send((message) req);
@@ -236,10 +229,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				StringInfo	rawString;
 				MemoryContext oldctx;
 
-				pljelog(DEBUG1, "result 2");
 				if (res->data[0][0].isnull == 1){
-					pljelog(DEBUG1, "result 2.1");
-					pljelog(DEBUG1, "result 3");
 					plpgj_return_cleanup;
 					PG_RETURN_NULL();
 				}
@@ -253,9 +243,9 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 					pljelog(ERROR, "invalid heaptuple at result return");
 				}
 
-					type = (Form_pg_type) GETSTRUCT(typetup);
+				type = (Form_pg_type) GETSTRUCT(typetup);
+				ReleaseSysCache(typetup);
 
-				pljelog(DEBUG1,"2");
 				/*
 				 */
 				/*
@@ -264,39 +254,20 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				/*
 				 */
 
-				pljelog(DEBUG1,"3");
 				oldctx = CurrentMemoryContext;
 				MemoryContextSwitchTo(QueryContext);
 
 				rawString = SPI_palloc(sizeof(StringInfoData));
 				initStringInfo(rawString);
-				pljelog(DEBUG1,"4");
-				/*
-				 * {
-				 * int i = 0;
-				 * for(i = 0; i<res->data[0][0].length; i++){
-				 * pljelog(DEBUG1,">%d",(char)((char*)res->data[0][0].data)[i]);
-				 * }
-				 *
-				 * }
-				 */
 				appendBinaryStringInfo(rawString, res->data[0][0].data,
 									   res->data[0][0].length);
-				pljelog(DEBUG1,"4.1");
 				rawDatum = PointerGetDatum(rawString);
 
-				pljelog(DEBUG1,"4.2");
 				ret = OidFunctionCall1(type->typreceive, rawDatum);
 
-				pljelog(DEBUG1,"5");
-				/*
-				 * SPI_pfree(rawString);
-				 */
-				ReleaseSysCache(typetup);
 
 				MemoryContextSwitchTo(oldctx);
 
-				pljelog(DEBUG1,"return ret;");
 				plpgj_return_cleanup;
 				return ret;
 			}
@@ -385,6 +356,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 					typoid = LookupTypeName(typnam);
 					typtup = SearchSysCache(TYPEOID, typoid, 0, 0, 0);
 					typ = (Form_pg_type) GETSTRUCT(typtup);
+					ReleaseSysCache(typtup);
 
 
 					datums[i] = OidFunctionCall1(typ->typreceive,
@@ -396,7 +368,6 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 					columns[i] = SPI_fnumber
 						(tdata->tg_relation->rd_att, res->colnames[i]);
 					nulls[i] = ' ';
-					ReleaseSysCache(typtup);
 				}
 				rettup = SPI_modifytuple(tdata->tg_relation,
 										 rettup,
@@ -461,8 +432,8 @@ plpgj_sql_do(sql_msg msg)
 				
 				PG_TRY();
 					
-					elog(DEBUG1,"success");
 					plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
+					elog(DEBUG1,"success");
 				PG_CATCH();
 					elog(DEBUG1,"failure");
 				PG_END_TRY();
@@ -485,7 +456,6 @@ plpgj_sql_do(sql_msg msg)
 
 				sql = (sql_pexecute)msg;
 				nulls = SPI_palloc( sql -> nparams * sizeof(char)) + 1;
-				pljelog(DEBUG1, "nparams: %d", sql -> nparams);
 				if(sql -> nparams == 0){
 					values = NULL;
 				} else {
@@ -505,24 +475,16 @@ plpgj_sql_do(sql_msg msg)
 						pljelog(DEBUG1, "[%d] type: %s", i, sql -> params[i].type);
 
 						nulls[i] = ' ';
-						pljelog(DEBUG1, "1");
 						typnam = makeTypeName(sql -> params[i].type );
-						pljelog(DEBUG1, "2");
 						typoid = LookupTypeName(typnam);
-						pljelog(DEBUG1, "3");
 						typtup = SearchSysCache(TYPEOID, typoid, 0, 0, 0);
-						pljelog(DEBUG1, "4");
 						typstr = (Form_pg_type)GETSTRUCT(typtup);
-						pljelog(DEBUG1, "5");
 						ReleaseSysCache(typtup);
 						
 						rawString = SPI_palloc(sizeof(StringInfoData));
 						initStringInfo(rawString);
-						pljelog(DEBUG1, "6: %d", sql -> params[i].data.length);
 						appendBinaryStringInfo(rawString, sql -> params[i].data.data, sql -> params[i].data.length);
-						pljelog(DEBUG1, "7");
 						values[i] = OidFunctionCall1(typstr -> typreceive, PointerGetDatum(rawString));
-						pljelog(DEBUG1, "8");
 						
 						
 					}
@@ -533,15 +495,15 @@ plpgj_sql_do(sql_msg msg)
 				int ret;
 				Portal pret;
 				pljlogging_error = 1;
-				elog(DEBUG1, "action:%d", sql -> action);
 				PG_TRY();
 					switch(sql -> action){
 						case SQL_PEXEC_ACTION_OPENCURSOR:
 							pljelog(DEBUG1,"SQL_PEXEC_ACTION_OPENCURSOR");
 							pret = SPI_cursor_open(NULL, plantable[sql -> planid], values, nulls);
+							elog(DEBUG1, "SPI_processed: %d", SPI_processed);
 							break;
 						case SQL_PEXEC_ACTION_EXECUTE:
-							pljelog(DEBUG1,"SQL_PEXEC_ACTION_EXECUTE");
+							pljelog(DEBUG1,"SQL_PEXEC_ACTION_EXECUTE: %d, %s", sql -> planid, nulls);
 							ret = SPI_execp(plantable[sql -> planid], values, nulls, 0);
 							break;
 						case SQL_PEXEC_ACTION_UPDATE:
@@ -550,7 +512,7 @@ plpgj_sql_do(sql_msg msg)
 							break;
 					}
 				PG_CATCH();
-					//send back error
+					elog(ERROR, "ERROR");
 				PG_END_TRY();
 				pljlogging_error = 0;
 				pljelog(DEBUG1,"executed.");
@@ -577,12 +539,9 @@ plpgj_sql_do(sql_msg msg)
 					break;
 				case SQL_PEXEC_ACTION_OPENCURSOR:
 					if(pret == NULL) {
-						elog(DEBUG1, "OPOENC 1");
 						plpgj_utl_senderror("Cursor open error");
 					} else {
-						elog(DEBUG1, "OPOENC 2");
 						plpgj_utl_sendstr(pret -> name);
-						elog(DEBUG1, "OPOENC 3");
 					}
 					break;
 				}
@@ -595,13 +554,10 @@ plpgj_sql_do(sql_msg msg)
 				Portal		portal;
 				sql_msg_cursor_close sql_c_c = (sql_msg_cursor_close) msg;
 
-				elog(DEBUG1, "closing cursot %s", sql_c_c -> cursorname);
 				portal = GetPortalByName(sql_c_c->cursorname);
 				if (!PortalIsValid(portal))
 				{
 					pljlogging_error = 1;
-					pljelog(ERROR, "the portal %s does not exist!",
-							sql_c_c->cursorname);
 
 					plpgj_utl_senderror("Cursor close error");
 				}
@@ -633,6 +589,7 @@ plpgj_sql_do(sql_msg msg)
 			Portal portal;
 			plpgj_result result;
 			int i, j;
+			SPITupleTable* res_tuptable;
 			
 			sql_msg_cursor_fetch sql_c_f = (sql_msg_cursor_fetch)msg;
 			pljelog(DEBUG1, "fetching from %s", sql_c_f -> cursorname);
@@ -643,38 +600,35 @@ plpgj_sql_do(sql_msg msg)
 				plpgj_utl_senderror("Cursor invalid");
 				break;
 			}
-			elog(DEBUG1, "f 1");
-			SPI_cursor_fetch(portal, /*((sql_msg_cursor_fetch)msg) -> direction ==*/ 1 , ((sql_msg_cursor_fetch)msg) -> count);
+			elog(DEBUG1, "f 1: %d", ((sql_msg_cursor_fetch)msg) -> count);
+			SPI_cursor_fetch(portal, !(((sql_msg_cursor_fetch)msg) -> direction) , ((sql_msg_cursor_fetch)msg) -> count);
+			res_tuptable = SPI_tuptable;
+			SPI_tuptable = NULL;
+
 			if(SPI_processed < 0){
 				plpgj_utl_senderror("Not processed");
 				break;
 			}
-			elog(DEBUG1, "f 2");
 
 			result = SPI_palloc(sizeof(str_plpgj_result));
 			result -> msgtype = MT_RESULT;
 			result -> length = sizeof(str_plpgj_result);
-			result -> cols = SPI_tuptable -> tupdesc -> natts;
+			result -> cols = res_tuptable -> tupdesc -> natts;
 			result -> rows = SPI_processed;
-			elog(DEBUG1, "rows: %d, cols: %d", result -> rows, result -> cols);
 			result -> types = SPI_palloc(result -> cols * sizeof(char*));
-			elog(DEBUG1, "f 3");
 			for(j = 0; j < result -> cols; j++){
 				HeapTuple typtup;
 				Form_pg_type typstr;
-				typtup = SearchSysCache(TYPEOID,SPI_tuptable -> tupdesc -> attrs[j] -> atttypid, 0,0,0);
+				typtup = SearchSysCache(TYPEOID,res_tuptable -> tupdesc -> attrs[j] -> atttypid, 0,0,0);
 				typstr = (Form_pg_type)GETSTRUCT(typtup);
 				ReleaseSysCache(typtup);
 				result -> types[j] = NameStr(typstr -> typname);
-				elog(DEBUG1, "COLUMN [%d]: %s", j, result -> types[j]);
 			}
-			elog(DEBUG1, "f 4");
 			if(result -> rows > 0){
 				result -> data = SPI_palloc(sizeof(raw) * result -> rows);
 			} else {
 				result -> data = NULL;
 			}
-			elog(DEBUG1, "f 5");
 			for(i = 0; i < result -> rows; i++){
 				
 				result -> data[i] = SPI_palloc(result -> cols * sizeof(struct str_raw));
@@ -683,15 +637,17 @@ plpgj_sql_do(sql_msg msg)
 					Form_pg_type typstr;
 					bool isnull;
 					Datum binDat;
-					typtup = SearchSysCache(TYPEOID, SPI_tuptable -> tupdesc -> attrs[j] -> atttypid , 0,0,0);
+					typtup = SearchSysCache(TYPEOID, res_tuptable -> tupdesc -> attrs[j] -> atttypid , 0,0,0);
 					typstr = (Form_pg_type)GETSTRUCT(typtup);
-					binDat = OidFunctionCall1(typstr -> typsend , SPI_getbinval(SPI_tuptable -> vals[i], SPI_tuptable -> tupdesc, j, &isnull ));
+					ReleaseSysCache(typtup);
+					binDat = SPI_getbinval(res_tuptable -> vals[i], res_tuptable -> tupdesc, j +1, &isnull );
+					binDat = OidFunctionCall1(typstr -> typsend, binDat);
 					if(isnull){
 						result -> data[i][j].isnull = 1;
 					} else {
 						result -> data[i][j].isnull = 0;
 						result -> data[i][j].length = datumGetSize(binDat, false, typstr -> typlen)
-			                                + (typstr -> typbyval ? 4 : 0);;
+			                                + (typstr -> typbyval ? 4 : 0);
 						result -> data[i][j].data = DatumGetPointer(binDat);
 					}
 				}

@@ -5,10 +5,16 @@
 #include "pqexpbuffer.h"
 
 int
+pqGetSome(PGconn_min *conn);
+
+int
 pqPutMsgEnd(PGconn_min *conn);
 
 int
 pqReadData(PGconn_min *conn);
+
+void
+pqMessageRecvd(PGconn_min *conn);
 
 //static int
 //pqSendSome(PGconn_min *conn, int len);

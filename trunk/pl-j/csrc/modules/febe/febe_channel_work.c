@@ -29,10 +29,18 @@ febe_receive_integer_4(void)
 	unsigned char c[4];
 	int			i;
 
-	for (i = 0; i < 4; i++)
+	elog(DEBUG1, "cursor: %d, end: %d", min_conn -> inCursor, min_conn -> inEnd);
+	if( min_conn -> inCursor == min_conn -> inEnd ){
+		pqReadData(min_conn);
+		elog(DEBUG1, "cursor: %d, end: %d", min_conn -> inCursor, min_conn -> inEnd);
+		
+	}
+	for (i = 0; i < 4; i++) {
 		pqGetc(c + i, min_conn);
+	}
 	i = c[3] + (c[2] * 256) + (c[1] * 256 * 256) +
 		(c[0] * 256 * 256 * 256);
+	elog(DEBUG1, "");
 	return i;
 }
 
@@ -49,7 +57,7 @@ febe_receive_string(void)
 	 * pqGetInt(&cnt, 4, min_conn);
 	 */
 	cnt = febe_receive_integer_4();
-//	pljelog(DEBUG1,"string len: %d", cnt);
+//	elog(DEBUG1,"string len: %d", (unsigned int)cnt);
 	tmp_chr = SPI_palloc(sizeof(char) * (cnt + 2));
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	tmp_chr[cnt] = 0;
@@ -476,12 +484,15 @@ sql_pexecute febe_receive_sql_pexec(void){
 	
 	for(i = 0; i < ret -> nparams; i++) {
 		char isnull;
+		isnull = 0;
 		pqGetc(&isnull, min_conn);
 		if(isnull == 'N') {
 			ret -> params[i].data.isnull = 1;
 			ret -> params[i].data.length = 0;
+			ret -> params[i].data.data = NULL;
 		} else {
-			ret -> params[i].type = "-d-";
+			if(isnull != 'D')
+				elog(WARNING, "Should be N or D: %d", (unsigned char)isnull);
 			ret -> params[i].data.isnull = 0;
 			ret -> params[i].type = febe_receive_string();
 			ret -> params[i].data.length = febe_receive_integer_4();
@@ -542,6 +553,7 @@ plpgj_channel_receive(void)
 {
 	char		type;
 	int			ret;
+	message		msgret;
 
 	if (min_conn->inCursor == min_conn->inEnd)
 	{
@@ -569,29 +581,35 @@ plpgj_channel_receive(void)
 		elog(ERROR, "Unexpected EOF from socket. PL-J server is gone?");
 	}
 
+	msgret = NULL;
 	switch (type)
 	{
 		case 'R':
-			return (message) febe_receive_result();
+			msgret = (message) febe_receive_result();
+			break;
 		case 'E':
-			return (message) febe_receive_exception();
+			msgret = (message) febe_receive_exception();
+			break;
 		case 'L':
-			return (message) febe_receive_log();
+			msgret = (message) febe_receive_log();
+			break;
 		case 'U':
-			return (message) febe_receive_tupres();
+			msgret = (message) febe_receive_tupres();
+			break;
 		case 'S':{
-			message msg;
-//			pljelog(DEBUG1, "-----");
-			msg = (message) febe_receive_sql();
-//			pljelog(DEBUG1, "-----");
-			return msg;
+			msgret = (message) febe_receive_sql();
+			break;
 			}
 		default:
 			//pljlogging_error = 1;
-//			elog(ERROR, "message type unknown :%d", type);
+			elog(ERROR, "message type unknown :%d", type);
+			break;
 			return NULL;
 	}
 
-	return NULL;
+	if(msgret != NULL)
+		pqMessageRecvd(min_conn);
+
+	return msgret;
 }
 
