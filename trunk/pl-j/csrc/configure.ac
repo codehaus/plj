@@ -64,6 +64,7 @@ ACX_PTHREAD()
 # Locate the PostgreSQL source tree
 
 AC_ARG_WITH(pgsourcetree, [  --with-pgsourcetree=<dir> Location of PostgreSQL source tree], AC_SUBST(PGSOURCETREE, $with_pgsourcetree))
+AC_ARG_WITH(pgversion, [  --with-pgversion=<dir> Location of PostgreSQL source tree], AC_SUBST(POSTGRES_VERSION, $with_pgversion))
 
 AC_ARG_WITH(confmod, [  --with-confmod=<module> configuration module], AC_SUBST(CONFMOD, $with_confmod))
 AC_ARG_WITH(channel, [  --with-channel=<module> channel module], AC_SUBST(CHANMOD, $with_channel))
@@ -72,9 +73,8 @@ AC_ARG_WITH(callmaker, [  --with-callmaker=<module> call maker module], AC_SUBST
 if test "x$with_pgsourcetree" = "x" ; then
 	AC_MSG_ERROR([
     ********************
-    * Compiling Slony-I currently requires a source installation
-    * of PostgreSQL. Please specify the location of the tree you
-    * built as --with-pgsourcetree=<dir>
+    * You need PostgreSQL source installed to build.
+    * See howto at http://docs.codehaus.org/display/PLJ/Build+and+install+howto
     ********************
 	])
 fi
@@ -102,6 +102,15 @@ if test "x$with_callmaker" = "x" ; then
     with_callmaker=plj
     CALLMKRMOD=plj
 fi
+
+if test "x$with_pgversion" = "x" ; then
+	AC_MSG_WARN([
+    assuming version 7.4
+	])
+    with_pgversion=74
+    POSTGRES_VERSION=74
+fi
+
 
 
 # ----

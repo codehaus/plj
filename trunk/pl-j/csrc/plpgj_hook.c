@@ -47,11 +47,16 @@ Datum		plpgj_result_do(plpgj_result);
 
 void		plpgj_log_do(log_message);
 
+
+
 void		plpgj_EOXactCallBack(bool isCommit, void *arg);
 
 void		plpgj_ErrorContextCallback(void *arg);
 
 int			callbacks_init = 0;
+
+short		plpgj_tx_externalize = 1;
+short		plpgj_tx_externalize_nested = 0;
 
 /*	*/
 
@@ -170,7 +175,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			 * PG_RETURN...
 			 */
 
-
+			pljelog(DEBUG1, "result");
 			plpgj_result res = (plpgj_result) ansver;
 
 			if (res->rows == 1 && res->cols == 1)
@@ -184,17 +189,23 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				StringInfo	rawString;
 				MemoryContext oldctx;
 
-				if (res->data[0][0].isnull == 1)
+				if (res->data[0][0].isnull == 1){
 					error_context_stack = error_context_stack->previous;
-				PG_RETURN_NULL();
+					PG_RETURN_NULL();
+				}
 
+				pljelog(DEBUG1,"1");
 				typeName = makeTypeName(res->types[0]);
 				typeOid = typenameTypeId(typeName);
 				typetup = SearchSysCache(TYPEOID, typeOid, 0, 0, 0);
-				if (!HeapTupleIsValid(typetup))
+				if (!HeapTupleIsValid(typetup)){
+					//TODO how to handle this situation the best?
+					pljelog(ERROR, "invalid heaptuple at result return");
+				}
 
 					type = (Form_pg_type) GETSTRUCT(typetup);
 
+				pljelog(DEBUG1,"2");
 				/*
 				 */
 				/*
@@ -203,11 +214,13 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				/*
 				 */
 
+				pljelog(DEBUG1,"3");
 				oldctx = CurrentMemoryContext;
 				MemoryContextSwitchTo(QueryContext);
 
 				rawString = SPI_palloc(sizeof(StringInfoData));
 				initStringInfo(rawString);
+				pljelog(DEBUG1,"4");
 				/*
 				 * {
 				 * int i = 0;
@@ -219,10 +232,13 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				 */
 				appendBinaryStringInfo(rawString, res->data[0][0].data,
 									   res->data[0][0].length);
+				pljelog(DEBUG1,"4.1");
 				rawDatum = PointerGetDatum(rawString);
 
+				pljelog(DEBUG1,"4.2");
 				ret = OidFunctionCall1(type->typreceive, rawDatum);
 
+				pljelog(DEBUG1,"5");
 				/*
 				 * SPI_pfree(rawString);
 				 */
@@ -230,10 +246,12 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 
 				MemoryContextSwitchTo(oldctx);
 
+				pljelog(DEBUG1,"return ret;");
 				return ret;
 			}
 			else if (res->rows == 0)
 			{
+				pljelog(DEBUG1,"multirow not implemented.");
 				error_context_stack = error_context_stack->previous;
 				PG_RETURN_VOID();
 			}
@@ -325,13 +343,16 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 										 res->colcount,
 										 columns, datums, nulls);
 			}
+			pljelog(DEBUG1, "returning tuple");
 			return PointerGetDatum(rettup);
 		}
-		pljelog(ERROR, "no handler");
+		
+//		pljelog(ERROR, "no handler for message type: %d", message_type);
 
 	}
 	while (1);
 
+	pljelog(DEBUG1, "return null");
 	PG_RETURN_NULL();
 
 }
@@ -348,9 +369,11 @@ plpgj_sql_do(sql_msg msg)
 	switch (msg->sqltype)
 	{
 		case SQL_TYPE_STATEMENT:
+			elog(DEBUG1, "entering nolog area");
 			pljlogging_error = 1;
 			SPI_exec(((sql_msg_statement) msg)->statement, 0);
 			pljlogging_error = 0;
+			elog(DEBUG1, "leaving nolog area");
 			break;
 		case SQL_TYPE_CURSOR_CLOSE:
 			{
@@ -434,14 +457,24 @@ plpgj_log_do(log_message log)
 
 }
 
+#if (POSTGRES_VERSION == 74)
+
 /**
  * This may be the starting point of transaction externalisation.
  */
 void
 plpgj_EOXactCallBack(bool isCommit, void *arg)
 {
+
+	/*
+	 * Not externalizing if configured so.
+	 */
+	if(!plpgj_tx_externalize)
+		return;
+
 	if (isCommit) {
 		pljelog(DEBUG1, "Transaction commit - plpgj");
+		
 	}
 	else
 	{
@@ -449,16 +482,24 @@ plpgj_EOXactCallBack(bool isCommit, void *arg)
 	};
 }
 
+#elif (POSTGRES_VERSION == 80)
+
+
+
+#endif
+
 /**
  * ErrorContextCallback function
  */
 void
 plpgj_ErrorContextCallback(void *arg)
 {
+	bool reenable_loging;
 
-
-	if (!pljlogging_error)
+//	if (!pljlogging_error)
 		return;
+
+	reenable_loging = pljloging;
 
 	/*
 	 * disable loging
@@ -475,12 +516,9 @@ plpgj_ErrorContextCallback(void *arg)
 	msg->classname = "PostgreSQL statement";
 	msg->message = "No information (see your statement)";
 	msg->stacktrace = "holla aimgos!";
-	pljelog(DEBUG1, "sending exception");
+//	pljelog(DEBUG1, "sending exception");
 	plpgj_channel_send((message) msg);
 
-	/*
-	 * pljelog(DEBUG1, "exception message sent");
-	 */
 	/*
 	 * Unregister ErrorContextCallback
 	 */
@@ -492,5 +530,7 @@ plpgj_ErrorContextCallback(void *arg)
 	/*
 	 * re-enable loging
 	 */
-	pljloging = 1;
+	if(reenable_loging)
+		pljloging = 1;
+
 }

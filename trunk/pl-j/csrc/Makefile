@@ -3,7 +3,8 @@ include Makefile.in
 
 INCDIR=include $(POSTGRES_SRC_HOME)/include
 
-CFLAGS=$(addprefix -I, $(INCDIR)) -Wall -g
+CFLAGS=$(addprefix -I, $(INCDIR)) -Wall -DPOSTGRES_VERSION=$(POSTGRES_VERSION) -g
+
 LIBS=
 
 all: plpgj.so
