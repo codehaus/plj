@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.avalon.framework.activity.Initializable;
 import org.apache.avalon.framework.configuration.Configurable;
@@ -44,6 +46,8 @@ public class JDBCClassLoader extends ClassLoader
 	protected String configDeleteJar;
 	protected String configGetCnt;
 
+	private Map classMap = new HashMap();
+
 	/**
 	 * @see PLJClassLoader#load(String)
 	 */
@@ -54,6 +58,9 @@ public class JDBCClassLoader extends ClassLoader
 		} catch (ClassNotFoundException clne) {
 			logger.debug("ok, trying from repo:" + fqn);
 		}
+
+		if (classMap.containsKey(fqn))
+			return (Class) classMap.get(fqn);
 
 		ResultSet res = null;
 		Connection conn = null;
@@ -77,6 +84,7 @@ public class JDBCClassLoader extends ClassLoader
 			Class ret = defineClass(fqn, data, 0, data.length);
 			resolveClass(ret);
 
+			classMap.put(ret.getName(), ret);
 			return ret;
 
 		} catch (SQLException sqle) {
@@ -148,6 +156,8 @@ public class JDBCClassLoader extends ClassLoader
 		Connection conn = null;
 		PreparedStatement sta = null;
 		ResultSet res = null;
+		if (classMap.containsKey(fqn))
+			return true;
 		try {
 			conn = getConnection();
 			sta = conn.prepareStatement(configStore);
