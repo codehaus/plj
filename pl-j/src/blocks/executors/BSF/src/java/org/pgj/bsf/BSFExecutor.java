@@ -15,7 +15,6 @@ import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
-import org.apache.bsf.util.BSFEngineImpl;
 import org.pgj.Client;
 import org.pgj.Executor;
 import org.pgj.messages.CallRequest;
@@ -23,7 +22,6 @@ import org.pgj.messages.Error;
 import org.pgj.messages.Message;
 import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.typemapping.MappingException;
-import org.pgj.typemapping.TypeMapper;
 
 
 /**
