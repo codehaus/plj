@@ -1,3 +1,4 @@
+
 package org.pgj.glue;
 
 import org.apache.avalon.excalibur.pool.Poolable;
@@ -8,9 +9,11 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.Executor;
+import org.pgj.TriggerExecutor;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
+import org.pgj.messages.TriggerCallRequest;
 import org.pgj.tools.channelutil.ClientUtils;
 
 /**
@@ -28,7 +31,9 @@ public class GlueWorker
 	/** the chanell we are dealing with */
 	private Channel chanell;
 	/** The executor object */
-	private Executor executor;
+	private Executor executor = null;
+	/** The executor object */
+	private TriggerExecutor triggerExecutor = null;
 	/** Client */
 	private Client client;
 	/** Are we asked to terminate? */
@@ -53,23 +58,32 @@ public class GlueWorker
 	 * @see Executable#execute()
 	 */
 	public void execute() {
-		
+
 		/* if the client is not set, so this is a new call from a client
 		 * we must set the Client object for this thread, and unset it
 		 * after the call is done. (see finally block)
 		 */
 		boolean setClient = ClientUtils.getClientforThread() == null;
-		if(setClient)
+		if (setClient)
 			ClientUtils.setClientforThread(client);
 
 		try {
 			while (true) {
+
 				Message msg = chanell.receiveFromRDBMS(client);
 				logger.debug("message in the glue");
-				Message ans = executor.execute((CallRequest) msg);
-				if (logger.isDebugEnabled()){
+
+				Message ans = null;
+				if (msg instanceof TriggerCallRequest) {
+					ans = ((TriggerExecutor) executor)
+							.executeTrigger((TriggerCallRequest) msg);
+				} else {
+					ans = executor.execute((CallRequest) msg);
+				}
+
+				if (logger.isDebugEnabled()) {
 					logger.debug("executed, ansver is " + ans);
-					logger.debug("message: "+msg);
+					logger.debug("message: " + msg);
 				}
 				ans.setClient(msg.getClient());
 				if (logger.isDebugEnabled())
@@ -91,7 +105,7 @@ public class GlueWorker
 			chanell = null;
 
 			//no funny tricks ;)
-			if(setClient)
+			if (setClient)
 				ClientUtils.setClientforThread(null);
 		}
 	}

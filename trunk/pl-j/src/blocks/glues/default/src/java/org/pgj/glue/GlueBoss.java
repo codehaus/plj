@@ -8,6 +8,7 @@ import org.apache.avalon.framework.logger.Logger;
 import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.Executor;
+import org.pgj.TriggerExecutor;
 
 /**
  * @author Laszlo Hornyak
@@ -19,17 +20,19 @@ import org.pgj.Executor;
 public class GlueBoss implements Runnable, LogEnabled, Startable {
 
 	/** Reference ot the chanell we are dealing with. */
-	Channel chanell = null;
+	private Channel chanell = null;
 	/** Logger for the Glue component. */
-	Logger logger = null;
+	private Logger logger = null;
 	/** flag to show if we are terminating */
-	boolean terminating = false;
+	private boolean terminating = false;
 	/** the thread pool to use for workers */
-	ThreadPool threadPool = null;
+	private ThreadPool threadPool = null;
 	/** Worker pool */
-	Pool workerPool = null;
+	private Pool workerPool = null;
 	/** Reference to the executor component. */
-	Executor executor;
+	private Executor executor;
+	/** Reference to the executor component. */
+	private TriggerExecutor triggerExecutor;
 
 	/**
 	 * Constructor for GlueBoss.
@@ -161,4 +164,16 @@ public class GlueBoss implements Runnable, LogEnabled, Startable {
 		this.executor = executor;
 	}
 
+	/**
+	 * @return Returns the triggerExecutor.
+	 */
+	protected TriggerExecutor getTriggerExecutor() {
+		return triggerExecutor;
+	}
+	/**
+	 * @param triggerExecutor The triggerExecutor to set.
+	 */
+	protected void setTriggerExecutor(TriggerExecutor triggerExecutor) {
+		this.triggerExecutor = triggerExecutor;
+	}
 }
