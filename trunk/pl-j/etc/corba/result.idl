@@ -1,0 +1,15 @@
+#include "commons.idl"
+
+module org{
+	module pgj{
+		module corba{
+			
+			struct result{
+				string sid;
+				sequence< string > types;
+				sequence< sequence <raw> > result_tab;
+			};
+			
+		};
+	};
+};
