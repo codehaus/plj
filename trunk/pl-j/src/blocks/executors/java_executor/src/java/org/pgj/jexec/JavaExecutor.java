@@ -16,11 +16,11 @@ import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
-import org.pgj.classloaders.pgjClassLoader;
 import org.pgj.messages.CallRequest;
 import org.pgj.messages.Message;
 import org.pgj.messages.Result;
 import org.pgj.messages.TriggerCallRequest;
+import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Tuple;
 import org.pgj.typemapping.TypeMapper;
@@ -47,7 +47,7 @@ public class JavaExecutor extends ClassLoader
 	private Logger logger = null;
 
 	/** class loader block */
-	private pgjClassLoader classloader = null;
+	private PLJClassLoader classloader = null;
 
 	/** reference to the type mapper block */
 	private TypeMapper typemapper = null;
@@ -171,7 +171,7 @@ public class JavaExecutor extends ClassLoader
 	 * @avalon.dependency key="tuple-mapper" type="org.pgj.tools.tuplemapper.TupleMapper" optional="true"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
-		classloader = (pgjClassLoader) arg0.lookup("classloader");
+		classloader = (PLJClassLoader) arg0.lookup("classloader");
 		typemapper = (TypeMapper) arg0.lookup("type-mapper");
 		try {
 			tupleMapper = (TupleMapper) arg0.lookup("tuple-mapper");
