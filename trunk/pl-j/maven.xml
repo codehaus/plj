@@ -18,5 +18,9 @@
 	<postGoal name="site:generate">
 		<attainGoal name="multiproject:site"/>
 	</postGoal>
+
+	<postGoal name="pdf:prepare">
+		<!-- attainGoal name=""/ -->
+	</postGoal>
 	
 </project>
