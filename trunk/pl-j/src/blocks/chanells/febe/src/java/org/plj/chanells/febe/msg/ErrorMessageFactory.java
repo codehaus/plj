@@ -38,9 +38,9 @@ public class ErrorMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#sendMessage()
 	 */
 	public void sendMessage(Message msg, PGStream stream) throws IOException {
-		stream.SendChar(MESSAGE_HEADER_ERROR);
+		stream.Send(((org.pgj.messages.Exception)msg).getExceptionClassName().getBytes());
 		stream.Send(((org.pgj.messages.Exception)msg).getMessage().getBytes());
-
+		stream.flush();
 	}
 
 	/* (non-Javadoc)
