@@ -98,4 +98,16 @@ public class TriggerCallRequest extends AbstractCall {
 	public void setRowmode(int rowmode) {
 		this.rowmode = rowmode;
 	}
+	/**
+	 * @return Returns the type.
+	 */
+	public int getType() {
+		return type;
+	}
+	/**
+	 * @param type The type to set.
+	 */
+	public void setType(int type) {
+		this.type = type;
+	}
 }
