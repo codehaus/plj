@@ -4,24 +4,24 @@ import org.pgj.messages.Message;
 
 /**
  * A communication channel with the RDBMS.
+ * The channel interface is used to send message objects to the RDBMS 
+ * and receive results. Typically, the GLUE will handle it and some
+ * utility packages in the user-space, such as JDBC drivers, loging
+ * tools.<br>
+ * Use of this interface is highly privileged, implementations should 
+ * be protected.
  * 
  * @author Laszlo Hornyak
  * @since 0.1
  */
 public interface Channel {
-	
-	//public model non_null Client[] new_clients;
-	
-	
+
 	/**
 	 * Wait for a new incoming connection with timeout.
 	 * @param timeout		time to wait before canceling
 	 * @return				New Client, of null if timed out.
 	 * @since 0.1
 	 */
-	/*@ public normal_behavior
-	  @ ensures \result == ()
-	  @*/
 	public Client getConnection(int timeout);
 
 	/**
