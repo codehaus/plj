@@ -18,6 +18,7 @@
 #include "utils/elog.h"
 
 #include "libpq-mini-misc.h"
+#include "libpq-mini.h"
 
 extern PGconn_min* min_conn;
 
@@ -43,7 +44,29 @@ char* febe_receive_string(void){
 	return tmp_chr;
 }
 
+void trigger_send_tuple(pparam* tuple, int colcount){
+	int i;
+	elog(DEBUG1, "send tuple");
+	
+	for(i = 0; i< colcount; i++){
+		pqPutInt(tuple[i] -> data.isnull != 0, 4, min_conn);
+		if(tuple[i] -> data.isnull){
+			
+		} else {
+			elog(DEBUG1,"1: %d", tuple[i] -> data.length);
+			pqPutInt(tuple[i] -> data.length, 4, min_conn);
+			elog(DEBUG1,"2");
+			pqPutnchar(tuple[i] -> data.data,tuple[i] -> data.length, min_conn);
+			elog(DEBUG1,"3: %s", tuple[i] -> type);
+			pqPuts(tuple[i] -> type, min_conn);
+		}
+	}
+	elog(DEBUG1, "tuple sent");
+}
+
 int febe_send_trigger(trigger_callreq call){
+	int i;
+	
 	elog(DEBUG1, "sending trigger");
 	pqPutMsgStart(0,0,min_conn);
 	elog(DEBUG1, "tracepoint 1");
@@ -52,12 +75,38 @@ int febe_send_trigger(trigger_callreq call){
 	pqPutInt(call -> row, 4, min_conn);
 	elog(DEBUG1, "tracepoint 3");
 	pqPutInt(call -> reason, 4, min_conn);
+	pqPutInt(call -> actionorder, 4, min_conn);
+	pqPutInt(call -> row, 4, min_conn);
 	elog(DEBUG1, "tracepoint 4");
 	pqPuts(call -> tablename, min_conn);
 	elog(DEBUG1, "tracepoint 5");
 	pqPuts(call -> classname, min_conn);
 	elog(DEBUG1, "tracepoint 6");
 	pqPuts(call -> methodname, min_conn);
+
+	elog(DEBUG1, "tracepoint 7");
+	pqPutInt(call -> colcount, 4, min_conn);
+	
+	elog(DEBUG1, "tracepoint 8");
+	for(i = 0; i < call -> colcount; i++){
+		pqPuts(call -> colnames[i], min_conn);
+		pqPuts(call -> coltypes[i], min_conn);
+		elog(DEBUG1, "tracepoint 8.1");
+	}
+
+	switch(call -> reason){
+		case PLPGJ_TRIGGER_REASON_INSERT:
+			trigger_send_tuple(call -> _new, call -> colcount);
+		break;
+		case PLPGJ_TRIGGER_REASON_UPDATE:
+			trigger_send_tuple(call -> _old, call -> colcount);
+			trigger_send_tuple(call -> _new, call -> colcount);
+		break;
+		case PLPGJ_TRIGGER_REASON_DELETE:
+			trigger_send_tuple(call -> _old, call -> colcount);
+		break;
+	}	
+
 	elog(DEBUG1,"trace point (before pqPutMsgEnd)");
 	pqPutMsgEnd(min_conn);
 	elog(DEBUG1,"trace point (before pqFlush)");
