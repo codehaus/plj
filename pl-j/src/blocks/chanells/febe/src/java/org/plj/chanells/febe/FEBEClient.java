@@ -44,11 +44,16 @@ final class FEBEClient implements Client {
 		this.encoding = encoding;
 	}
 
+	private Channel channel = null;
 	/* (non-Javadoc)
 	 * @see org.pgj.Client#getChannel()
 	 */
 	public Channel getChannel() {
-		return null;
+		return channel;
 	}
 
+	public void setChannel(Channel channel) {
+		this.channel = channel;
+	}
+	
 }
