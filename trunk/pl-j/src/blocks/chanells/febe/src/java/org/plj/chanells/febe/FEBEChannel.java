@@ -52,6 +52,11 @@ import org.plj.chanells.febe.msg.jdbc.SQLMessageFactory;
  * 
  * @avalon.component name="FEBEChannel" lifestyle="singleton" 
  * @avalon.service type="org.pgj.Channel"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.Channel"
+ * @mx.component
+ * 
  */
 public class FEBEChannel
 		implements
@@ -124,20 +129,19 @@ public class FEBEChannel
 					Message ret = factory.getMessage(stream, encoding);
 					ret.setClient(client);
 					return ret;
-				} else {
-					//debug block -->
-					try {
-						while (true) {
-							logger.debug(new Character((char) stream
-									.ReceiveChar()).toString());
-						}
-					} catch (RuntimeException e1) {
-						logger.debug("client gone.");
-					}
-					// <- debug block
-					throw new CommunicationException("Unhandled message type:"
-							+ type);
 				}
+					//debug block -->
+				try {
+					while (true) {
+						logger.debug(new Character((char) stream.ReceiveChar())
+								.toString());
+					}
+				} catch (RuntimeException e1) {
+					logger.debug("client gone.");
+				}
+				// <- debug block
+				throw new CommunicationException("Unhandled message type:"
+						+ type);
 			}
 		} catch (IOException e) {
 			logger.error("I/O exception on receiveing from RDBMS", e);
@@ -159,7 +163,6 @@ public class FEBEChannel
 		FEBEClient client = (FEBEClient) msg.getClient();
 		synchronized (client) {
 			PGStream stream = client.getStream();
-			Encoding encoding = client.getEncoding();
 			//byte[] hdr = {0, 0, 0, 0};
 			try {
 				//stream.Send(hdr);
@@ -247,10 +250,11 @@ public class FEBEChannel
 
 	/**
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
-	 *      @avalon.dependency key="socket-manager"
-	 *      type="org.apache.avalon.cornerstone.services.sockets.SocketManager"
-	 *      @avalon.dependency key="type-mapper"
-	 *      type="org.pgj.typemapping.TypeMapper"
+	 * @avalon.dependency key="socket-manager" type="org.apache.avalon.cornerstone.services.sockets.SocketManager"
+	 * @avalon.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
+	 * 
+	 * @dna.dependency key="socket-manager" type="org.apache.avalon.cornerstone.services.sockets.SocketManager"
+	 * @dna.dependency key="type-mapper" type="org.pgj.typemapping.TypeMapper"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		logger.debug("servicing");
