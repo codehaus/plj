@@ -43,6 +43,7 @@
 
 	<build>
 		<nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
+		<sourceDirectory>src/java</sourceDirectory>
 	</build>
 
 </project>
