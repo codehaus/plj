@@ -2,8 +2,11 @@
 <project>
 
   <pomVersion>3</pomVersion>
-  <id>pl-j-java</id>
-  <name>pl-j-java</name>
+  <id>pl-j-febe</id>
+  <name>pl-j-febe</name>
+  <currentVersion>0.0.1</currentVersion>
+
+  <!-- extend>${basedir}/../../../../project.xml</extend -->
 
   <inceptionYear>2003</inceptionYear>
 
@@ -37,6 +40,14 @@
 		<type>jar</type>
 		<artifactId>cornerstone-sockets-impl</artifactId>
 		<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+			<id>pl-j</id>
+			<type>jar</type>
+			<artifactId>pl-j-api</artifactId>
+			<version>0.0.1</version>
+			<url>http://forgeahead.fastcrypt.com/maven/pl-j/plj-0.0.1</url>
 		</dependency>
 
 	</dependencies>
