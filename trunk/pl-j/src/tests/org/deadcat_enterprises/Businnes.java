@@ -72,6 +72,8 @@ public class Businnes {
 	}
 
 	public int testInt1(Integer i1, Integer i2) {
+		System.out.println("i1: "+i1);
+		System.out.println("i2: "+i2);
 		return i1.intValue() + i2.intValue();
 	}
 

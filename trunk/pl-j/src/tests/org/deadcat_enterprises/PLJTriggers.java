@@ -16,6 +16,7 @@ public class PLJTriggers {
 	private static Category cat = Category.getInstance(PLJTriggers.class);
 
 	public TestTableRecord testTableInsertTrigger(TestTableRecord _new) {
+		cat.warn("id: "+_new.getId());
 		cat.warn("adding to testtable: " + _new.getName());
 		_new.setName("(checked by trigger)".concat(_new.getName()));
 		return _new;

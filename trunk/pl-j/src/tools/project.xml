@@ -66,10 +66,9 @@
         </dependency>
 
         <dependency>
-            <groupId>sun</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.0.1B</version>
-            <url>http://java.sun.com/products/jta/</url>
+            <groupId>jboss</groupId>
+            <artifactId>jboss-j2ee</artifactId>
+            <version>3.2.3</version>
             <type>jar</type>
         </dependency>
 

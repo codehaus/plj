@@ -23,12 +23,9 @@ import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.CommunicationException;
 import org.pgj.ExecutionCancelException;
-import org.pgj.jdbc.core.JDBCInitializer;
 import org.pgj.messages.Error;
+import org.pgj.messages.Message;
 import org.pgj.tools.utils.ClientUtils;
-import org.pgj.tools.utils.JDBCUtil;
-
-import com.sun.corba.se.internal.iiop.messages.Message;
 
 /**
  * PGJ JDBC Connection.
@@ -41,10 +38,10 @@ public class PLJJDBCConnection implements Connection {
 			.getInstance(PLJJDBCConnection.class);
 
 	/** We are communicating with the backend using this chanell. */
-	private Channel communicationChanell = null;
+	protected Channel communicationChanell = null;
 
 	/** The client (must attach to each message) */
-	private Client client = null;
+	protected Client client = null;
 
 	/** is it closed? */
 	private boolean closed = false;
@@ -540,15 +537,49 @@ public class PLJJDBCConnection implements Connection {
 			throw new PLJJDBCSQLException("Connection closed");
 	}
 
-	protected org.pgj.messages.Message doReceiveMessage()
-			throws CommunicationException, SQLException,
-			ExecutionCancelException {
-		org.pgj.messages.Message msg = communicationChanell
-				.receiveFromRDBMS(client);
-		if (msg instanceof Error
-				&& getBooleanFromConf("isStatementErrorIrrecoverable"))
-			throw new ExecutionCancelException();
-		return msg;
+	/**
+	 * Send message to RDBMS and handle communication errors.
+	 * 
+	 * @param msg
+	 * @throws ExecutionCancelException
+	 */
+	protected void doSendMessage(org.pgj.messages.Message msg)
+			throws ExecutionCancelException {
+		try {
+			msg.setClient(client);
+			communicationChanell.sendToRDBMS(msg);
+		} catch (CommunicationException e) {
+			throw new ExecutionCancelException(e);
+		}
 	}
 
+	/**
+	 * Receives a message. If the database sends an error and
+	 * isStatementErrorIrrecoverable is true, then throws an
+	 * ExecutionCancelException.
+	 * 
+	 * @return The message received from the RDBMS (if the operation is
+	 *         successful)
+	 * @throws SQLException
+	 * @throws ExecutionCancelException
+	 */
+	protected org.pgj.messages.Message doReceiveMessage() throws SQLException,
+			ExecutionCancelException {
+		try {
+			org.pgj.messages.Message msg = communicationChanell
+					.receiveFromRDBMS(client);
+			if (msg instanceof Error
+					&& getBooleanFromConf("isStatementErrorIrrecoverable"))
+				throw new ExecutionCancelException(((Error) msg).getMessage());
+			return msg;
+		} catch (CommunicationException e) {
+			throw new ExecutionCancelException("Communication failure", e);
+		}
+	}
+
+	protected Message doSendReceive(Message msg) throws ExecutionCancelException, SQLException{
+		doSendMessage(msg);
+		return doReceiveMessage();
+	}
+	
 }
