@@ -57,25 +57,25 @@
 
 				<resource 
 					id="pl-j:pl-j-api" 
-					version="0.0.3"/>
+					version="0.0.4"/>
 				<resource
 					id="pl-j:pl-j-javaexecutor"
-					version="0.0.3"/>
+					version="0.0.4"/>
 				<resource
 					id="pl-j:pl-j-febe"
-					version="0.0.3"/>
+					version="0.0.4"/>
 				<resource
 					id="pl-j:pl-j-postgres"
-					version="0.0.3"/>
+					version="0.0.4"/>
 				<resource
 					id="pl-j:pl-j-glue"
-					version="0.0.3"/>
+					version="0.0.4"/>
 				<resource
 					id="pl-j:pl-j-tools"
-					version="0.0.3"/>
+					version="0.0.4"/>
 				<resource
 					id="pl-j:pl-j-jdbc"
-					version="0.0.3"/>
+					version="0.0.4"/>
 
 			</repository>
 		</classpath>
@@ -156,9 +156,21 @@
 	</component>
 
 	<component
+		name="default-methodfinder"
+		class="org.pgj.tools.methodfinder.impl.DefaultMethodFinder">
+		<dependencies>
+			<dependency key="tuple-mapper" source="tuplemapper"/>
+		</dependencies>
+		<configuration>
+			<useDefault>true</useDefault>
+		</configuration>
+	</component>
+
+	<component
 		name="executor"
 		class="org.pgj.jexec.JavaExecutor">
 		<dependencies>
+			<dependency key="default-methodfinder" source="classloader"/>
 			<dependency key="classloader" source="classloader"/>
 			<dependency key="tuple-mapper" source="tuplemapper"/>
 		</dependencies>
@@ -214,6 +226,16 @@
 				<isStatementErrorIrrecoverable>
 					true</isStatementErrorIrrecoverable>
 				<!--
+					defaultFetchSize tells the fetchsize of the resultsets of 
+					the scratch driver.
+					-->
+				<defaultFetchSize>10</defaultFetchSize>
+				<!--
+					if false setFetchSize will have no effect and the default fetch size
+					will be applied.
+					-->
+				<canUserOverrideFetchSize>false</canUserOverrideFetchSize>
+				<!--
 					===== DatabaseMetadata =====
 					-->
 				<!--
@@ -254,6 +276,7 @@
 		</categories>
 		<configuration>
 			<relation name="plj_testtable" class="org.deadcat_enterprises.TestTableRecord"/>
+			<relation name="plj_testable2" class="org.deadcat_enterprises.TestTableRecord"/>
 		</configuration>
 	</component>
 
