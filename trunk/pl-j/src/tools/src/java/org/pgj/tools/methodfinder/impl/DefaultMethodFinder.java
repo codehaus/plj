@@ -5,6 +5,7 @@
 package org.pgj.tools.methodfinder.impl;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.avalon.framework.configuration.Configurable;
@@ -64,7 +65,7 @@ public class DefaultMethodFinder
 	protected Method findJSProcMethod(CallRequest call, Class clazz)
 			throws MappingException, NoSuchMethodException {
 
-		Vector paramvector = call.getParams();
+		List paramvector = call.getParams();
 		org.pgj.typemapping.Field[] params = new org.pgj.typemapping.Field[paramvector
 				.size()];
 		Class[] paramclasses = new Class[params.length];
@@ -76,15 +77,16 @@ public class DefaultMethodFinder
 		Method callm = null;
 
 		callm = clazz.getMethod(call.getMethodname(), paramclasses);
-		if(callm.getModifiers() != 9)
-			throw new NoSuchMethodException("A JSProc method must be public static.");
+		if (callm.getModifiers() != 9)
+			throw new NoSuchMethodException(
+					"A JSProc method must be public static.");
 
 		return callm;
 	}
 
 	protected Method findTriggerMethod(TriggerCallRequest call, Class clazz)
 			throws MappingException, NoSuchMethodException {
-		
+
 		Class[] paramClasses = null;
 		if (call.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW) {
 			switch (call.getReason()) {
@@ -106,10 +108,11 @@ public class DefaultMethodFinder
 			paramClasses = new Class[0];
 		}
 		Method callm = clazz.getMethod(call.getMethodname(), paramClasses);
-		
-		if(callm.getModifiers() != 9)
-			throw new NoSuchMethodException("A JSProc method must be public static.");
-		
+
+		if (callm.getModifiers() != 9)
+			throw new NoSuchMethodException(
+					"A JSProc method must be public static.");
+
 		return callm;
 	}
 
