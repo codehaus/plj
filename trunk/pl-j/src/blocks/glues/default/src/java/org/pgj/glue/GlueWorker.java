@@ -88,7 +88,7 @@ public class GlueWorker
 				if (logger.isDebugEnabled())
 					logger.debug("ansver:" + ans);
 				if ((ans instanceof Result)
-						|| (ans instanceof org.pgj.messages.Exception)) {
+						|| (ans instanceof org.pgj.messages.Error)) {
 					chanell.sendToRDBMS(ans);
 				} else {
 					logger

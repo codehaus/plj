@@ -99,7 +99,7 @@ public class JavaExecutor
 			try {
 				obj = callm.invoke(callobj, paramobjs);
 			} catch (Throwable t) {
-				org.pgj.messages.Exception exc = createException(t);
+				org.pgj.messages.Error exc = createException(t);
 				return exc;
 			}
 
@@ -112,7 +112,7 @@ public class JavaExecutor
 
 			return ret;
 		} catch (java.lang.Exception e){
-			org.pgj.messages.Exception exc = createException(e);
+			org.pgj.messages.Error exc = createException(e);
 			return exc;
 			
 		} finally {
@@ -120,8 +120,8 @@ public class JavaExecutor
 		}
 	}
 
-	private org.pgj.messages.Exception createException(Throwable t) {
-		org.pgj.messages.Exception exc = new org.pgj.messages.Exception();
+	private org.pgj.messages.Error createException(Throwable t) {
+		org.pgj.messages.Error exc = new org.pgj.messages.Error();
 
 		logger.debug("exception!");
 
