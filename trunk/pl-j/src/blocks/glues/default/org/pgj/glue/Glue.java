@@ -1,15 +1,22 @@
 package org.pgj.glue;
 
-import org.apache.avalon.excalibur.thread.*;
+import org.apache.avalon.excalibur.pool.DefaultPool;
+import org.apache.avalon.excalibur.pool.Pool;
+import org.apache.avalon.excalibur.thread.ThreadPool;
 import org.apache.avalon.excalibur.thread.impl.DefaultThreadPool;
-import org.apache.avalon.framework.activity.*;
-import org.apache.avalon.framework.service.*;
+import org.apache.avalon.framework.activity.Initializable;
+import org.apache.avalon.framework.activity.Startable;
+import org.apache.avalon.framework.configuration.Configurable;
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.ConfigurationException;
+import org.apache.avalon.framework.logger.LogEnabled;
+import org.apache.avalon.framework.logger.Logger;
+import org.apache.avalon.framework.service.ServiceException;
+import org.apache.avalon.framework.service.ServiceManager;
+import org.apache.avalon.framework.service.Serviceable;
 import org.apache.excalibur.threadcontext.ThreadContext;
-import org.apache.avalon.framework.configuration.*;
-import org.apache.avalon.framework.logger.*;
-import org.apache.avalon.excalibur.pool.*;
-
-import org.pgj.*;
+import org.pgj.Channel;
+import org.pgj.Executor;
 
 /**
  * Glue is the glue component, containing worker threads.
@@ -18,17 +25,17 @@ public class Glue
 	implements Configurable, Initializable, Serviceable, Startable, LogEnabled {
 
 	/** A Thread pool to enable pooling capabilities for workers. */
-	ThreadPool threadPool = null;
+	private ThreadPool threadPool = null;
 	/** the configured capacity of the Thread pool */
-	int configThreadPoolCapacity = 10;
+	private int configThreadPoolCapacity = 10;
 	/** Workers are pooled here. */
-	Pool workerPool = null;
+	private Pool workerPool = null;
 	/** Factory that creates workers */
-	GlueWorkerFactory gwfactory = null;
+	private GlueWorkerFactory gwfactory = null;
 	/** flag to show if the component is terminating */
-	boolean terminating = false;
+	private boolean terminating = false;
 	/** The glue boss */
-	GlueBoss gb;
+	private GlueBoss gb;
 
 	/** The chanell we are dealing with */
 	Channel chanell = null;
