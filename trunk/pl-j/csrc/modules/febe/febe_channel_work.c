@@ -49,6 +49,7 @@ febe_receive_string(void)
 	 * pqGetInt(&cnt, 4, min_conn);
 	 */
 	cnt = febe_receive_integer_4();
+	pljelog(DEBUG1,"string len: %d", cnt);
 	tmp_chr = SPI_palloc(sizeof(char) * (cnt + 2));
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	tmp_chr[cnt] = 0;
@@ -151,7 +152,25 @@ febe_send_call(callreq call)
 int
 febe_send_result(plpgj_result res)
 {
+	int i, j;
 	pqPutMsgStart(0, 0, min_conn);
+	pqPutc('R', min_conn);
+	pqPutInt(res -> rows, 4, min_conn);
+	pqPutInt(res -> cols, 4, min_conn);
+	for(i = 0; i < res -> rows; i++) {
+		for(j = 0; j < res -> cols; j++) {
+			if(res-> data[i][j]. isnull) {
+				pqPutc('N', min_conn);
+			} else {
+				pqPutc('D', min_conn);
+				pqPutInt(res -> data[i][j].length, 4, min_conn);
+				pqPutnchar(res -> data[i][j].data, res -> data[i][j].length, min_conn);
+				
+				pqPuts(res -> types[j], min_conn);
+				
+			}
+		}
+	}
 	return 0;
 }
 
@@ -400,14 +419,21 @@ sql_msg_prepapre febe_receive_sql_prepare(void){
 
 	ret = (sql_msg_prepapre) SPI_palloc(sizeof(struct str_sql_prepare));
 	ret -> length = sizeof(struct str_sql_prepare);
+	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_PREPARE;
 	ret -> statement = febe_receive_string();
 	ret -> ntypes = febe_receive_integer_4();
+	ret -> types = ret -> ntypes == 0 ? NULL : SPI_palloc(ret -> ntypes * sizeof(char*));
+
+//	ret -> ntypes = 0;
+//	ret -> types = NULL;
 
 	for (i = 0; i < ret -> ntypes; i++) {
 		ret -> types[i] = febe_receive_string();
+		pljelog(DEBUG1, "ret -> types[%d] = %s", i, ret -> types[i]);
 	}
 
+	pljelog(DEBUG1,"febe_receive_sql_prepare");
 	return ret;
 }
 

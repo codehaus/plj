@@ -385,8 +385,6 @@ plpgj_sql_do(sql_msg msg)
 			elog(DEBUG1, "leaving nolog area");
 			break;
 		case SQL_TYPE_PREPARE:
-			elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
-			pljlogging_error = 1;
 			//do trixx
 			{
 				Oid *argtypes;
@@ -404,8 +402,12 @@ plpgj_sql_do(sql_msg msg)
 					argtypes[i] = LookupTypeName(typnam);
 				}
 
+				elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
+				pljlogging_error = 1;
 				plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
 				planid = store_plantable(plan);
+				pljlogging_error = 0;
+				elog(DEBUG1, "SQL_TYPE_PREPARE done, leaving nolog area");
 
 				//create result
 				res = SPI_palloc(sizeof(str_plpgj_result));
@@ -419,15 +421,28 @@ plpgj_sql_do(sql_msg msg)
 				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
 				res -> data[0] -> length = 8;
 				res -> data[0] -> isnull = 0;
-				res -> data[0] -> data = SPI_palloc(sizeof(12));
-			//	res -> data[0] -> date[0] = 8;
-			//	res -> data[0] -> date[1] = 0;
-			//	res -> data[0] -> date[2] = 0;
-			//	res -> data[0] -> date[3] = 0;
+				//res -> data[0] -> data = SPI_palloc(sizeof(12));
+				{
+					Form_pg_type int4typ;
+					HeapTuple int4htp;
+					Oid int4oid;
+					TypeName* int4nam;
+					Datum d;
+					
+					int4nam = makeTypeName("int4");
+					int4oid = LookupTypeName(int4nam);
+					int4htp = SearchSysCache(TYPEOID, int4oid, 0, 0, 0);
+					int4typ = (Form_pg_type)GETSTRUCT(int4htp);
+					ReleaseSysCache(int4htp);
+
+					d = OidFunctionCall1(int4typ -> typsend, UInt32GetDatum(planid));
+					res -> data[0] -> data = DatumGetPointer(d);
+				}
+				pljelog(DEBUG1,"action!");
+				plpgj_channel_send((message)res);
 				
 			}
-			pljlogging_error = 0;
-			elog(DEBUG1, "SQL_TYPE_PREPARE done, leaving nolog area");
+			break;
 		case SQL_TYPE_CURSOR_CLOSE:
 			{
 				Portal		portal;

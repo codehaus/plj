@@ -99,7 +99,7 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 
 #else
 
-#error UNSUPPORTED PG VERSION, MUST BE 7.4 OR 7.5DEV
+#error UNSUPPORTED PG VERSION, MUST BE 74 OR 80
 #endif
 
 	/*

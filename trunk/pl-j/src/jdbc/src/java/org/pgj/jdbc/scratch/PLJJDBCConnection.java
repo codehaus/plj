@@ -126,9 +126,8 @@ public class PLJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#prepareStatement(java.lang.String)
 	 */
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
-		log.error("not implemented: prepareStatement(String sql) ");
 		checkClosed();
-		return null;
+		return new PLJJDBCPreparedStatement(this,sql);
 	}
 
 	/*
