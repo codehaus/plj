@@ -29,7 +29,7 @@ public class ErrorMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessage(org.plj.chanells.febe.core.PGStream)
 	 */
 	public Message getMessage(PGStream stream, Encoding encoding) throws IOException{
-		org.pgj.messages.Exception msg = new org.pgj.messages.Exception();
+		org.pgj.messages.Error msg = new org.pgj.messages.Error();
 		msg.setMessage(stream.ReceiveString(encoding));
 		return null;
 	}
@@ -38,8 +38,8 @@ public class ErrorMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#sendMessage()
 	 */
 	public void sendMessage(Message msg, PGStream stream) throws IOException {
-		stream.Send(((org.pgj.messages.Exception)msg).getExceptionClassName().getBytes());
-		stream.Send(((org.pgj.messages.Exception)msg).getMessage().getBytes());
+		stream.Send(((org.pgj.messages.Error)msg).getExceptionClassName().getBytes());
+		stream.Send(((org.pgj.messages.Error)msg).getMessage().getBytes());
 		stream.flush();
 	}
 
@@ -47,7 +47,7 @@ public class ErrorMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getHandledClassname()
 	 */
 	public String getHandledClassname() {
-		return org.pgj.messages.Exception.class.getName();
+		return org.pgj.messages.Error.class.getName();
 	}
 
 }

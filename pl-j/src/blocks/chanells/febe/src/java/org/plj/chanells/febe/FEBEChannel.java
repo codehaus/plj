@@ -54,7 +54,7 @@ public class FEBEChannel
 			Startable {
 
 	private ServerSocket serverSocket = null;
-	TypeMapper typeMapper = null;
+	private TypeMapper typeMapper = null;
 	/**
 	 * The encoding object of the chanell.
 	 */
@@ -143,7 +143,7 @@ public class FEBEChannel
 		try {
 			stream.Send(hdr);
 			Character type = null;
-			if (msg instanceof org.pgj.messages.Exception) {
+			if (msg instanceof org.pgj.messages.Error) {
 				type = new Character('E');
 			} else if (msg instanceof Result) {
 				type = new Character('R');
