@@ -5,6 +5,7 @@
 package org.pgj.messages;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Executes a prepared SQL statement with a given data.
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 public class PreparedSQL extends SQL {
 
 	private String statementID = null;
-	private ArrayList data = new ArrayList();
+	private ArrayList data = null;
 
 	/**
 	 * @return
@@ -31,14 +32,20 @@ public class PreparedSQL extends SQL {
 	}
 
 	public void setData(int nr, Object d) {
+		if(data == null)
+			data = new ArrayList();
 		data.add(nr, d);
 	}
 
 	public Object getData(int nr) {
+		if(data == null)
+			return null;
 		return data.get(nr);
 	}
 
 	public int getSize() {
+		if(data == null)
+			return 0;
 		return data.size();
 	}
 }

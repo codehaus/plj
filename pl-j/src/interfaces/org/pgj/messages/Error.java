@@ -8,6 +8,7 @@ package org.pgj.messages;
 public class Error extends Message {
 
 	private String message = null;
+	private boolean recoverable = true;
 	private String stackTrace = null;
 	private String exceptionClassName = null;
 

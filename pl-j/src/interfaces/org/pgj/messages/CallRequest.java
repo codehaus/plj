@@ -15,7 +15,7 @@ public class CallRequest extends AbstractCall {
 	/**
 	 * Parameter vector.
 	 */
-	private Vector params = new Vector();
+	private Vector params = null;
 	/** Expected return type */
 	private String expect = null;
 	/** is oneway */
@@ -31,6 +31,8 @@ public class CallRequest extends AbstractCall {
 	 * @param param pam-param :)
 	 */
 	public void addParam(Field param) {
+		if(params == null)
+			params = new Vector();
 		params.add(param);
 	}
 
@@ -38,6 +40,8 @@ public class CallRequest extends AbstractCall {
 	 * 
 	 */
 	public Vector getParams() {
+		if(params == null)
+			params = new Vector();
 		return params;
 	}
 
