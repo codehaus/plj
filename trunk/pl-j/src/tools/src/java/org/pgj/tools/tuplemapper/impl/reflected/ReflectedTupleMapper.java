@@ -23,6 +23,7 @@ import org.pgj.tools.tuplemapper.TupleMapper;
 import org.pgj.typemapping.Field;
 import org.pgj.typemapping.MappingException;
 import org.pgj.typemapping.Tuple;
+import org.pgj.typemapping.TypeMapper;
 
 
 /**
@@ -41,6 +42,7 @@ public class ReflectedTupleMapper
 
 	Logger logger = null;
 	Map classmap = new HashMap();
+	Map backMap = new HashMap();
 	PLJClassLoader classLoader = null;
 
 	/* (non-Javadoc)
@@ -61,6 +63,7 @@ public class ReflectedTupleMapper
 				Class cls = classLoader.load((confs[i].getAttribute("class")));
 				logger.debug("Assigning " + name + " to " + cls.getName());
 				classmap.put(name, cls);
+				backMap.put(cls.getName(), name);
 			}
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException("Class not found.", arg0, e);
@@ -118,9 +121,39 @@ public class ReflectedTupleMapper
 	/* (non-Javadoc)
 	 * @see org.pgj.tools.tuplemapper.TupleMapper#backMap(java.lang.Object)
 	 */
-	public Tuple backMap(Object obj) throws MappingException {
-		// TODO Auto-generated method stub
-		return null;
+	public Tuple backMap(Object obj, TypeMapper typeMapper)
+			throws MappingException {
+		if (obj == null) {
+			return new Tuple();
+		}
+
+		try {
+			Tuple t = new Tuple();
+			String clname = obj.getClass().getName();
+			String relname = (String) backMap.get(clname);
+
+			t.setRelationName(relname);
+			Map desc = BeanUtils.describe(obj);
+			Iterator i = desc.keySet().iterator();
+			while (i.hasNext()) {
+				String key = i.next().toString();
+				if (!"class".equals(key)) {
+					t.addField(key, typeMapper.backMap(BeanUtils.getProperty(
+							obj, key)));
+				}
+			}
+
+			return t;
+		} catch (IllegalAccessException e) {
+			logger.error("backmap", e);
+			throw new MappingException("backmap", e);
+		} catch (InvocationTargetException e) {
+			logger.error("backmap", e);
+			throw new MappingException("backmap", e);
+		} catch (NoSuchMethodException e) {
+			logger.error("backmap", e);
+			throw new MappingException("backmap", e);
+		}
 	}
 
 
