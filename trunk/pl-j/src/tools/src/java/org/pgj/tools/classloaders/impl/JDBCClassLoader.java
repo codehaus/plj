@@ -22,7 +22,7 @@ import org.pgj.tools.classloaders.PLJClassLoader;
  * @author Laszlo Hornyak
  * 
  * @avalon.component name="jdbc-classloader"
- * @avalon.service type="org.pgj.classloaders.pgjClassLoader"
+ * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
  */
 public class JDBCClassLoader
 	extends ClassLoader
