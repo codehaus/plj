@@ -1,6 +1,7 @@
 /*
  * Created on Apr 3, 2004
  */
+
 package org.pgj.typemapping;
 
 import java.util.HashMap;
@@ -15,7 +16,8 @@ import java.util.Map;
 public class Tuple {
 
 	private String relationName = null;
-	
+
+	//TODO: map is not realy safe for this purpose...
 	private Map fieldMap = new HashMap();
 
 	/**
@@ -29,7 +31,7 @@ public class Tuple {
 	 * @param fieldName
 	 * @param field
 	 */
-	public void addField(String fieldName, Field field){
+	public void addField(String fieldName, Field field) {
 		fieldMap.put(fieldName, field);
 	}
 
@@ -37,8 +39,8 @@ public class Tuple {
 	 * @param fieldName
 	 * @return
 	 */
-	public Field getField(String fieldName){
-		return (Field)fieldMap.get(fieldName);
+	public Field getField(String fieldName) {
+		return (Field) fieldMap.get(fieldName);
 	}
 
 	/**
@@ -47,6 +49,7 @@ public class Tuple {
 	public String getRelationName() {
 		return relationName;
 	}
+
 	/**
 	 * @param relationName The relationName to set.
 	 */
