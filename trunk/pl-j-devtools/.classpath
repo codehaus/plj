@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="main/src/java"/>
+	<classpathentry kind="src" path="main/test/java"/>
+	<classpathentry kind="src" path="main/src/resources"/>
+	<classpathentry kind="src" path="main/test/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="MAVEN_REPO/ant/jars/ant-1.6.2.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/qdox/jars/qdox-1.5.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
