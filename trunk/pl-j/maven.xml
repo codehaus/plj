@@ -15,7 +15,7 @@
 	<preGoal name="multiproject:artifact">
 		<attainGoal name="jar:install"/>
 	</preGoal>
-	
+
 	<postGoal name="site:generate">
 		<attainGoal name="multiproject:site"/>
 	</postGoal>
@@ -40,7 +40,7 @@
 			force="true"/>
 		<style 
 			in="${basedir}/etc/merlin/classes/BLOCK-INF/block.xml" 
-			out="${maven.build.dest}/include-classes.xml"
+			out="${maven.build.dest}/includeclasses.xml"
 			style="${basedir}/etc/loom/include-classes.xslt" 
 			processor="trax"
 			force="true"/>
@@ -48,10 +48,15 @@
 
 	<preGoal name="loom:sar">
 		<attainGoal name="merlin-2-loom"/>
-		<!--
-			Now do something to REALLY load and RESOLVE the properties
-			from the generated file.
-			-->
+		<mkdir dir="${maven.build.dir}/loomlibs"/>
+		<exec dir="${basedir}" executable="${basedir}/loom-wa.sh">
+			<arg line="${maven.repo.local}"/>
+			<arg line="${maven.build.dir}/loomlibs"/>
+		</exec>
+		<copy todir="${maven.build.dir}/loomlibs">
+			<fileset dir="${maven.repo.local}" includesfile="loomincludes.properties"/>
+		</copy>
+		<echo message="${maven.loom.lib.include}, ${maven.repo.local}"/>
 	</preGoal>
 
 </project>
