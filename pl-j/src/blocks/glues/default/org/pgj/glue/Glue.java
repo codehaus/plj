@@ -20,6 +20,7 @@ import org.pgj.Executor;
 
 /**
  * Glue is the glue component, containing worker threads.
+ * @avalon.component name="glue"
  */
 public class Glue
 	implements Configurable, Initializable, Serviceable, Startable, LogEnabled {
