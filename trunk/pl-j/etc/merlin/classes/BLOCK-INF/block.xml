@@ -57,25 +57,25 @@
 
 				<resource 
 					id="pl-j:pl-j-api" 
-					version="0.0.2"/>
+					version="0.0.3"/>
 				<resource
 					id="pl-j:pl-j-javaexecutor"
-					version="0.0.2"/>
+					version="0.0.3"/>
 				<resource
 					id="pl-j:pl-j-febe"
-					version="0.0.2"/>
+					version="0.0.3"/>
 				<resource
 					id="pl-j:pl-j-postgres"
-					version="0.0.2"/>
+					version="0.0.3"/>
 				<resource
 					id="pl-j:pl-j-glue"
-					version="0.0.2"/>
+					version="0.0.3"/>
 				<resource
 					id="pl-j:pl-j-tools"
-					version="0.0.2"/>
+					version="0.0.3"/>
 				<resource
 					id="pl-j:pl-j-jdbc"
-					version="0.0.2"/>
+					version="0.0.3"/>
 
 			</repository>
 		</classpath>
@@ -87,6 +87,7 @@
 		<configuration>
 			<map>
 				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
+				<type db="int8" class="org.pgj.typemapping.postgres.PGBigInt"/>
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
 				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
 			</map>
@@ -94,6 +95,7 @@
 				<type class="java.lang.Integer" type="int4"/>
 				<type class="java.lang.String" type="varchar"/>
 				<type class="java.lang.Boolean" type="bool"/>
+				<type class="java.lang.Long" type="int8"/>
 			</backmap>
 			
 		</configuration>
