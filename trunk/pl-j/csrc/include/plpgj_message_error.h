@@ -5,7 +5,8 @@
 
 typedef struct str_error_message
 {
-	base_message_content char *classname;
+	base_message_content
+	char *classname;
 	char	   *message;
 	char	   *stacktrace;
 } str_error_message, *error_message;
