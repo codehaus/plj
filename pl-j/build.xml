@@ -2,6 +2,7 @@
 
 <!--
 	MAIN build
+	WARNING: This file is deprecated and will be removed!
 -->
 
 <project name="plpgj" default="all">
