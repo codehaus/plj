@@ -4,7 +4,7 @@ import org.pgj.messages.*;
 
 /**
  * Interface for type mapper blocks.
- * Type mapper blocks create Java methods
+ * Type mapper blocks create Java objects from database data.
  */
 public interface TypeMapper{
 	
