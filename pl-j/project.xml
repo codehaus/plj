@@ -3,7 +3,7 @@
     <groupId>pl-j</groupId>
     <artifactId>pl-j-api</artifactId>
     <name>pl-j</name>
-    <currentVersion>0.0.1</currentVersion>
+    <currentVersion>0.0.2</currentVersion>
     <organization>
         <name>The pl-j developer group</name>
         <url>http://plj.codehaus.org</url>
@@ -24,7 +24,13 @@
         <connection>scm:cvs:pserver:anonymous@cvs.plj.codehaus.org:/home/projects/plj/scm:pl-j</connection>
         <url>http://cvs.plj.codehaus.org</url>
     </repository>
-    <versions/>
+    <versions>
+        <version>
+            <id>0.0.1</id>
+            <name>alpha-0.0.1</name>
+            <tag>alpha-0.0.1</tag>
+        </version>
+    </versions>
     <branches/>
     <mailingLists>
         <mailingList>
@@ -96,10 +102,23 @@
             <type>plugin</type>
             <properties/>
         </dependency>
+        <dependency>
+            <groupId>merlin</groupId>
+            <artifactId>merlin-unit</artifactId>
+            <version>3.2.9</version>
+            <type>jar</type>
+            <url>http://www.dpml.net/merlin/jars/</url>
+            <properties/>
+        </dependency>
     </dependencies>
     <build>
         <nagEmailAddress>hornyakl@inf.elte.hu</nagEmailAddress>
         <sourceDirectory>src/interfaces</sourceDirectory>
+        <unitTest>
+            <includes>
+                <include>src/unit-tests</include>
+            </includes>
+        </unitTest>
     </build>
     <reports>
         <report>maven-multiproject-plugin</report>
