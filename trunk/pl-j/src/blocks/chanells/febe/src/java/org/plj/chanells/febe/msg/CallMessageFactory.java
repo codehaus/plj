@@ -1,6 +1,7 @@
 /*
  * Created on Jan 27, 2004
  */
+
 package org.plj.chanells.febe.msg;
 
 import java.io.IOException;
@@ -16,15 +17,16 @@ import org.plj.chanells.febe.core.PGStream;
 
 /**
  * Creates call messages.
+ * 
  * @author Laszlo Hornyak
  * @version 0.1
  */
 public class CallMessageFactory implements MessageFactory {
 
-	TypeMapper typeMapper = null;
+	private TypeMapper typeMapper = null;
 
-	Logger logger = null;
-	
+	private Logger logger = null;
+
 	public CallMessageFactory(TypeMapper typeMapper, Logger logger) {
 		this.typeMapper = typeMapper;
 		this.logger = logger;
@@ -43,17 +45,17 @@ public class CallMessageFactory implements MessageFactory {
 	 * @see org.plj.chanells.febe.msg.MessageFactory#getMessage(org.plj.chanells.febe.core.PGStream, org.plj.chanells.febe.core.Encoding)
 	 */
 	public Message getMessage(PGStream stream, Encoding encoding)
-		throws IOException, MappingException {
+			throws IOException, MappingException {
 
 		CallRequest request = new CallRequest();
 		request.setClassname(stream.ReceiveString(encoding));
 		request.setMethodname(stream.ReceiveString(encoding));
 		request.setExpect(stream.ReceiveString(encoding));
-		logger.debug("classname:"+request.getClassname());
-		logger.debug("method:"+request.getMethodname());
-		logger.debug("expects:"+request.getExpect());
+		logger.debug("classname:" + request.getClassname());
+		logger.debug("method:" + request.getMethodname());
+		logger.debug("expects:" + request.getExpect());
 		int paramcount = stream.ReceiveInteger(4);
-		logger.debug("count of params: "+paramcount);
+		logger.debug("count of params: " + paramcount);
 
 		for (int i = 0; i < paramcount; i++) {
 			String paramType = stream.ReceiveString(encoding);
