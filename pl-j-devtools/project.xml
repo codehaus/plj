@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <pomVersion>1</pomVersion>
+  <artifactId>null</artifactId>
+  <name>pl-j-devtools</name>
+  <groupId>null</groupId>
+  <organization>
+    <name>The PL-J team</name>
+    <url>http://plj.codehaus.org/</url>
+  </organization>
+  <inceptionYear>2004</inceptionYear>
+  <package>pljdevtools</package>
+  <description>The goal of this subproject is to make the life of developements related o PL-J more easy.</description>
+  <shortDescription>PLJ tools for developers</shortDescription>
+  <siteAddress>http://plj.codehaus.org/devtools/</siteAddress>
+  <siteDirectory>/home/projects/pl-j/public_html/devtools/</siteDirectory>
+  <repository />
+  <licenses>
+    <license>
+      <name>BSD</name>
+    </license>
+  </licenses>
+  <dependencies>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.6.2</version>
+      <type>jar</type>
+      <properties>
+        <unknown>unknown</unknown>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>qdox</groupId>
+      <artifactId>qdox</artifactId>
+      <version>1.5</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+  <build />
+  <reports>
+    <report>maven-jira-plugin</report>
+  </reports>
+</project>
+
