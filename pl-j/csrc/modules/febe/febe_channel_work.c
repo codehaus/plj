@@ -394,6 +394,25 @@ febe_receive_sql_statement(void)
 	return ret;
 }
 
+sql_msg_prepapre febe_receive_sql_prepare(void){
+	sql_msg_prepapre ret;
+	int i;
+
+	ret = (sql_msg_prepapre) SPI_palloc(sizeof(struct str_sql_prepare));
+	ret -> length = sizeof(struct str_sql_prepare);
+	ret -> sqltype = SQL_TYPE_PREPARE;
+	ret -> statement = febe_receive_string();
+	ret -> ntypes = febe_receive_integer_4();
+
+	for (i = 0; i < ret -> ntypes; i++) {
+		ret -> types[i] = febe_receive_string();
+	}
+
+	return ret;
+}
+
+
+
 sql_msg
 febe_receive_sql(void)
 {
@@ -404,6 +423,8 @@ febe_receive_sql(void)
 	{
 		case SQL_TYPE_STATEMENT:
 			return (sql_msg) febe_receive_sql_statement();
+		case SQL_TYPE_PREPARE:
+			return (sql_msg) febe_receive_sql_prepare();
 		default:
 			pljlogging_error = 1;
 			elog(ERROR, "UNHANDLED SQL TYPE: %d", typ);

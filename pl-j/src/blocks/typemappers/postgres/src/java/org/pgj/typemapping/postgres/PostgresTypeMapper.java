@@ -259,4 +259,12 @@ public class PostgresTypeMapper
 
 		return ret;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.typemapping.TypeMapper#getRDBMSTypeFor(java.lang.Class)
+	 */
+	public String getRDBMSTypeFor(Class cl) throws MappingException {
+		//TODO IMPLEMENT ME!
+		return null;
+	}
 }

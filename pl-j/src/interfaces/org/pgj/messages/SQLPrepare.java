@@ -3,16 +3,21 @@
  */
 package org.pgj.messages;
 
+import java.util.ArrayList;
+
 /**
  * Message to prepare an SQL statement for execution.
  * 
  * @author Laszlo Hornyak
  */
 public class SQLPrepare extends SQL {
-	
-	/** the statement to prepare */
+
+	/** The statement to prepare */
 	private String statement = null;
-	
+
+	/** Parameter types */
+	private ArrayList paramtypes = new ArrayList();
+
 	/**
 	 * @return
 	 */
@@ -27,4 +32,10 @@ public class SQLPrepare extends SQL {
 		statement = string;
 	}
 
+	public ArrayList getParamtypes() {
+		return paramtypes;
+	}
+	public void setParamtypes(ArrayList paramtypes) {
+		this.paramtypes = paramtypes;
+	}
 }

@@ -14,10 +14,11 @@
 
 typedef struct
 {
-	base_message_content int rows;
+	base_message_content 
+	int			rows;
 	int			cols;
-	char	  **types;
-	raw		   *data;
+	char	  		**types;
+	raw			*data;
 } str_plpgj_result;
 
 typedef str_plpgj_result *plpgj_result;
