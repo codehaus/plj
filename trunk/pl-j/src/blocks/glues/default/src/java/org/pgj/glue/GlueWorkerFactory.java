@@ -1,7 +1,8 @@
 package org.pgj.glue;
 
-import org.apache.avalon.excalibur.pool.*;
-import org.apache.avalon.framework.logger.*;
+import org.apache.avalon.excalibur.pool.ObjectFactory;
+import org.apache.avalon.framework.logger.LogEnabled;
+import org.apache.avalon.framework.logger.Logger;
 
 /**
  * @author Laszlo Hornyak
