@@ -88,7 +88,7 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 		DatumGetCString(DirectFunctionCall1
 						(textout, PointerGetDatum(&procStruct->prosrc)));
 
-#elif POSTGRES_VERSION == 75
+#elif POSTGRES_VERSION == 80
 
 	func_src = DatumGetCString(DirectFunctionCall1(textout,
 												   SysCacheGetAttr(PROCOID,
@@ -400,7 +400,7 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 		DatumGetCString(DirectFunctionCall1
 						(textout, PointerGetDatum(&procstruct->prosrc)));
 
-#elif POSTGRES_VERSION == 75
+#elif POSTGRES_VERSION == 80
 
 	func_src =
 		DatumGetCString(DirectFunctionCall1
@@ -434,9 +434,10 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 			SearchSysCache(TYPEOID,
 						   ObjectIdGetDatum(procstruct->proargtypes[i]), 0,
 						   0, 0);
-		if (!HeapTupleIsValid(typeTup))
+		if (!HeapTupleIsValid(typeTup)){
 			pljlogging_error = 1;
-		elog(ERROR, "INVALID TYPE OID?");
+			elog(ERROR, "INVALID TYPE OID?");
+		}
 
 		paramtype = (Form_pg_type) GETSTRUCT(typeTup);
 		if (fcinfo->argnull[i])
