@@ -56,12 +56,15 @@ public class GlueBoss implements Runnable, LogEnabled, Startable {
 	 * @see Executable#execute()
 	 */
 	public void execute() throws Exception {
-		try {
+		try{
+			if(logger.isInfoEnabled())
+				logger.debug("Client session acceptor thread starting.");
 			while (!terminating) {
 				Client cli = null;
 				do {
 					cli = chanell.getConnection(-1);
-					logger.debug("I HAVE A CIENT:"+cli);
+					if(logger.isInfoEnabled())
+						logger.debug("New client session:"+cli);
 
 					if (terminating)
 						return;
@@ -76,7 +79,8 @@ public class GlueBoss implements Runnable, LogEnabled, Startable {
 
 			}
 		} finally {
-
+			if(logger.isInfoEnabled())
+				logger.debug("Client session acceptor thread stoping.");
 		}
 	}
 

@@ -1,6 +1,7 @@
 /*
  * Created on Aug 19, 2004
  */
+
 package org.pgj.glue;
 
 import org.apache.avalon.framework.logger.Logger;
@@ -11,6 +12,7 @@ import org.pgj.ExecutionCancelException;
 import org.pgj.Executor;
 import org.pgj.TriggerExecutor;
 import org.pgj.messages.CallRequest;
+import org.pgj.messages.Error;
 import org.pgj.messages.Message;
 import org.pgj.messages.TXOperation;
 import org.pgj.messages.TriggerCallRequest;
@@ -42,13 +44,18 @@ public class ChannelWrapper implements Channel {
 	 * The JTA adapter.
 	 */
 	private JTAAdapter jtaadapter = null;
-	
+
+	/**
+	 * Client wrapper.
+	 */
 	private ClientWrapper clientWrapper = null;
+
+	private boolean errorRecoverable = false;
 
 	/**
 	 *  
 	 */
-	public ChannelWrapper(Logger logger, Channel realChannel, Executor executor) {
+	public ChannelWrapper(Logger logger, Channel realChannel, Executor executor, GlueConfiguration conf) {
 		this.logger = logger;
 		this.realChannel = realChannel;
 		this.executor = executor;
@@ -82,7 +89,8 @@ public class ChannelWrapper implements Channel {
 		 * easily cause a StackOverflowError.
 		 */
 		while (true) {
-			Message msg = realChannel.receiveFromRDBMS(clientWrapper.getRealClient());
+			Message msg = realChannel.receiveFromRDBMS(clientWrapper
+					.getRealClient());
 			if (msg instanceof CallRequest) {
 				executor.execute((CallRequest) msg);
 				continue;
@@ -91,16 +99,27 @@ public class ChannelWrapper implements Channel {
 					((TriggerExecutor) executor)
 							.executeTrigger((TriggerCallRequest) msg);
 					continue;
-				} else {
-					logger
-							.fatalError("no trigger executor is given now should send back an error.");
-					//TODO fix execution here!
 				}
+				logger
+						.fatalError("no trigger executor is given now should send back an error.");
+
+
 			} else if (msg instanceof TXOperation) {
 				//TODO do something with the transaction!
 				//and recursion to do the same.
 				continue;
+			} else if (msg instanceof Error) {
+				if (!errorRecoverable){
+					logger.info("Received an error, and by configuration, cant recover errors");
+					logger.info("Error message:"+((Error) msg).getMessage());
+					
+					throw new ExecutionCancelException(
+							"Cant recover RDBMS exceptions: "
+									+ ((Error) msg).getMessage());
+					
+				}
 			}
+
 			msg.setClient(clientWrapper);
 			return msg;
 		}

@@ -1,3 +1,4 @@
+
 package org.pgj.glue;
 
 import org.apache.avalon.excalibur.pool.Poolable;
@@ -21,8 +22,13 @@ import org.pgj.messages.TupleResult;
  * 
  * @author Laszlo Hornyak
  */
-public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
-		Startable {
+public class GlueWorker
+		implements
+			Poolable,
+			Runnable,
+			Executable,
+			LogEnabled,
+			Startable {
 
 	/** the chanell we are dealing with */
 	private Channel channel;
@@ -45,12 +51,15 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 	/** Logger */
 	private Logger logger = null;
 
+	private GlueConfiguration gConf = null;
+
 	/**
 	 * @see Executable#execute()
 	 */
 	public void execute() {
 
-		ChannelWrapper channelWrapper = new ChannelWrapper(logger, channel, executor);
+		ChannelWrapper channelWrapper = new ChannelWrapper(logger, channel,
+				executor, gConf);
 		ClientWrapper clientWrapper = new ClientWrapper(channelWrapper, client);
 		channelWrapper.setClientWrapper(clientWrapper);
 		executor.initClientSession(clientWrapper);
@@ -161,4 +170,7 @@ public class GlueWorker implements Poolable, Runnable, Executable, LogEnabled,
 		this.client = client;
 	}
 
+	public void setGConf(GlueConfiguration conf) {
+		gConf = conf;
+	}
 }

@@ -32,6 +32,11 @@ public class Glue implements Configurable, Initializable, Serviceable,
 
 	/** A Thread pool to enable pooling capabilities for workers. */
 	private ThreadPool threadPool = null;
+	
+	/**
+	 * Glue configuration object.
+	 */
+	private GlueConfiguration gConf = null;
 
 	/** the configured capacity of the Thread pool */
 	private int configThreadPoolCapacity = 10;
@@ -64,6 +69,8 @@ public class Glue implements Configurable, Initializable, Serviceable,
 	//from Configurable
 	//
 	public void configure(Configuration conf) throws ConfigurationException {
+		gConf = new GlueConfiguration();
+		gConf.setErrorRecoverable(conf.getChild("errorRecoverable").getValueAsBoolean());
 		logger.debug("configured");
 	}
 
@@ -72,7 +79,8 @@ public class Glue implements Configurable, Initializable, Serviceable,
 		threadPool = new DefaultThreadPool("Glue pool", 10, 5);
 		((DefaultThreadPool) threadPool).enableLogging(logger);
 		gwfactory = new GlueWorkerFactory();
-		gwfactory.enableLogging(logger);
+		gwfactory.setLogger(logger);
+		gwfactory.setGConf(gConf);
 		workerPool = new DefaultPool(gwfactory);
 		((DefaultPool) workerPool).enableLogging(logger);
 	}
