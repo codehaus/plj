@@ -277,4 +277,39 @@ public class PostgresTypeMapper
 			throw new MappingException("no backmapping for" + cl);
 		return typ;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.typemapping.TypeMapper#createResult(java.lang.Object, java.lang.String, boolean)
+	 */
+	public Result createResult(Object obj, String expect, boolean strict)
+			throws MappingException {
+		Result ret = new Result();
+
+		ret.setSize(1, 1);
+
+		Class eMapperClass = (Class) this.map.get(expect);
+		if (expect == null) {
+			if (strict)
+				throw new MappingException(
+						"No mapping for expected result type ");
+		}
+		AbstractPGField efld = null;
+
+		try {
+			efld = (AbstractPGField) eMapperClass.newInstance();
+			efld.backMap(obj);
+		} catch (MappingException e) {
+			if (strict)
+				throw e;
+			return createResult(obj);
+		} catch (InstantiationException e) {
+			throw new MappingException("Reflection error on backmapping", e);
+		} catch (IllegalAccessException e) {
+			throw new MappingException("Reflection error on backmapping", e);
+		}
+
+		ret.set(0, 0, efld);
+
+		return ret;
+	}
 }
