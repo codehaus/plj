@@ -109,10 +109,16 @@ static int	pqSocketPoll(int sock, int forRead, int forWrite, time_t end_time);
 int
 pqGetc(char *result, PGconn_min *conn)
 {
+	elog(DEBUG1, "pqGetc");
+
 	if (conn->inCursor >= conn->inEnd)
 		return EOF;
 
+	elog(DEBUG1, "pqGetc: perhaps realy geting something...");
+
 	*result = conn->inBuffer[conn->inCursor++];
+
+	elog(DEBUG1, "conn->inCursor = %d ", conn->inCursor );
 
 	if (conn->Pfdebug)
 		fprintf(conn->Pfdebug, "From backend> %c\n", *result);
@@ -156,11 +162,15 @@ pqGets(PQExpBuffer buf, PGconn_min *conn)
 	while (inCursor < inEnd && inBuffer[inCursor])
 		inCursor++;
 
-	if (inCursor >= inEnd)
+	if (inCursor >= inEnd){
+		elog(DEBUG1, "pqGets: EOF");
 		return EOF;
+	}
 
 	slen = inCursor - conn->inCursor;
-
+	
+	elog(DEBUG1, "length: %d", slen);
+	
 	resetPQExpBuffer(buf);
 	appendBinaryPQExpBuffer(buf, inBuffer + conn->inCursor, slen);
 
@@ -196,17 +206,22 @@ pqPuts(const char *s, PGconn_min *conn)
 int
 pqGetnchar(char *s, size_t len, PGconn_min *conn)
 {
-	if (len < 0 || len > (size_t) (conn->inEnd - conn->inCursor))
+	if (len < 0 || len > (size_t) (conn->inEnd - conn->inCursor)){
+		elog(DEBUG1, "conn->inEnd = %d", conn->inEnd);
+		elog(DEBUG1, "conn->inCursor = %d", conn->inCursor);
 		return EOF;
+	}
 
 	memcpy(s, conn->inBuffer + conn->inCursor, len);
 	/* no terminating null */
 
 	conn->inCursor += len;
 
-	if (conn->Pfdebug)
+	elog(DEBUG1,"pqGetnchar: conn->inCursor = %d", conn->inCursor);
+	if (conn->Pfdebug){
 		fprintf(conn->Pfdebug, "From backend (%lu)> %.*s\n", (unsigned long) len, (int) len, s);
-
+		elog(DEBUG1,"From backend (%lu)> %.*s\n", (unsigned long) len, (int) len, s);
+	}
 	return 0;
 }
 
@@ -633,9 +648,11 @@ pqReadData(PGconn_min *conn)
 	}
 
 	/* OK, try to read some data */
+	elog(DEBUG1, "pqReadData: now calling pqsecure_read");
 retry3:
 	nread = pqsecure_read(conn, conn->inBuffer + conn->inEnd,
 						  conn->inBufSize - conn->inEnd);
+	elog(DEBUG1, "pqReadData: pqsecure_read returned: %d", nread);
 	if (nread < 0)
 	{
 		if (SOCK_ERRNO == EINTR)

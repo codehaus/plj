@@ -21,6 +21,34 @@
 
 extern PGconn_min* min_conn;
 
+int febe_receive_integer_4(void){
+	unsigned char c[4];
+	int i;
+	for(i=0; i<4; i++){
+		pqGetc(c+i, min_conn);
+		elog(DEBUG1, "febe_receive_integer_4 [%d]: %d", i, c[i]);
+	}
+	i = c[3] + (c[2]*256) + (c[1]*256*256) + (c[0]*256*256*256);
+	elog(DEBUG1, "febe_receive_integer_4: %d", i);
+	return i;
+}
+
+char* febe_receive_string(void){
+	//this is a hackaround, should work with pqGets
+	int cnt = 0;
+	char* tmp_chr;
+	//pqGetInt(&cnt, 4, min_conn);
+	cnt = febe_receive_integer_4();
+	elog(DEBUG1, "febe_receive_string: geting %d bytes as string", cnt);
+	tmp_chr = SPI_palloc(sizeof(char) * (cnt+2));
+	elog(DEBUG1, "febe_receive_string: 1");
+	pqGetnchar(tmp_chr, cnt, min_conn);
+	elog(DEBUG1, "febe_receive_string: 2");
+	tmp_chr[cnt] = 0;
+}
+
+
+
 int febe_send_call(callreq call){
 	
 	elog(DEBUG1, "sending call req. (test phase)");
@@ -77,22 +105,31 @@ void* febe_receive_exception(){
 	name = createPQExpBuffer();
 	mesg = createPQExpBuffer();
 
-	pqReadData(min_conn);
+//	pqReadData(min_conn);
 
 	elog(DEBUG1, "febe_receive_exception tp 1");
-	res = pqGets(name, min_conn);
+	//res = pqGets(name, min_conn);
 
-	res = pqGets(mesg, min_conn);
+	//res = pqGets(mesg, min_conn);
 
-	elog(DEBUG1, "febe_receive_exception tp 2");	
+	elog(DEBUG1, "febe_receive_exception tp 2");
 
-	ret = malloc(sizeof(str_error_message));
+	ret = SPI_palloc(sizeof(str_error_message));
+	if(ret == NULL){
+		elog(DEBUG1, "gebasz.");
+	}
 
-	ret -> classname = name -> data;
-	ret -> message = mesg -> data;
+	//ret -> classname = name -> data;
+	//ret -> message = mesg -> data;
+	ret -> classname = febe_receive_string();
+	elog(DEBUG1, "febe_receive_exception tp 2.1");
+	ret -> message = febe_receive_string();
 	ret -> stacktrace = NULL;
 
 	elog(DEBUG1, "febe_receive_exception tp 3");
+
+	ret -> msgtype = MT_EXCEPTION;
+	ret -> length = sizeof(error_message);
 
 	return ret;
 }
@@ -105,11 +142,21 @@ message plpgj_channel_receive(void){
 	int header;
 	char type;
 	int ret;
-	sleep(10);
 	
-	ret = pqGetInt(&header, 4, min_conn);
+	//ret = pqGetInt(&header, 4, min_conn);
 
-	elog(DEBUG1, "header: %d", header);
+	//elog(DEBUG1, "header: %d", header);
+
+	ret = pqReadData(min_conn);
+	switch(ret){
+		case 1: elog(DEBUG1, "got data from the server"); 
+		break;
+		case 0: elog(DEBUG1, "no data, but still okay (who knows?)"); 
+		break;
+		case -1: elog(DEBUG1, "got data from the server"); 
+		break;
+		default: elog(ERROR, "something is realy _very_ wrong");
+	}
 
 	ret = pqGetc(&type, min_conn);
 
