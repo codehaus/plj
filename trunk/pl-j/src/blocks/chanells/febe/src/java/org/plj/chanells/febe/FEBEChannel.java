@@ -86,6 +86,7 @@ public class FEBEChannel
 			PGStream stream = new PGStream(sock, logger);
 			client.setStream(stream);
 			client.setChannel(this);
+			client.setTypeMapper(typeMapper);
 			return client;
 		} catch (IOException e) {
 			logger.fatalError("GetConnection, accept", e);
