@@ -545,8 +545,10 @@ public class PLJJDBCConnection implements Connection {
 	protected void doSendMessage(org.pgj.messages.Message msg)
 			throws ExecutionCancelException {
 		try {
-			msg.setClient(client);
-			communicationChanell.sendToRDBMS(msg);
+			synchronized(this.communicationChanell){
+				msg.setClient(client);
+				communicationChanell.sendToRDBMS(msg);
+			}
 		} catch (CommunicationException e) {
 			throw new ExecutionCancelException(e);
 		}
@@ -565,20 +567,24 @@ public class PLJJDBCConnection implements Connection {
 	protected org.pgj.messages.Message doReceiveMessage() throws SQLException,
 			ExecutionCancelException {
 		try {
-			org.pgj.messages.Message msg = communicationChanell
-					.receiveFromRDBMS(client);
-			if (msg instanceof Error
-					&& getBooleanFromConf("isStatementErrorIrrecoverable"))
-				throw new ExecutionCancelException(((Error) msg).getMessage());
-			return msg;
+			synchronized(this.communicationChanell){
+				org.pgj.messages.Message msg = communicationChanell
+						.receiveFromRDBMS(client);
+				if (msg instanceof Error
+						&& getBooleanFromConf("isStatementErrorIrrecoverable"))
+					throw new ExecutionCancelException(((Error) msg).getMessage());
+				return msg;
+			}
 		} catch (CommunicationException e) {
 			throw new ExecutionCancelException("Communication failure", e);
 		}
 	}
 
 	protected Message doSendReceive(Message msg) throws ExecutionCancelException, SQLException{
-		doSendMessage(msg);
-		return doReceiveMessage();
+		synchronized(this.communicationChanell){
+			doSendMessage(msg);
+			return doReceiveMessage();
+		}
 	}
 	
 }
