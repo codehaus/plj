@@ -38,12 +38,8 @@ public class GlueBoss implements Executable, LogEnabled, Startable {
 	/**
 	 * @see Runnable#run()
 	 */
-	public void run() {
-		try {
-			execute();
-		} catch (Exception e) {
-			logger.debug("", e);
-		}
+	public void run() throws Exception{
+		execute();
 	}
 
 	/**
