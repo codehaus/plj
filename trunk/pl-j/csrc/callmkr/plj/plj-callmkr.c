@@ -43,21 +43,101 @@ void plpgj_create_call_regex_init(){
 	plpgj_re_init = 1;
 }
 
-/*void plpgj_fill_callstruct(
-	ProcStruct struct,
-	char** classname, 
-	char** methodname){
+Form_pg_proc glpgj_getproc(PG_FUNCTION_ARGS){
+	HeapTuple proctup;
+	Form_pg_proc procstruct;
+	Oid funcoid;
+
+	funcoid = fcinfo->flinfo->fn_oid;
+	proctup = SearchSysCache(PROCOID, ObjectIdGetDatum(funcoid), 0,0,0 );
+	procstruct = (Form_pg_proc) GETSTRUCT(proctup);
+	ReleaseSysCache(proctup);
+	return procstruct;
+}
+
+void plpgj_fill_callstruct(
+	Form_pg_proc procStruct,
+	char* classname, 
+	char* methodname){
 
 	char *func_src;
+	int func_src_len;
+	int fret, i;
 	regmatch_t matches[MAX_NO_OPTS];
-	
-}*/
+
+	plpgj_create_call_regex_init();
+
+	func_src = DatumGetCString( DirectFunctionCall1(textout, PointerGetDatum( &procStruct->prosrc ) ) );
+	elog(DEBUG1,func_src);
+	func_src_len = strlen(func_src);
+
+	i = 0;
+	while(1){
+		int namestart;
+		int nameend;
+		int start;
+		int end;
+		char tmp[100];
+
+		elog(DEBUG1,"trace!");
+
+		fret = regexec(&func_opt_regexp, func_src + i, MAX_NO_OPTS, matches, 0);
+		if(fret)
+			break;
+		
+		start = matches[2].rm_so; 
+		end = matches[2].rm_eo;
+		namestart = matches[1].rm_so; 
+		nameend = matches[1].rm_eo;
+		
+		elog(DEBUG1,"trace 1");
+		strncpy(tmp, func_src+i+namestart, nameend-namestart);
+		elog(DEBUG1,"trace 2");
+		tmp[nameend-namestart] = 0;
+		elog(DEBUG1,"name:%s", tmp);
+		//elog(DEBUG1,"namestart: %d, nameend: %d", namestart, nameend);
+		//elog(DEBUG1,"start: %d, end: %d", start, end);
+		strncpy(tmp, func_src+i+start, end-start);
+		tmp[end-start] = 0;
+		//elog(DEBUG1, "data:%s", tmp);
+		if((start == -1)||(end == -1))
+			break;
+		
+		if(strncmp(func_src+i+namestart, "class", 5) == 0){
+			if(end - start > 50){
+				elog(ERROR, "Too long class name");
+				return;
+			}
+			strncpy(classname, func_src+i+start, end-start);
+		}else
+		if(strncmp(func_src+i+namestart, "method", 6) == 0){
+			if(end - start > 50){
+				elog(ERROR, "Too long method name");
+				return;
+			}
+			strncpy(methodname, func_src+i+start, end-start);
+		}else {
+			elog(DEBUG1,"");
+		}
+		
+		i+=end+1;
+		//elog(DEBUG1,"moving to: %d",i);
+		if(i >= func_src_len)
+			break;
+	}
+
+}
 
 trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS){
 	TriggerData* tdata;
 	trigger_callreq ret;
+	Form_pg_proc procStruct;
+
 
 	ret = SPI_palloc(sizeof(str_msg_trigger_callreq));
+	ret -> msgtype = MT_TRIGREQ;
+	ret -> length = sizeof(str_msg_trigger_callreq);
+
 	tdata = (TriggerData*)fcinfo -> context;
 	if(TRIGGER_FIRED_AFTER(tdata)){
 		ret -> actionorder = PLPGJ_TRIGGER_ACTIONORDER_AFTER;
@@ -74,9 +154,17 @@ trigger_callreq plpgj_create_trigger_call(PG_FUNCTION_ARGS){
 	if(TRIGGER_FIRED_BY_INSERT(tdata)){
 		ret -> reason = PLPGJ_TRIGGER_REASON_INSERT;
 	} else if (TRIGGER_FIRED_BY_UPDATE(tdata)){
-		
+		ret -> reason = PLPGJ_TRIGGER_REASON_UPDATE;
+	} else {
+		ret -> reason = PLPGJ_TRIGGER_REASON_DELETE;
 	}
 
+	//get table name somehow...
+	ret -> tablename = "";
+
+	procStruct = glpgj_getproc(fcinfo);
+	plpgj_fill_callstruct(procStruct, ret -> classname, ret -> methodname);
+	return ret;
 }
 
 callreq plpgj_create_call(PG_FUNCTION_ARGS){
@@ -91,8 +179,6 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	regmatch_t matches[MAX_NO_OPTS];
 	i = 0;
 	
-	plpgj_create_call_regex_init();
-	
 	ret = SPI_palloc(sizeof(str_msg_callreq));
 	memset(ret, 0, sizeof(str_msg_callreq));
 	ret->msgtype = MT_CALLREQ;
@@ -106,60 +192,7 @@ callreq plpgj_create_call(PG_FUNCTION_ARGS){
 	
 	func_src_len = strlen(func_src);
 	
-	while(1){
-		int namestart;
-		int nameend;
-		int start;
-		int end;
-		char tmp[100];
-		
-		fret = regexec(&func_opt_regexp, func_src + i, MAX_NO_OPTS, matches, 0);
-		if(fret)
-			break;
-		
-		start = matches[2].rm_so; 
-		end = matches[2].rm_eo;
-		namestart = matches[1].rm_so; 
-		nameend = matches[1].rm_eo;
-		
-		strncpy(tmp, func_src+i+namestart, nameend-namestart);
-		tmp[nameend-namestart] = 0;
-		//elog(DEBUG1,"name:%s", tmp);
-		//elog(DEBUG1,"namestart: %d, nameend: %d", namestart, nameend);
-		//elog(DEBUG1,"start: %d, end: %d", start, end);
-		strncpy(tmp, func_src+i+start, end-start);
-		tmp[end-start] = 0;
-		//elog(DEBUG1, "data:%s", tmp);
-		if((start == -1)||(end == -1))
-			break;
-		
-		if(strncmp(func_src+i+namestart, "class", 5) == 0){
-			if(end - start > 50){
-				elog(ERROR, "Too long class name");
-				return NULL;
-			}
-			strncpy(ret->classname, func_src+i+start, end-start);
-			//elog(DEBUG1,"class <- %s", ret->classname);
-		}else
-		if(strncmp(func_src+i+namestart, "method", 6) == 0){
-			if(end - start > 50){
-				elog(ERROR, "Too long method name");
-				return NULL;
-			}
-			strncpy(ret->methodname, func_src+i+start, end-start);
-			//elog(DEBUG1,"method <- %s", ret->methodname);
-		}else
-		if(strncmp(func_src+i+namestart, "oneway", 6) == 0){
-			//elog(DEBUG1, "nothing to do with oneway calls");
-		}else{
-			elog(DEBUG1,"didn`t match any");
-		}
-		
-		i+=end+1;
-		//elog(DEBUG1,"moving to: %d",i);
-		if(i >= func_src_len)
-			break;
-	}
+	plpgj_fill_callstruct(procstruct, ret -> classname, ret -> methodname);
 	
 	ret -> nrOfParams = fcinfo -> nargs;
 	if(ret -> nrOfParams > 0)
