@@ -266,8 +266,10 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			 * break;
 			 */
 		}
-		if (message_type == MT_EXCEPTION)
+		if (message_type == MT_EXCEPTION) {
+			elog(ERROR, ((error_message)ansver) -> message);
 			PG_RETURN_NULL();
+		}
 		if (message_type == MT_TUPLRES)
 		{
 			HeapTuple	rettup;
@@ -278,8 +280,9 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			 */
 			TriggerData *tdata = (TriggerData *) fcinfo->context;
 
-			if (TRIGGER_FIRED_FOR_STATEMENT(tdata->tg_event))
+			if (TRIGGER_FIRED_FOR_STATEMENT(tdata->tg_event)) {
 				rettup = NULL;
+			}
 			else
 			{
 				Datum	   *datums;
@@ -320,6 +323,11 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 					appendBinaryStringInfo(rawString,
 										   res->_tuple[i]->data.data,
 										   res->_tuple[i]->data.length);
+					{
+					int j;
+					for(j=0; j < res->_tuple[i]->data.length; j++)
+						pljelog(DEBUG1, "res->_tuple[%d]->data.data[%d] = %d", i, j, ((char*)(res->_tuple[i]->data.data))[j]);
+					}
 
 					typnam = makeTypeName(res->_tuple[i]->type);
 					typoid = LookupTypeName(typnam);
@@ -430,8 +438,7 @@ plpgj_sql_do(sql_msg msg)
 void
 plpgj_exception_do(error_message msg)
 {
-
-/*	pljelog(ERROR,"Java side exception occured: \n %s : %s \n ", msg->classname, msg->message ); */
+	elog(ERROR,"Java side exception occured: \n %s : %s \n ", msg->classname, msg->message ); 
 }
 
 void
