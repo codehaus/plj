@@ -50,8 +50,8 @@ public class ChannelWrapper implements Channel {
 	 * Client wrapper.
 	 */
 	private ClientWrapper clientWrapper = null;
-
-	private boolean errorRecoverable = false;
+	
+	private GlueConfiguration conf = null;
 
 	/**
 	 *  
@@ -60,6 +60,7 @@ public class ChannelWrapper implements Channel {
 		this.logger = logger;
 		this.realChannel = realChannel;
 		this.executor = executor;
+		this.conf = conf;
 	}
 
 	/*
@@ -110,7 +111,7 @@ public class ChannelWrapper implements Channel {
 				//and recursion to do the same.
 				continue;
 			} else if (msg instanceof Error) {
-				if (!errorRecoverable){
+				if (!conf.isErrorRecoverable()){
 					logger.info("Received an error, and by configuration, cant recover errors");
 					logger.info("Error message:"+((Error) msg).getMessage());
 					
