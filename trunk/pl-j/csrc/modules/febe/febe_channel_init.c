@@ -38,14 +38,14 @@ plpgj_channel_initialize()
 
 	CONFIG_COPY("febe-mini.unix-socket", PLJ_UNIX_SOCKET)
 		CONFIG_COPY("febe-mini.connect-timeout", PLJ_CONNECT_TIMEOUT)
-		pljelog(DEBUG1, "configured");
+//		pljelog(DEBUG1, "configured");
 	min_conn = (struct PGconn_min *) pq_min_connect();
-	pljelog(DEBUG1, "connected");
+//	pljelog(DEBUG1, "connected");
 
 	tracefile = plj_get_configvalue_string("febe-mini.proto-trace");
 	if (strcmp(tracefile, "") != 0)
 	{
-		pljelog(DEBUG2, "using tracefile: %s", tracefile);
+//		pljelog(DEBUG2, "using tracefile: %s", tracefile);
 		pq_min_set_trace(min_conn, fopen(tracefile, "a"));
 	}
 
