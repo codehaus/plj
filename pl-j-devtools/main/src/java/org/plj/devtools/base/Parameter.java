@@ -5,9 +5,10 @@ package org.plj.devtools.base;
 
 
 /**
+ * Represents an SQL stored procedure parameter.
+ * 
  * @author Laszlo Hornyak
  */
-//TODO: edit comments for Parameter
 public class Parameter {
 
 	public final static int mode_in = 1;

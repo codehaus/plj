@@ -23,4 +23,5 @@ public interface DbPlatform {
 	String createUdf(String clazz, String method, Set properties,
 			String comment, String udfName, String returns, List params);
 
+	String getDefaultRDBMSType(String fqn);
 }
