@@ -54,13 +54,19 @@ public class CallMessageFactory implements MessageFactory {
 		logger.debug("classname:" + request.getClassname());
 		logger.debug("method:" + request.getMethodname());
 		logger.debug("expects:" + request.getExpect());
-		int paramcount = stream.ReceiveInteger(4);
+		int paramcount = stream.ReceiveIntegerR(4);
 		logger.debug("count of params: " + paramcount);
 
 		for (int i = 0; i < paramcount; i++) {
 			String paramType = stream.ReceiveString(encoding);
-			int paramSize = stream.ReceiveInteger(4);
-			byte[] paramData = stream.Receive(paramSize);
+			byte[] paramData = null;
+			if(stream.ReceiveChar() == 'D'){
+				int paramSize = stream.ReceiveIntegerR(4);
+				paramData = stream.Receive(paramSize);
+				logger.debug("not null field param");
+			} else {
+				logger.debug("null param");
+			}
 			Field fld = typeMapper.map(paramData, paramType);
 			request.addParam(fld);
 		}
