@@ -33,6 +33,10 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @avalon.component name="reflectedtuplemapper" lifestyle="singleton"
  * @avalon.service type="org.pgj.tools.tuplemapper.TupleMapper"
+ * 
+ * @dna.component name="reflectedtuplemapper"
+ * @dna.service type="org.pgj.tools.tuplemapper.TupleMapper"
+ * 
  */
 public class ReflectedTupleMapper
 		implements
@@ -122,6 +126,8 @@ public class ReflectedTupleMapper
 	 * @see org.apache.avalon.framework.service.Serviceable#service(org.apache.avalon.framework.service.ServiceManager)
 	 * 
 	 * @avalon.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
+	 * 
+	 * @dna.dependency key="classloader" type="org.pgj.tools.classloaders.PLJClassLoader"
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		classLoader = (PLJClassLoader) arg0.lookup("classloader");

@@ -23,6 +23,9 @@ import org.pgj.tools.transactions.JTAAdapter;
  * Glue is the glue component, containing worker threads.
  * 
  * @avalon.component name="glue" lifestyle="singleton"
+ * 
+ * @dna.component
+ * 
  */
 public class Glue implements Configurable, Initializable, Serviceable,
 		Startable, LogEnabled {
@@ -116,6 +119,12 @@ public class Glue implements Configurable, Initializable, Serviceable,
 	 * @avalon.dependency key="executor" type="org.pgj.Executor"
 	 * @avalon.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor" optional="true"
 	 * @avalon.dependency key="jta-adapter" type="org.pgj.tools.transactions.JTAAdapter" optional="true"
+	 * 
+	 * @dna.dependency key="channel" type="org.pgj.Channel"
+	 * @dna.dependency key="executor" type="org.pgj.Executor"
+	 * @dna.dependency key="triggerexecutor" type="org.pgj.TriggerExecutor" optional="true"
+	 * @dna.dependency key="jta-adapter" type="org.pgj.tools.transactions.JTAAdapter" optional="true"
+	 * 
 	 */
 	public void service(ServiceManager arg0) throws ServiceException {
 		chanell = (Channel) arg0.lookup("channel");

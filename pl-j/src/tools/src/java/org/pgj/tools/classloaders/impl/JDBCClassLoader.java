@@ -28,6 +28,10 @@ import org.pgj.tools.classloaders.PLJClassLoader;
  * 
  * @avalon.component name="jdbc-classloader"
  * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
+ * 
+ * @dna.component
+ * @avalon.service type="org.pgj.tools.classloaders.PLJClassLoader"
+ * 
  */
 public class JDBCClassLoader extends ClassLoader
 		implements

@@ -12,6 +12,9 @@ import org.pgj.tools.transactions.JTAAdapter;
  * @author Laszlo Hornyak
  * @avalon.component name="jta-adapter" lifestyle="singleton" 
  * @avalon.service type="org.pgj.tools.transactions.JTAAdapter"
+ * 
+ * @dna.component
+ * @dna.service type="org.pgj.tools.transactions.JTAAdapter"
  */
 public class FakeJTAAdapter implements JTAAdapter {
 

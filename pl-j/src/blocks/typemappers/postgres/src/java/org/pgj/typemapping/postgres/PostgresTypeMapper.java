@@ -22,6 +22,10 @@ import org.pgj.typemapping.TypeMapper;
  * 
  * @avalon.component name="postgre-typemapper" lifestyle="singleton"
  * @avalon.service type="org.pgj.typemapping.TypeMapper"
+ * 
+ * @dna.component name="postgre-typemapper"
+ * @dna.service type="org.pgj.typemapping.TypeMapper"
+ * 
  */
 public class PostgresTypeMapper
 		implements
