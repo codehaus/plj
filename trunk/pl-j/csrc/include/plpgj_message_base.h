@@ -11,9 +11,9 @@ base_message_content} str_message, *message;
 
 typedef struct str_raw
 {
-	int			length;
-	unsigned short isnull;
-	void	   *data;
+	int	length;
+	int	isnull;
+	void	*data;
 }	*raw;
 
 typedef struct fnc_param
