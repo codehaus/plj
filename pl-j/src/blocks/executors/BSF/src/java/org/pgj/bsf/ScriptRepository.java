@@ -10,7 +10,7 @@ package org.pgj.bsf;
  * @author Laszlo Hornyak
  */
 public interface ScriptRepository {
-	Script loadScript(String name) throws ScriptNotFoundException;
+	Script loadScript(String name) throws ScriptNotFoundException, ScriptStoreException;
 	void storeScript(Script script) throws ScriptStoreException;
 	void deleteScript(String name) throws ScriptStoreException, ScriptNotFoundException;
 }

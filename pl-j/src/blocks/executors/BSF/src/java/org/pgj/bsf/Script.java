@@ -8,14 +8,16 @@ package org.pgj.bsf;
  * A Script bean.
  * @author Laszlo Hornyak
  */
-class Script {
+public class Script {
 
 	private String language = null;
 	private String source = null;
+	private String scrName = null;
 
-	public Script(String lang, String src) {
+	public Script(String lang, String src, String name) {
 		language = lang;
 		source = src;
+		scrName = name;
 	}
 
 
@@ -25,5 +27,11 @@ class Script {
 	}
 	public String getSource() {
 		return source;
+	}
+	public String getName() {
+		return scrName;
+	}
+	public void setName(String name) {
+		this.scrName = name;
 	}
 }
