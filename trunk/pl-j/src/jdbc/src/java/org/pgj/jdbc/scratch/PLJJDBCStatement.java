@@ -62,6 +62,7 @@ public class PLJJDBCStatement implements Statement {
 
 			try {
 				channel.sendToRDBMS(msg);
+				channel.receiveFromRDBMS(client);
 			} catch (CommunicationException e) {
 				throw new SQLException("Comminication exception. root reason:"
 						+ e.getMessage());
