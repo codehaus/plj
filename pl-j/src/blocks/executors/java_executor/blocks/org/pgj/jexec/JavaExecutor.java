@@ -1,22 +1,31 @@
 package org.pgj.jexec;
 
 import java.io.File;
-import java.lang.reflect.*;
-import java.util.*;
-import org.pgj.*;
-import org.pgj.classloaders.*;
-import org.pgj.messages.*;
-import org.pgj.typemapping.*;
-import org.apache.avalon.framework.configuration.*;
-import org.apache.avalon.framework.logger.*;
-import org.apache.avalon.framework.service.*;
+import java.lang.reflect.Method;
+import java.util.Vector;
+
+import org.apache.avalon.framework.configuration.Configurable;
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.ConfigurationException;
+import org.apache.avalon.framework.logger.LogEnabled;
+import org.apache.avalon.framework.logger.Logger;
+import org.apache.avalon.framework.service.ServiceException;
+import org.apache.avalon.framework.service.ServiceManager;
+import org.apache.avalon.framework.service.Serviceable;
+import org.pgj.Executor;
+import org.pgj.classloaders.pgjClassLoader;
+import org.pgj.messages.CallRequest;
+import org.pgj.messages.Message;
+import org.pgj.messages.Result;
+import org.pgj.typemapping.TypeMapper;
 
 /**
  * @author Laszlo Hornyak
  * 
  * Executes java code. 
- * @phoenix:block
- * @phoenix:mx-topic name="plj"
+ * 
+ * @avalon.component name="java-executor"
+ * @avalon.service type="org.pgj.Executor"
  */
 public class JavaExecutor
 	extends ClassLoader
