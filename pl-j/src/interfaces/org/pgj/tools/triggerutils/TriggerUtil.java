@@ -19,7 +19,7 @@ public class TriggerUtil {
 
 	public static final synchronized void pushTriggerData(TriggerCallRequest t) {
 		Stack stack = (Stack) threadTrigger.get();
-		if (stack != null) {
+		if (stack == null) {
 			stack = new Stack();
 			threadTrigger.set(stack);
 		}
@@ -28,7 +28,7 @@ public class TriggerUtil {
 
 	public static final synchronized TriggerCallRequest peekTriggerData() {
 		Stack stack = (Stack) threadTrigger.get();
-		if (stack != null) {
+		if (stack == null) {
 			stack = new Stack();
 			threadTrigger.set(stack);
 		}
