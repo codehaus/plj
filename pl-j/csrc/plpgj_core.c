@@ -25,6 +25,8 @@ Datum plpgj_call_handler(PG_FUNCTION_ARGS){
 	
 	datumreturn = plpgj_call_hook(fcinfo);
 	
+	elog(DEBUG1,"call done, disconnect and return");
+	
 	if( SPI_finish() != SPI_OK_FINISH ){
 		elog(ERROR,"SPI finsh error");
 	}
