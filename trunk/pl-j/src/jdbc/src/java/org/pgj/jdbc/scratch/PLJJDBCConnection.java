@@ -14,11 +14,15 @@ import java.sql.SQLWarning;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.log4j.Category;
+import org.apache.log4j.Priority;
 import org.pgj.Channel;
 import org.pgj.Client;
 import org.pgj.CommunicationException;
@@ -26,6 +30,8 @@ import org.pgj.ExecutionCancelException;
 import org.pgj.messages.Error;
 import org.pgj.messages.Message;
 import org.pgj.tools.utils.ClientUtils;
+import org.pgj.typemapping.MappingException;
+import org.pgj.typemapping.TypeMapper;
 
 /**
  * PLJ JDBC Connection.
@@ -113,6 +119,11 @@ public class PLJJDBCConnection implements Connection {
 		conf = org.pgj.tools.utils.JDBCUtil.getConfiguration();
 		if (getBooleanFromConf("usePlanPool")) {
 			planPool = PlanPool.getPlanPool();
+		}
+		if(getBooleanFromConf("clientThreadingEnabled")){
+			warnings = new Vector();
+		} else {
+			warnings = new ArrayList();
 		}
 	}
 
@@ -228,15 +239,18 @@ public class PLJJDBCConnection implements Connection {
 		return new PLJJDBCMetaData(this);
 	}
 
+	
+	private boolean readOnly = false;
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.sql.Connection#setReadOnly(boolean)
 	 */
 	public void setReadOnly(boolean readOnly) throws SQLException {
-		// TODO Auto-generated method stub
 		log.error("not implemented");
 		checkClosed();
+		this.readOnly = readOnly;
 	}
 
 	/*
@@ -245,10 +259,9 @@ public class PLJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#isReadOnly()
 	 */
 	public boolean isReadOnly() throws SQLException {
-		// TODO Auto-generated method stub
 		log.error("not implemented");
 		checkClosed();
-		return false;
+		return readOnly;
 	}
 
 	/*
@@ -257,8 +270,8 @@ public class PLJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#setCatalog(java.lang.String)
 	 */
 	public void setCatalog(String catalog) throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		if(log.isEnabledFor(Priority.WARN))
+			log.warn("setCatalog:"+catalog+" -- ignored");
 		checkClosed();
 	}
 
@@ -268,8 +281,6 @@ public class PLJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#getCatalog()
 	 */
 	public String getCatalog() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
 		checkClosed();
 		return null;
 	}
@@ -296,15 +307,27 @@ public class PLJJDBCConnection implements Connection {
 		return 0;
 	}
 
+	private List warnings = null;
+	private int warningPos = 0;
+
+	/**
+	 * 
+	 * @param w
+	 */
+	protected void addWarning(SQLWarning w) {
+		warnings.add(w);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.sql.Connection#getWarnings()
 	 */
 	public SQLWarning getWarnings() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
-		return null;
+		if(warnings.size() == 0)
+			return null;
+		warningPos = 0;
+		return (SQLWarning) warnings.get(0);
 	}
 
 	/*
@@ -313,8 +336,8 @@ public class PLJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#clearWarnings()
 	 */
 	public void clearWarnings() throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
+		warnings.clear();
+		warningPos = 0;
 		checkClosed();
 	}
 
@@ -357,6 +380,8 @@ public class PLJJDBCConnection implements Connection {
 		return null;
 	}
 
+	private Map typeMap = null;
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -364,6 +389,7 @@ public class PLJJDBCConnection implements Connection {
 	 */
 	public Map getTypeMap() throws SQLException {
 		// TODO Auto-generated method stub
+		TypeMapper mapper = this.client.getTypeMapper();
 		log.error("not implemented");
 		checkClosed();
 		return null;
@@ -549,7 +575,7 @@ public class PLJJDBCConnection implements Connection {
 	 * @throws ExecutionCancelException
 	 */
 	protected void doSendMessage(org.pgj.messages.Message msg)
-			throws ExecutionCancelException {
+			throws ExecutionCancelException, SQLException {
 		try {
 			synchronized (this.communicationChanell) {
 				msg.setClient(client);
@@ -557,6 +583,8 @@ public class PLJJDBCConnection implements Connection {
 			}
 		} catch (CommunicationException e) {
 			throw new ExecutionCancelException(e);
+		} catch (MappingException e) {
+			throw new SQLException("Typemapping error at sending: " + e.getMessage());
 		}
 	}
 
@@ -571,7 +599,7 @@ public class PLJJDBCConnection implements Connection {
 	 * @throws ExecutionCancelException
 	 */
 	protected org.pgj.messages.Message doReceiveMessage() throws SQLException,
-			ExecutionCancelException {
+			ExecutionCancelException, SQLException {
 		try {
 			synchronized (this.communicationChanell) {
 				org.pgj.messages.Message msg = communicationChanell
@@ -583,6 +611,8 @@ public class PLJJDBCConnection implements Connection {
 			}
 		} catch (CommunicationException e) {
 			throw new ExecutionCancelException("Communication failure", e);
+		} catch (MappingException e) {
+			throw new SQLException("Typemapping error at receiveing: " + e.getMessage());
 		}
 	}
 
