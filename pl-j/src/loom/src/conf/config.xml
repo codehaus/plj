@@ -58,18 +58,18 @@
 		<tempDir>/tmp/</tempDir>
 	</bsf-executor>
 	<jta-adapter/>
-	<glue/>
+	<glue>
+	   <!--
+	   	Should be true if the RDBMS does not support error handling.
+	   	-->
+		<errorRecoverable>true</errorRecoverable>
+	</glue>
 	<jdbc-configurator>
 		<class>org.pgj.jdbc.scratch.PLJJDBCDriver</class>
 	<jdbc-config>
 				<!--
 					==== Behavioral properties ====
 					-->
-				<!--
-					Throw an ExecutionCancelException is receiveing error message
-					from the client. Should be true for PostgreSQL always.
-					-->
-				<isStatementErrorIrrecoverable>true</isStatementErrorIrrecoverable>
 				<!--
 					defaultFetchSize tells the fetchsize of the resultsets of 
 					the scratch driver.
@@ -83,7 +83,11 @@
 				<!--
 					Use the plan pool feature.
 					-->
-				<usePlanPool>false</usePlanPool>
+				<usePlanPool>true</usePlanPool>
+				<!--
+					Client threads enabled
+					-->
+				<clientThreadingEnabled>false</clientThreadingEnabled>
 				<!--
 					===== DatabaseMetadata =====
 					-->
@@ -116,23 +120,21 @@
 		<relation name="plj_testtable" class="org.deadcat_enterprises.TestTableRecord"/>
 		<relation name="plj_testable2" class="org.deadcat_enterprises.TestTableRecord"/>
 		</tuplemapper>
+<!--
 		<log4j-init>
 		<properties>
-			<!--
 			The root logger is the PLJAppender, so all log categories
 			not configured here will go to RDBMS (or at least try to go there)
-			-->
 			<property name="log4j.rootLogger" value="INFO, plj"/>
 			<property name="log4j.appender.plj" value="org.pgj.tools.log4j.PLJAppender"/>
 			<property name="log4j.appender.plj.layout" value="org.apache.log4j.PatternLayout"/>
 			<property name="log4j.appender.plj.layout.conversionPattern" value=" %d [%t] %-5p %c{1} - %m%n"/>
 				
-				<!--
 				These entries are for the PostgreSQL typemapper`s 
 				Field implementations. (it uses log4j). Its logs should remain
 				local.
-				-->
 				
 		</properties>
 	</log4j-init>
+	-->
 </config>

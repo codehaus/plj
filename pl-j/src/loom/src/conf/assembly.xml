@@ -41,7 +41,9 @@
 	<block name="tuplemapper" class="org.pgj.tools.tuplemapper.impl.reflected.ReflectedTupleMapper">
 		<provide name="classloader" role="classloader" alias="classloader"/>
 	</block>
+	<!--
 	<block name="log4j-init" class="org.pgj.tools.log4j.Log4jInitComponent">
 	</block>
+	-->
 	<!-- proxy disable="true"/ -->
 </assembly>
