@@ -271,7 +271,7 @@ PACKAGE_STRING='pl-pgj 20040330'
 PACKAGE_BUGREPORT=''
 
 ac_unique_file="src"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT LD with_gnu_ld acx_pthread_config PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS PGSOURCETREE CONFMOD CHANMOD CALLMKRMOD LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT LD with_gnu_ld acx_pthread_config PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS PGSOURCETREE POSTGRES_VERSION CONFMOD CHANMOD CALLMKRMOD LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -806,6 +806,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-gnu-ld           assume the C compiler uses GNU ld default=no
   --with-pgsourcetree=<dir> Location of PostgreSQL source tree
+  --with-pgversion=<dir> Location of PostgreSQL source tree
   --with-confmod=<module> configuration module
   --with-channel=<module> channel module
   --with-callmaker=<module> call maker module
@@ -2769,6 +2770,13 @@ if test "${with_pgsourcetree+set}" = set; then
 
 fi;
 
+# Check whether --with-pgversion or --without-pgversion was given.
+if test "${with_pgversion+set}" = set; then
+  withval="$with_pgversion"
+  POSTGRES_VERSION=$with_pgversion
+
+fi;
+
 
 # Check whether --with-confmod or --without-confmod was given.
 if test "${with_confmod+set}" = set; then
@@ -2794,16 +2802,14 @@ fi;
 if test "x$with_pgsourcetree" = "x" ; then
 	{ { echo "$as_me:$LINENO: error:
     ********************
-    * Compiling Slony-I currently requires a source installation
-    * of PostgreSQL. Please specify the location of the tree you
-    * built as --with-pgsourcetree=<dir>
+    * You need PostgreSQL source installed to build.
+    * See howto at http://docs.codehaus.org/display/PLJ/Build+and+install+howto
     ********************
 	" >&5
 echo "$as_me: error:
     ********************
-    * Compiling Slony-I currently requires a source installation
-    * of PostgreSQL. Please specify the location of the tree you
-    * built as --with-pgsourcetree=<dir>
+    * You need PostgreSQL source installed to build.
+    * See howto at http://docs.codehaus.org/display/PLJ/Build+and+install+howto
     ********************
 	" >&2;}
    { (exit 1); exit 1; }; }
@@ -2841,6 +2847,18 @@ echo "$as_me: WARNING:
     with_callmaker=plj
     CALLMKRMOD=plj
 fi
+
+if test "x$with_pgversion" = "x" ; then
+	{ echo "$as_me:$LINENO: WARNING:
+    assuming version 7.4
+	" >&5
+echo "$as_me: WARNING:
+    assuming version 7.4
+	" >&2;}
+    with_pgversion=74
+    POSTGRES_VERSION=74
+fi
+
 
 
 # ----
@@ -3609,6 +3627,7 @@ s,@PTHREAD_CC@,$PTHREAD_CC,;t t
 s,@PTHREAD_LIBS@,$PTHREAD_LIBS,;t t
 s,@PTHREAD_CFLAGS@,$PTHREAD_CFLAGS,;t t
 s,@PGSOURCETREE@,$PGSOURCETREE,;t t
+s,@POSTGRES_VERSION@,$POSTGRES_VERSION,;t t
 s,@CONFMOD@,$CONFMOD,;t t
 s,@CHANMOD@,$CHANMOD,;t t
 s,@CALLMKRMOD@,$CALLMKRMOD,;t t
