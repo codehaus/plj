@@ -36,6 +36,9 @@ public class PostgresTypeMapper
 	/** Map for maping classes into DB types. */
 	private HashMap backMap = new HashMap();
 
+	/** Map classnames into rdbms types. */
+	private HashMap typeBackMap = new HashMap();
+	
 	/** Avalon logger */
 	private Logger logger = null;
 
@@ -109,6 +112,7 @@ public class PostgresTypeMapper
 			}
 
 			Class bmClass = null;
+			typeBackMap.put(bmClassName, bmType);
 			try {
 				bmClass = Class.forName(bmClassName);
 			} catch (ClassNotFoundException cnfe) {
@@ -264,7 +268,9 @@ public class PostgresTypeMapper
 	 * @see org.pgj.typemapping.TypeMapper#getRDBMSTypeFor(java.lang.Class)
 	 */
 	public String getRDBMSTypeFor(Class cl) throws MappingException {
-		//TODO IMPLEMENT ME!
-		return null;
+		String typ = (String)typeBackMap.get(cl.getName());
+		if(typ == null)
+			throw new MappingException("no backmapping for"+cl);
+		return typ;
 	}
 }
