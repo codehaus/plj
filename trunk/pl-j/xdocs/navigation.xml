@@ -8,14 +8,13 @@
 
     <menu name="General Information">
       <item name="Introduction"					href="introduction.html"/>
-      <item name="Build and install howto"				href="http://docs.codehaus.org/display/PLJ/Build+and+install+howto"/>
+      <item name="Build and install howto"				href="http://docs.codehaus.org/pages/viewpage.action?pageId=12950"/>
     </menu>
 
     <menu name="Documentation">
-      <item name="Current changes"				href="/current-changes.html"/>
+	  <item name="ChangeLog"               			href="http://docs.codehaus.org/display/PLJ/ChangeLog"/>
       <item name="JDBC"               			href="/jdbc.html"/>
-      <item name="Trigger support"				href="/triggers.html"/>
-      <item name="Use cases of stored procedures"   href="use-cases.html"/>
+      <item name="Trigger support"				href="http://docs.codehaus.org/pages/viewpage.action?pageId=3178"/>
       <item name="Performance"   href="performance.html"/>
       <item name="More documentation"   href="more-docs.html"/>
     </menu>
