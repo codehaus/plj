@@ -96,37 +96,41 @@ public class FEBEChannel
 	public Message receiveFromRDBMS(Client client)
 			throws CommunicationException {
 		try {
-			PGStream stream = ((FEBEClient) client).getStream();
-			Encoding encoding = ((FEBEClient) client).getEncoding();
-			if (encoding == null) {
-				logger.warn("ancodign was null, fallback to hardcoded default");
-				encoding = Encoding.defaultEncoding();
-			}
-			//the length??
-			stream.Receive(4);
-			int msgtype = stream.ReceiveChar();
-			Character type = new Character((char) msgtype);
-			logger.debug("message type:" + type);
-			MessageFactory factory = (MessageFactory) messageFactoryMap
-					.get(type);
-			if (factory != null) {
-				logger.debug("handling with " + factory.getClass().getName());
-				Message ret = factory.getMessage(stream, encoding);
-				ret.setClient(client);
-				return ret;
-			} else {
-				//debug block -->
-				try {
-					while (true) {
-						logger.debug(new Character((char) stream.ReceiveChar())
-								.toString());
-					}
-				} catch (RuntimeException e1) {
-					logger.debug("client gone.");
+			synchronized (client) {
+				PGStream stream = ((FEBEClient) client).getStream();
+				Encoding encoding = ((FEBEClient) client).getEncoding();
+				if (encoding == null) {
+					logger
+							.warn("ancodign was null, fallback to hardcoded default");
+					encoding = Encoding.defaultEncoding();
 				}
-				// <- debug block
-				throw new CommunicationException("Unhandled message type:"
-						+ type);
+				//the length??
+				stream.Receive(4);
+				int msgtype = stream.ReceiveChar();
+				Character type = new Character((char) msgtype);
+				logger.debug("message type:" + type);
+				MessageFactory factory = (MessageFactory) messageFactoryMap
+						.get(type);
+				if (factory != null) {
+					logger.debug("handling with "
+							+ factory.getClass().getName());
+					Message ret = factory.getMessage(stream, encoding);
+					ret.setClient(client);
+					return ret;
+				} else {
+					//debug block -->
+					try {
+						while (true) {
+							logger.debug(new Character((char) stream
+									.ReceiveChar()).toString());
+						}
+					} catch (RuntimeException e1) {
+						logger.debug("client gone.");
+					}
+					// <- debug block
+					throw new CommunicationException("Unhandled message type:"
+							+ type);
+				}
 			}
 		} catch (IOException e) {
 			logger.error("I/O exception on receiveing from RDBMS", e);
@@ -145,32 +149,36 @@ public class FEBEChannel
 	 */
 	public void sendToRDBMS(Message msg) throws CommunicationException {
 		FEBEClient client = (FEBEClient) msg.getClient();
-		PGStream stream = client.getStream();
-		Encoding encoding = client.getEncoding();
-		//byte[] hdr = {0, 0, 0, 0};
-		try {
-			//stream.Send(hdr);
-			Character type = null;
-			if (msg instanceof org.pgj.messages.Error) {
-				type = new Character('E');
-			} else if (msg instanceof Result) {
-				type = new Character('R');
-			} else if (msg instanceof Log) {
-				type = new Character('L');
+		synchronized (client) {
+			PGStream stream = client.getStream();
+			Encoding encoding = client.getEncoding();
+			//byte[] hdr = {0, 0, 0, 0};
+			try {
+				//stream.Send(hdr);
+				Character type = null;
+				if (msg instanceof org.pgj.messages.Error) {
+					type = new Character('E');
+				} else if (msg instanceof Result) {
+					type = new Character('R');
+				} else if (msg instanceof Log) {
+					type = new Character('L');
+				}
+				if (type == null)
+					throw new CommunicationException(
+							"unhandled type of message");
+				MessageFactory factory = (MessageFactory) messageFactoryMap
+						.get(type);
+				stream.SendChar(type.charValue());
+				logger.debug(msg.toString());
+				factory.sendMessage(msg, stream);
+				stream.flush();
+			} catch (IOException e) {
+				throw new CommunicationException(
+						"could not send message to DB", e);
+			} catch (MappingException e) {
+				logger.error("mapping exception, rethrowing", e);
+				throw new CommunicationException("mapping excption occured", e);
 			}
-			if (type == null)
-				throw new CommunicationException("unhandled type of message");
-			MessageFactory factory = (MessageFactory) messageFactoryMap
-					.get(type);
-			stream.SendChar(type.charValue());
-			logger.debug(msg.toString());
-			factory.sendMessage(msg, stream);
-			stream.flush();
-		} catch (IOException e) {
-			throw new CommunicationException("could not send message to DB", e);
-		} catch (MappingException e) {
-			logger.error("mapping exception, rethrowing", e);
-			throw new CommunicationException("mapping excption occured", e);
 		}
 	}
 
