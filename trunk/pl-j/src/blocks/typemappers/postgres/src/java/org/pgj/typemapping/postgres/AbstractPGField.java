@@ -26,8 +26,6 @@ public abstract class AbstractPGField implements Field {
 	 */
 	public AbstractPGField() {
 		super();
-		cat.debug("instantiated");
-		System.out.println("instantiated");
 	}
 
 	/**
@@ -41,8 +39,6 @@ public abstract class AbstractPGField implements Field {
 	 * @see Field#get()
 	 */
 	public final byte[] get() {
-		cat.debug("Alive!!");
-		cat.debug(raw);
 		return raw;
 	}
 
