@@ -88,11 +88,11 @@
         <sourceDirectory>src/interfaces</sourceDirectory>
     </build>
     <reports>
-<!--        <report>maven-license-plugin</report>
+        <report>maven-jira-plugin</report>
+        <report>maven-license-plugin</report>
         <report>maven-tasklist-plugin</report>
         <report>maven-changes-plugin</report>
         <report>maven-javadoc-plugin</report>
         <report>maven-multiproject-plugin</report>
--->
     </reports>
 </project>
