@@ -4,8 +4,8 @@
   <pomVersion>3</pomVersion>
   <id>pl-j-tools</id>
   <name>pl-j-tools</name>
-  <currentVersion>0.0.1</currentVersion>
-  
+  <currentVersion>0.0.2</currentVersion>
+
   <extend>${basedir}/../project.xml</extend>
 
   <inceptionYear>2004</inceptionYear>
@@ -19,13 +19,13 @@
 	<dependencies>
 
 		<dependency>
-			<id>log4j</id>
+			<groupId>log4j</groupId>
 			<type>jar</type>
 			<artifactId>log4j</artifactId>
 			<version>1.2.8</version>
 		</dependency>
 		<dependency>
-			<id>avalon-framework</id>
+			<groupId>avalon-framework</groupId>
 			<type>jar</type>
 			<artifactId>avalon-framework</artifactId>
 			<version>4.1.5</version>
@@ -37,18 +37,27 @@
 			<version>1.6.1</version>
 		</dependency>
 		<dependency>
-			<id>pl-j</id>
+			<groupId>pl-j</groupId>
 			<type>jar</type>
 			<artifactId>pl-j-api</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 		</dependency>
 
 		<dependency>
-			<id>bsf</id>
+			<groupId>bsf</groupId>
 			<type>jar</type>
 			<artifactId>bsf</artifactId>
 			<version>2.3.0-rc1</version>
 		</dependency>
+
+        <dependency>
+            <groupId>avalon-meta</groupId>
+            <artifactId>avalon-meta-plugin</artifactId>
+            <version>1.4-SNAPSHOT</version>
+            <type>plugin</type>
+            <properties/>
+        </dependency>
+
 
 	</dependencies>
 
