@@ -8,6 +8,10 @@
 				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
 				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
 				<!--
+				Only for backmapping, do not remove it!
+				-->
+				<type db="void" class="org.pgj.typemapping.postgres.PGVoid"/>
+				<!--
 					This is a very strange type here, it should be mapped to any kind.
 					-->
 				<type db="unknown" class="org.pgj.typemapping.postgres.PGBytea"/>
