@@ -3,11 +3,15 @@ package org.pgj.typemapping.postgres;
 import org.pgj.typemapping.MappingException;
 
 /**
- * @author Laszlo Hornyak
  * Void datatype for PostgreSQL.
+ * 
+ * @author Laszlo Hornyak
  */
 public class PGVoid extends AbstractPGField {
 
+	public boolean isNull() {
+		return true;
+	}
 	/**
 	 * Constructor for PGVoid.
 	 */
@@ -15,30 +19,20 @@ public class PGVoid extends AbstractPGField {
 		super();
 	}
 
-	/**
-	 * @see Field#getJavaClasses()
-	 */
+	private static final Class[] cls = new Class[] {Void.class};
+	
 	public Class[] getJavaClasses() {
-		return null;
+		return cls;
 	}
 
-	/**
-	 * @see Field#getPreferredClass()
-	 */
 	public Class getPreferredClass() {
-		return null;
+		return Void.class;
 	}
 
-	/**
-	 * @see Field#get(Class)
-	 */
 	public Object get(Class clazz) throws MappingException {
 		return null;
 	}
 
-	/**
-	 * @see Field#defaultGet()
-	 */
 	public Object defaultGet() throws MappingException {
 		return null;
 	}
@@ -50,10 +44,6 @@ public class PGVoid extends AbstractPGField {
 		return "void";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.pgj.typemapping.postgres.AbstractPGField#backMap(java.lang.Object)
-	 */
 	protected void backMap(Object obj) throws MappingException {
 	}
-
 }

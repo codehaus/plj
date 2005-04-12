@@ -288,11 +288,11 @@ public class PostgresTypeMapper
 		ret.setSize(1, 1);
 
 		Class eMapperClass = (Class) this.map.get(expect);
-		if (expect == null) {
-			if (strict)
-				throw new MappingException(
-						"No mapping for expected result type ");
+		if (eMapperClass == null) {
+			throw new MappingException(
+					"No mapping for expected result type "+expect);
 		}
+		
 		AbstractPGField efld = null;
 
 		try {
