@@ -1,11 +1,13 @@
 /*
  * Created on Sep 5, 2004
  */
+
 package org.pgj.tools.pljava;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.pgj.messages.TriggerCallRequest;
 import org.pgj.typemapping.Tuple;
 import org.postgresql.pljava.TriggerData;
 
@@ -14,18 +16,23 @@ import org.postgresql.pljava.TriggerData;
  * 
  * @author Laszlo Hornyak
  */
-public class PLJavaTriggerData implements TriggerData{
+public class PLJavaTriggerData implements TriggerData {
 
+	TriggerCallRequest call = null;
 	private Tuple old = null;
 	private PLJavaTupleResultSet oldRs = null;
 	private Tuple _new = null;
 	private PLJavaTupleResultSet newRs = null;
-	
+
 	/**
 	 * 
+	 * @param call trigger call request
 	 */
-	public PLJavaTriggerData(Tuple old, Tuple _new) {
+	public PLJavaTriggerData(TriggerCallRequest call) {
 		super();
+		Tuple old = call.getOld();
+		Tuple _new = call.getNew();
+		this.call = call;
 		this.old = old;
 		oldRs = new PLJavaTupleResultSet(old);
 		this._new = _new;
@@ -57,9 +64,9 @@ public class PLJavaTriggerData implements TriggerData{
 	 * @see org.postgresql.pljava.TriggerData#getName()
 	 */
 	public String getName() throws SQLException {
-		if(_new != null)
+		if (_new != null)
 			return _new.getRelationName();
-		if(old != null)
+		if (old != null)
 			return old.getRelationName();
 		return null;
 	}
@@ -68,9 +75,9 @@ public class PLJavaTriggerData implements TriggerData{
 	 * @see org.postgresql.pljava.TriggerData#getTableName()
 	 */
 	public String getTableName() throws SQLException {
-		if(_new != null)
+		if (_new != null)
 			return _new.getRelationName();
-		if(old != null)
+		if (old != null)
 			return old.getRelationName();
 		return null;
 	}
@@ -79,56 +86,49 @@ public class PLJavaTriggerData implements TriggerData{
 	 * @see org.postgresql.pljava.TriggerData#isFiredAfter()
 	 */
 	public boolean isFiredAfter() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getType() == TriggerCallRequest.TRIGGER_FIRED_AFTER);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#isFiredBefore()
 	 */
 	public boolean isFiredBefore() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getType() == TriggerCallRequest.TRIGGER_FIRED_BEFORE);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#isFiredForEachRow()
 	 */
 	public boolean isFiredForEachRow() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_ROW);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#isFiredForStatement()
 	 */
 	public boolean isFiredForStatement() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getRowmode() == TriggerCallRequest.TRIGGER_ROWMODE_STATEMENT);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#isFiredByDelete()
 	 */
 	public boolean isFiredByDelete() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getReason() == TriggerCallRequest.TRIGGER_REASON_DELETE);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#isFiredByInsert()
 	 */
 	public boolean isFiredByInsert() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getReason() == TriggerCallRequest.TRIGGER_REASON_INSERT);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.postgresql.pljava.TriggerData#isFiredByUpdate()
 	 */
 	public boolean isFiredByUpdate() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return (call.getReason() == TriggerCallRequest.TRIGGER_REASON_UPDATE);
 	}
 
 }

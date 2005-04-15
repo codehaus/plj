@@ -35,8 +35,7 @@ public class PLJavaMethodFinder extends DefaultMethodFinder {
 
 	protected Object[] createParametersforTrigger(TriggerCallRequest call,
 			Method method) throws MappingException {
-		PLJavaTriggerData trigdata = new PLJavaTriggerData(call.getOld(), call
-				.getNew());
+		PLJavaTriggerData trigdata = new PLJavaTriggerData(call);
 		return new Object[]{trigdata};
 	}
 }
