@@ -27,7 +27,7 @@ import org.pgj.typemapping.Tuple;
 
 /**
  * Resultset to be returned by PLJavaTriggerData as 'old' and 'new' tuples.
- * This class is under construction!
+ * This class is under construction! (It is sooo damn boring!)
  * 
  * @author Laszlo Hornyak
  */
@@ -61,6 +61,8 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getFetchDirection()
 	 */
 	public int getFetchDirection() throws SQLException {
+		logger
+		.warn("int getFetchDirection(): it makes no sense");
 		return 0;
 	}
 
@@ -129,8 +131,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#clearWarnings()
 	 */
 	public void clearWarnings() throws SQLException {
-		// TODO Auto-generated method stub
-
+		//I hope you dont expect some magic from this!
 	}
 
 	/*
@@ -148,8 +149,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#deleteRow()
 	 */
 	public void deleteRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		//I hope you dont expect some magic from this!
 	}
 
 	/*
@@ -158,8 +158,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#insertRow()
 	 */
 	public void insertRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		//I hope you dont expect some magic from this!
 	}
 
 	/*
@@ -168,8 +167,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#moveToCurrentRow()
 	 */
 	public void moveToCurrentRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		//I hope you dont expect some magic from this!
 	}
 
 	/*
@@ -178,8 +176,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#moveToInsertRow()
 	 */
 	public void moveToInsertRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		//I hope you dont expect some magic from this!
 	}
 
 	/*
@@ -188,8 +185,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#refreshRow()
 	 */
 	public void refreshRow() throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -198,8 +193,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateRow()
 	 */
 	public void updateRow() throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -208,8 +201,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#first()
 	 */
 	public boolean first() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/*
@@ -218,7 +210,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#isAfterLast()
 	 */
 	public boolean isAfterLast() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -228,7 +219,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#isBeforeFirst()
 	 */
 	public boolean isBeforeFirst() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -238,7 +228,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#isFirst()
 	 */
 	public boolean isFirst() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -258,7 +247,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#last()
 	 */
 	public boolean last() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -268,7 +256,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#next()
 	 */
 	public boolean next() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -278,7 +265,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#previous()
 	 */
 	public boolean previous() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -288,7 +274,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#rowDeleted()
 	 */
 	public boolean rowDeleted() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -298,7 +283,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#rowInserted()
 	 */
 	public boolean rowInserted() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -308,9 +292,10 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#rowUpdated()
 	 */
 	public boolean rowUpdated() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
+
+	private boolean wasNull = false;
 
 	/*
 	 * (non-Javadoc)
@@ -318,7 +303,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#wasNull()
 	 */
 	public boolean wasNull() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -328,8 +312,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getByte(int)
 	 */
 	public byte getByte(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Byte)_getObject(columnIndex, Byte.class)).byteValue();
 	}
 
 	/*
@@ -338,8 +321,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getDouble(int)
 	 */
 	public double getDouble(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Double)_getObject(columnIndex, Double.class)).doubleValue();
 	}
 
 	/*
@@ -348,8 +330,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getFloat(int)
 	 */
 	public float getFloat(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Float)_getObject(columnIndex, Float.class)).floatValue();
 	}
 
 	/*
@@ -358,8 +339,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getInt(int)
 	 */
 	public int getInt(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Integer)_getObject(columnIndex, Integer.class)).intValue();
 	}
 
 	/*
@@ -368,8 +348,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getLong(int)
 	 */
 	public long getLong(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Long)_getObject(columnIndex, Long.class)).longValue();
 	}
 
 	/*
@@ -378,8 +357,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getShort(int)
 	 */
 	public short getShort(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Short)_getObject(columnIndex, Short.class)).shortValue();
 	}
 
 	/*
@@ -388,8 +366,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#setFetchDirection(int)
 	 */
 	public void setFetchDirection(int direction) throws SQLException {
-		// TODO Auto-generated method stub
-
+		logger.warn("setFetchDirection makes no sense");
 	}
 
 	/*
@@ -398,8 +375,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#setFetchSize(int)
 	 */
 	public void setFetchSize(int rows) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -408,8 +383,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateNull(int)
 	 */
 	public void updateNull(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -418,7 +391,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#absolute(int)
 	 */
 	public boolean absolute(int row) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -428,8 +400,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getBoolean(int)
 	 */
 	public boolean getBoolean(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return ((Boolean)_getObject(columnIndex, Boolean.class)).booleanValue();
 	}
 
 	/*
@@ -438,7 +409,6 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#relative(int)
 	 */
 	public boolean relative(int rows) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -448,8 +418,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getBytes(int)
 	 */
 	public byte[] getBytes(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (byte[])_getObject(columnIndex, byte[].class);
 	}
 
 	/*
@@ -458,8 +427,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateByte(int, byte)
 	 */
 	public void updateByte(int columnIndex, byte x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, new Byte(x));
 	}
 
 	/*
@@ -468,8 +436,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateDouble(int, double)
 	 */
 	public void updateDouble(int columnIndex, double x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, new Double(x));
 	}
 
 	/*
@@ -478,8 +445,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateFloat(int, float)
 	 */
 	public void updateFloat(int columnIndex, float x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, new Float(x));
 	}
 
 	/*
@@ -488,8 +454,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateInt(int, int)
 	 */
 	public void updateInt(int columnIndex, int x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, new Integer(x));
 	}
 
 	/*
@@ -498,8 +463,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateLong(int, long)
 	 */
 	public void updateLong(int columnIndex, long x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, new Long(x));
 	}
 
 	/*
@@ -508,8 +472,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateShort(int, short)
 	 */
 	public void updateShort(int columnIndex, short x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, new Short(x));
 	}
 
 	/*
@@ -518,8 +481,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateBoolean(int, boolean)
 	 */
 	public void updateBoolean(int columnIndex, boolean x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, x ? Boolean.TRUE : Boolean.FALSE);
 	}
 
 	/*
@@ -528,8 +490,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateBytes(int, byte[])
 	 */
 	public void updateBytes(int columnIndex, byte[] x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -538,8 +499,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getAsciiStream(int)
 	 */
 	public InputStream getAsciiStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (InputStream)_getObject(columnIndex, InputStream.class);
 	}
 
 	/*
@@ -548,8 +508,8 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getBinaryStream(int)
 	 */
 	public InputStream getBinaryStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		//FIXME this should not be the same as getAsciiStream
+		return (InputStream)_getObject(columnIndex, InputStream.class);
 	}
 
 	/*
@@ -558,8 +518,8 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getUnicodeStream(int)
 	 */
 	public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		//FIXME this should not be the same as getAsciiStream
+		return (InputStream)_getObject(columnIndex, InputStream.class);
 	}
 
 	/*
@@ -569,8 +529,8 @@ class PLJavaTupleResultSet implements ResultSet {
 	 */
 	public void updateAsciiStream(int columnIndex, InputStream x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		//FIXME this ignores length
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -580,8 +540,8 @@ class PLJavaTupleResultSet implements ResultSet {
 	 */
 	public void updateBinaryStream(int columnIndex, InputStream x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		//FIXME this ignores length
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -590,8 +550,8 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getCharacterStream(int)
 	 */
 	public Reader getCharacterStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		//FIXME this should not be the same as getAsciiStream
+		return (Reader)_getObject(columnIndex, Reader.class);
 	}
 
 	/*
@@ -601,8 +561,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 */
 	public void updateCharacterStream(int columnIndex, Reader x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -611,8 +570,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getObject(int)
 	 */
 	public Object getObject(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return _getObject(columnIndex, Object.class);
 	}
 
 	/*
@@ -621,8 +579,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateObject(int, java.lang.Object)
 	 */
 	public void updateObject(int columnIndex, Object x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -632,8 +589,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 */
 	public void updateObject(int columnIndex, Object x, int scale)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -643,7 +599,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 */
 	public String getCursorName() throws SQLException {
 		// TODO Auto-generated method stub
-		return null;
+		return "tuple";
 	}
 
 	/*
@@ -652,8 +608,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getString(int)
 	 */
 	public String getString(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (String)_getObject(columnIndex, String.class);
 	}
 
 	/*
@@ -662,8 +617,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateString(int, java.lang.String)
 	 */
 	public void updateString(int columnIndex, String x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(columnIndex, x);
 	}
 
 	/*
@@ -672,8 +626,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getByte(java.lang.String)
 	 */
 	public byte getByte(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Byte)_getObject(_getColId(columnName), Byte.class)).byteValue();
 	}
 
 	/*
@@ -682,8 +635,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getDouble(java.lang.String)
 	 */
 	public double getDouble(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Double)_getObject(_getColId(columnName), Double.class)).doubleValue();
 	}
 
 	/*
@@ -692,8 +644,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getFloat(java.lang.String)
 	 */
 	public float getFloat(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Float)_getObject(_getColId(columnName), Float.class)).floatValue();
 	}
 
 	/*
@@ -702,8 +653,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#findColumn(java.lang.String)
 	 */
 	public int findColumn(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return _getColId(columnName);
 	}
 
 	/*
@@ -712,8 +662,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getInt(java.lang.String)
 	 */
 	public int getInt(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Integer)_getObject(_getColId(columnName), Integer.class)).intValue();
 	}
 
 	/*
@@ -722,8 +671,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getLong(java.lang.String)
 	 */
 	public long getLong(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Long)_getObject(_getColId(columnName), Long.class)).longValue();
 	}
 
 	/*
@@ -732,8 +680,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getShort(java.lang.String)
 	 */
 	public short getShort(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((Short)_getObject(_getColId(columnName), Short.class)).shortValue();
 	}
 
 	/*
@@ -742,8 +689,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateNull(java.lang.String)
 	 */
 	public void updateNull(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(_getColId(columnName), null);
 	}
 
 	/*
@@ -752,8 +698,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getBoolean(java.lang.String)
 	 */
 	public boolean getBoolean(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return ((Boolean)_getObject(_getColId(columnName), Boolean.class)).booleanValue();
 	}
 
 	/*
@@ -762,8 +707,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#getBytes(java.lang.String)
 	 */
 	public byte[] getBytes(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return (byte[])_getObject(_getColId(columnName), byte[].class);
 	}
 
 	/*
@@ -772,8 +716,7 @@ class PLJavaTupleResultSet implements ResultSet {
 	 * @see java.sql.ResultSet#updateByte(java.lang.String, byte)
 	 */
 	public void updateByte(String columnName, byte x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		_setObj(_getColId(columnName), new Byte(x));
 	}
 
 	/*
@@ -1455,4 +1398,16 @@ class PLJavaTupleResultSet implements ResultSet {
 		return null;
 	}
 
+	private int _getColId(String colName){
+		return 1;
+	}
+	
+	private Object _getObject(int i, Class clazz){
+		return null;
+	}
+	
+	private void _setObj(int i, Object obj){
+		
+	}
+	
 }
