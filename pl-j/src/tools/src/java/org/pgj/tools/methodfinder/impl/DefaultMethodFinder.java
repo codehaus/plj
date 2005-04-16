@@ -77,10 +77,11 @@ public class DefaultMethodFinder
 		Method callm = null;
 
 		callm = clazz.getMethod(call.getMethodname(), paramclasses);
-		if (callm.getModifiers() != 9)
+		if (callm.getModifiers() != 9){
+			logger.info("Method "+call.getMethodname()+" in class "+clazz.getName()+" should be public static.");
 			throw new NoSuchMethodException(
 					"A JSProc method must be public static.");
-
+		}
 		return callm;
 	}
 
