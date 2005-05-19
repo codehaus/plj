@@ -245,17 +245,21 @@ pqGetnchar(char *s, size_t len, PGconn_min * conn)
 		}
 	}
 
+	elog(DEBUG1, "1 pqGetnchar: %d", len);
+
 	memcpy(s, conn->inBuffer + conn->inCursor, len);
 	/*
 	 * no terminating null
 	 */
 
+	elog(DEBUG1, "1/5 pqGetnchar: %d", len);
 	conn->inCursor += len;
 	
 	if(conn -> inCursor > conn -> inEnd){
 		conn -> inEnd = conn -> inCursor;
 	}
 
+	elog(DEBUG1, "2 pqGetnchar: %d", len);
 	if (conn->Pfdebug)
 	{
 		fprintf(conn->Pfdebug, "From backend (%lu)> %.*s\n",
