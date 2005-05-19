@@ -468,15 +468,10 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 				OidFunctionCall1(paramtype->typsend, fcinfo->arg[i]);
 			ret->parameters[i].data.isnull = 0;
 			ret->parameters[i].data.data = DatumGetPointer(sendDatum);
-			pljelog(DEBUG1, "paramtype->typbyval = %d", paramtype->typbyval);
 			ret->parameters[i].data.length =
 				datumGetSize(sendDatum, false,
 							 paramtype->typlen)
 				+ (paramtype->typbyval ? 4 : 0 );
-			pljelog(DEBUG1, "ret->parameters[%d].data.length = %d", i, ret->parameters[i].data.length );
-			for(x = 0; x < ret->parameters[i].data.length; x++){
-				pljelog(DEBUG1,"data(%d): %d",x, ((char*)(ret->parameters[i].data.data))[x] );
-			}
 		}
 
 		ret->parameters[i].type = paramtype->typname.data;
@@ -491,7 +486,7 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 					   0, 0, 0);
 	if (!HeapTupleIsValid(retTypetup)){
 		pljlogging_error = 1;
-		elog(ERROR, "return type is invalid?");
+		elog(ERROR, "[call maker] return type is invalid?");
 	}
 	rettype = (Form_pg_type) GETSTRUCT(retTypetup);
 	ret->expect = (char *) rettype->typname.data;
