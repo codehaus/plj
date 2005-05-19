@@ -19,6 +19,7 @@
 #include "module_config.h"
 #include "commands/trigger.h"
 #include "executor/spi_priv.h"
+#include "msghandler.h"
 
 #include "utils/palloc.h"
 #include "utils/memutils.h"
@@ -27,6 +28,8 @@
 #include "plantable.h"
 #include "envstack.h"
 #include <string.h>
+
+#include "plpgj_hook.h"
 
 /*	*/
 
@@ -52,9 +55,6 @@ Datum		plpgj_result_do(plpgj_result);
 void		plpgj_log_do(log_message);
 
 
-void plpgj_utl_sendint(int);
-void plpgj_utl_sendstr(const char*);
-void plpgj_utl_senderror(char*);
 
 void		plpgj_EOXactCallBack(bool isCommit, void *arg);
 
@@ -108,9 +108,11 @@ void reg_error_callback() {
 
 void handle_exception(void){
 	ErrorData  *edata;
+	elog(DEBUG1, "exception handler.");
 	edata = CopyErrorData();
 	plpgj_utl_senderror(edata -> message);
 
+	elog(DEBUG1, "flushing error");
 	FlushErrorState();
 
 //	RollbackAndReleaseCurrentSubTransaction();
@@ -120,6 +122,9 @@ void handle_exception(void){
 #else
 #endif
 
+
+/*
+//this code fragment moves out.
 void sql_cursor_open(message msg){
 				Portal		portal;
 				sql_msg_cursor_open sql_c_o = (sql_msg_cursor_open) msg;
@@ -134,9 +139,6 @@ void sql_cursor_open(message msg){
 				}
 				elog(DEBUG1, " -> %s", cname);
 
-				/*
-				 * TODO: creates constantly bidirectional cursors :(
-				 */
 
 				PG_TRY();
 				{
@@ -168,6 +170,7 @@ void sql_cursor_open(message msg){
 
 
 }
+*/
 
 
 #if (POSTGRES_VERSION == 74)
@@ -211,16 +214,6 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 #endif
 
 
-	/*
-	 * register event handlers
-	 */
-
-	/*
-	 * now do the real job
-	 */
-
-	pljelog(DEBUG1, "7");
-
 	if (CALLED_AS_TRIGGER(fcinfo)
 		&& plj_get_configvalue_boolean("plpgj.core.usetriggers"))
 	{
@@ -232,11 +225,9 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		req = (message) plpgj_create_call(fcinfo);
 	}
 
-	pljelog(DEBUG1, "7");
 	plpgj_channel_send((message) req);
 	free_message(req);
 
-	pljelog(DEBUG1, "7");
 	do
 	{
 		void	   *ansver = NULL;
@@ -467,14 +458,20 @@ plpgj_result_do(plpgj_result res)
 void
 plpgj_sql_do(sql_msg msg)
 {
+		/**
 	switch (msg->sqltype)
 	{
+
 		case SQL_TYPE_STATEMENT:
-			elog(DEBUG1, "entering nolog area");
+			elog(DEBUG1, "[plj core] runing statement: %s", ((sql_msg_statement) msg)->statement);
 			pljlogging_error = 1;
-			SPI_exec(((sql_msg_statement) msg)->statement, 0);
+			PG_TRY();
+				SPI_exec(((sql_msg_statement) msg)->statement, 0);
+				plpgj_utl_sendint(SPI_processed);
+			PG_CATCH();
+				handle_exception();
+			PG_END_TRY();
 			pljlogging_error = 0;
-			elog(DEBUG1, "leaving nolog area");
 			break;
 		case SQL_TYPE_PREPARE:
 			//do trixx
@@ -493,7 +490,7 @@ plpgj_sql_do(sql_msg msg)
 					argtypes[i] = LookupTypeName(typnam);
 				}
 
-				elog(DEBUG1, "SQL_TYPE_PREPARE, nolog area");
+				elog(DEBUG1, "[plj core] SQL_TYPE_PREPARE");
 				pljlogging_error = 1;
 				
 				PG_TRY();
@@ -501,16 +498,15 @@ plpgj_sql_do(sql_msg msg)
 					plan = SPI_prepare( prep -> statement, prep -> ntypes, argtypes);
 					plan = SPI_saveplan(plan);
 					elog(DEBUG1,"success");
+					planid = store_plantable(plan);
+					plpgj_utl_sendint(planid);
+
 				PG_CATCH();
 					elog(DEBUG1,"failure");
 					handle_exception();
 				PG_END_TRY();
 				
 				pljlogging_error = 0;
-				elog(DEBUG1, "SQL_TYPE_PREPARE done, leaving nolog area");
-				planid = store_plantable(plan);
-
-				plpgj_utl_sendint(planid);
 				pljloging = 1;
 			}
 			break;
@@ -558,8 +554,6 @@ plpgj_sql_do(sql_msg msg)
 						
 					}
 				}
-				elog(DEBUG1,"sql->nparams=%d", sql -> nparams);
-				elog(DEBUG1,"sql->planid=%d", sql -> planid);
 				if(!plantable_entry_valid(sql -> planid)){
 					elog(WARNING,"Invalidated plan id: %d", sql -> planid);
 					plpgj_utl_senderror("Invalidated plan id");
@@ -576,22 +570,10 @@ plpgj_sql_do(sql_msg msg)
 				PG_TRY();
 					_SPI_plan* pln;
 					pln = (_SPI_plan*) plantable[sql -> planid];
-					elog(DEBUG1, "plan: (%d) %s", sql -> planid, pln -> query );
 					switch(sql -> action){
 						case SQL_PEXEC_ACTION_OPENCURSOR:
 							pljelog(DEBUG1,"SQL_PEXEC_ACTION_OPENCURSOR");
 							
-							if(plantable[sql -> planid] == NULL){
-								elog(WARNING, "hoppa");
-							} else {
-								elog(WARNING, "oksa");
-							}
-							if(values == NULL){
-								elog(WARNING, "values is null");
-							} else {
-								elog(WARNING, "values not null");
-							}
-
 							#if POSTGRES_VERSION >= 80
 							pret = SPI_cursor_open(NULL, plantable[sql -> planid], values, nulls == NULL ? "" : nulls, true);
 							#else
@@ -740,19 +722,21 @@ plpgj_sql_do(sql_msg msg)
 					}
 				}
 			}
-			elog(DEBUG1, "sending ansver");
+			elog(DEBUG1, "[plj core] sending fetch result");
 			plpgj_channel_send(result);
 			}
 			
 			break;
 		case SQL_TYPE_UNPREPARE: {
 			sql_msg_unprepare unprep = (sql_msg_unprepare) msg;
+			elog(DEBUG1, "[plj core] unpreparing plan %d", unprep -> planid);
 			remove_plantable_entry(unprep -> planid);
 			}
 			break;
 		default:
 			pljelog(FATAL, "Unhandled SQL message.");
 	}
+		*/
 }
 
 void
