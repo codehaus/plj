@@ -12,6 +12,8 @@
 #define SQL_TYPE_PEXECUTE			6
 #define SQL_TYPE_UNPREPARE			7
 
+#define SQL_TYPE_MAX				8
+
 typedef struct str_sql_msg
 {
 	base_message_content sql_message_content;
@@ -31,7 +33,7 @@ typedef struct str_sql_prepare
 	char	*statement;
 	int	ntypes;
 	char	**types;
-}	*sql_msg_prepapre;
+}	*sql_msg_prepare;
 
 typedef struct str_sql_unprepare
 {

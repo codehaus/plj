@@ -442,13 +442,13 @@ febe_receive_sql_statement(void)
 	return ret;
 }
 
-sql_msg_prepapre 
+sql_msg_prepare 
 febe_receive_sql_prepare(void)
 {
-	sql_msg_prepapre ret;
+	sql_msg_prepare ret;
 	int i;
 
-	ret = (sql_msg_prepapre) SPI_palloc(sizeof(struct str_sql_prepare));
+	ret = (sql_msg_prepare) SPI_palloc(sizeof(struct str_sql_prepare));
 	ret -> length = sizeof(struct str_sql_prepare);
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_PREPARE;
