@@ -12,7 +12,6 @@ import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
@@ -20,7 +19,6 @@ import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -102,7 +100,6 @@ public class PLJJDBCPreparedStatement extends PLJJDBCStatement implements Prepar
 			}
 		}
 		dbstatement = buf.toString();
-		System.out.println(dbstatement);
 	}
 
 	/**
@@ -245,7 +242,6 @@ public class PLJJDBCPreparedStatement extends PLJJDBCStatement implements Prepar
 	public boolean execute() throws SQLException {
 		try {
 			doPrepare();
-			TypeMapper mapper = conn.client.getTypeMapper();
 			SQLExecute exec = new SQLExecute();
 			Field[] flds = doMakeFields();
 			exec.setPlanid(plan);
@@ -886,29 +882,9 @@ public class PLJJDBCPreparedStatement extends PLJJDBCStatement implements Prepar
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see java.sql.Statement#executeUpdate(java.lang.String)
-	 */
-	public int executeUpdate(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see java.sql.Statement#addBatch(java.lang.String)
 	 */
 	public void addBatch(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#setCursorName(java.lang.String)
-	 */
-	public void setCursorName(String name) throws SQLException {
 		// TODO Auto-generated method stub
 
 	}
@@ -969,15 +945,6 @@ public class PLJJDBCPreparedStatement extends PLJJDBCStatement implements Prepar
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see java.sql.Statement#getConnection()
-	 */
-	public Connection getConnection() throws SQLException {
-		return this.conn;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see java.sql.Statement#getGeneratedKeys()
 	 */
 	public ResultSet getGeneratedKeys() throws SQLException {
@@ -991,49 +958,6 @@ public class PLJJDBCPreparedStatement extends PLJJDBCStatement implements Prepar
 	 * @see java.sql.Statement#getResultSet()
 	 */
 	public ResultSet getResultSet() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#getWarnings()
-	 */
-	public SQLWarning getWarnings() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#executeUpdate(java.lang.String,
-	 *      java.lang.String[])
-	 */
-	public int executeUpdate(String sql, String[] columnNames)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#execute(java.lang.String, java.lang.String[])
-	 */
-	public boolean execute(String sql, String[] columnNames)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.sql.Statement#executeQuery(java.lang.String)
-	 */
-	public ResultSet executeQuery(String sql) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}

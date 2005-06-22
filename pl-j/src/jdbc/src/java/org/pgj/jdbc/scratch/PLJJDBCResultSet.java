@@ -138,12 +138,13 @@ public class PLJJDBCResultSet implements ResultSet {
 		this.conn = null;
 	}
 
+	private boolean wasNull = false;
+	
 	/* (non-Javadoc)
 	 * @see java.sql.ResultSet#wasNull()
 	 */
 	public boolean wasNull() throws SQLException {
-		// TODO Auto-generated method stubFor every org.drools.rule.Rule, there is a java.lang.ExceptionFor every org.drools.rule.Rule, there is a java.lang.ExceptionFor every org.drools.rule.Rule, there is a java.lang.Exceptionstr_sql_statementstr_sql_statementstr_sql_statementstr_sql_statement
-		return false;
+		return wasNull;
 	}
 
 	/* (non-Javadoc)
@@ -1310,7 +1311,9 @@ public class PLJJDBCResultSet implements ResultSet {
 			throw new SQLException("Field " + col + " is null.");
 		}
 		try {
-			return fields[col - 1].get(clazz);
+			Object obj = fields[col - 1].get(clazz);
+			wasNull = (obj == null);
+			return obj;
 		} catch (MappingException e) {
 			throw new SQLException("Field " + col + " cannot be mapped to "
 					+ clazz.getName());

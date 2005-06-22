@@ -2,6 +2,7 @@
 package org.pgj.typemapping.postgres;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.avalon.framework.activity.Initializable;
 import org.apache.avalon.framework.configuration.Configurable;
@@ -311,5 +312,12 @@ public class PostgresTypeMapper
 		ret.set(0, 0, efld);
 
 		return ret;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pgj.typemapping.TypeMapper#getClassMap()
+	 */
+	public Map getClassMap() {
+		return (Map)typeBackMap.clone();
 	}
 }
