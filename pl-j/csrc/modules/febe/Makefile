@@ -14,4 +14,4 @@ module.a: febe_channel_init.o febe_channel_work.o libpq-mini.o libpq-mini-misc.o
 	ar r $@ $^ 
 
 clean:
-	rm *.o *.a -f
+	rm -f *.o *.a
