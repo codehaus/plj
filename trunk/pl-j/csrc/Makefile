@@ -23,7 +23,7 @@ plpgj.so: msghandler.o plpgj_message_fns.o plantable.o pljloging.o plpgj_hook.o 
 #	strip plpgj.so
 
 clean:
-	rm plpgj.so *.o -rf
+	rm -f plpgj.so *.o
 	make -C modules/$(COMM_MODULE) clean
 	make -C conf/$(CONF_MODULE) clean
 	make -C callmkr/$(CALLMKR_MODULE) clean

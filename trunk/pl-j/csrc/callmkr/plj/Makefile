@@ -9,4 +9,4 @@ callmkr.a: plj-callmkr.o
 	ar r $@ $^
 
 clean:
-	rm *.o *.a -f
+	rm -f *.o *.a
