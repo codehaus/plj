@@ -1,6 +1,8 @@
 
 package org.pgj.typemapping;
 
+import java.util.Map;
+
 import org.pgj.messages.Result;
 
 /**
@@ -78,4 +80,10 @@ public interface TypeMapper {
 	 * @throws MappingException	if the class is not mappable
 	 */
 	String getRDBMSTypeFor(Class cl) throws MappingException;
+
+	/**
+	 * Return the map of classes to their default database type. It is perhaps too JDBC specific function, probably should be somewhere else.
+	 * @return the map of classes
+	 */
+	Map getClassMap();
 }
