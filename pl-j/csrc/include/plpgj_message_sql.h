@@ -12,7 +12,16 @@
 #define SQL_TYPE_PEXECUTE			6
 #define SQL_TYPE_UNPREPARE			7
 
-#define SQL_TYPE_MAX				8
+#define SQL_TYPE_BLOBCREATE				8
+#define SQL_TYPE_BLOBDELETE				9
+#define SQL_TYPE_BLOBSEEK				10
+#define SQL_TYPE_BLOBWRITE				11
+#define SQL_TYPE_BLOBREAD				12
+#define SQL_TYPE_BLOBTELL				13
+#define SQL_TYPE_BLOBOPEN				14
+#define SQL_TYPE_BLOBCLOSE				15
+
+#define SQL_TYPE_MAX				16
 
 typedef struct str_sql_msg
 {
