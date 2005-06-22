@@ -254,6 +254,8 @@ public class JavaExecutor extends ClassLoader
 		privilegedCalls.put("install_jar", new InstallJar(this));
 		privilegedCalls.put("replace_jar", new ReplaceJar(this));
 		privilegedCalls.put("remove_jar", new RemoveJar(this));
+		privilegedCalls.put("get_default_mapping",
+				new GetDefaultMappingForClass(this));
 		privilegedCalls.put("alter_java_path", null);
 	}
 
