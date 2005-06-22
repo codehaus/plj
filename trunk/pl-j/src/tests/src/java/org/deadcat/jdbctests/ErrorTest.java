@@ -24,6 +24,7 @@ public class ErrorTest {
 
 	/**
 	 * UDF for executing SQL queries. Returns something as result.
+	 * This UDF is very useful for testing sql errors.
 	 * 
 	 * @param statement	an SQL query
 	 * @return a string generated from the result
@@ -73,4 +74,17 @@ public class ErrorTest {
 		return buf.toString();
 	}
 
+	/**
+	 * Execute <code>execSql(statement)</code> N times.
+	 * 
+	 * @param statement		the statement to execute
+	 * @param n				quantity to call execSql
+	 * @return				a string
+	 */
+	public static String execSqlN(String statement, int n){
+		for(int i=0; i<n; i++)
+			execSql(statement);
+		return "-- executed N times --";
+	}
+	
 }

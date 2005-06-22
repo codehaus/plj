@@ -164,10 +164,8 @@ public class PLJJDBCConnection implements Connection {
 	 * @see java.sql.Connection#nativeSQL(java.lang.String)
 	 */
 	public String nativeSQL(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-		log.error("not implemented");
 		checkClosed();
-		return null;
+		return sql;
 	}
 
 	/*
@@ -390,6 +388,7 @@ public class PLJJDBCConnection implements Connection {
 	public Map getTypeMap() throws SQLException {
 		// TODO Auto-generated method stub
 		TypeMapper mapper = this.client.getTypeMapper();
+		
 		log.error("not implemented");
 		checkClosed();
 		return null;

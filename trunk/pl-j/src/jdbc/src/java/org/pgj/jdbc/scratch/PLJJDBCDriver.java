@@ -27,7 +27,8 @@ public class PLJJDBCDriver implements Driver {
 		try {
 			DriverManager.registerDriver(new PLJJDBCDriver());
 		} catch (SQLException e) {
-			System.out.println("gebasz");
+			System.err.println("Could not register scratch driver");
+			e.printStackTrace();
 		}
 	}
 
