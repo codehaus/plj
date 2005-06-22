@@ -19,7 +19,7 @@
 plpgj_handler handlertab = NULL;
 int msg_handler_init = 0;
 
-message* handle_invalid_message(sql_msg msg) {
+message handle_invalid_message(sql_msg msg) {
 	elog(ERROR, "[plj core] invalid message type: %d", msg -> sqltype);
 	return NULL;
 }
@@ -208,6 +208,8 @@ message handle_pexecute_message(sql_msg msg){
 	int i;
 	sql_pexecute sql = (sql_pexecute)msg;
 
+	elog(DEBUG1, "handle_pexecute_message");
+
 	if(sql -> nparams == 0){
 		values = NULL;
 		nulls = NULL;
@@ -254,8 +256,8 @@ message handle_pexecute_message(sql_msg msg){
 		PG_TRY();
 			_SPI_plan* pln;
 			pln = (_SPI_plan*) plantable[sql -> planid];
-			switch(sql -> action) {
-				case SQL_PEXEC_ACTION_OPENCURSOR:
+			if (sql -> action == SQL_PEXEC_ACTION_OPENCURSOR) {
+					elog(DEBUG1, "opening cursor.");
 					#if POSTGRES_VERSION >= 80
 					pret = SPI_cursor_open(NULL, 
 						plantable[sql -> planid], values, nulls == NULL ? "" : nulls, true);
@@ -268,8 +270,15 @@ message handle_pexecute_message(sql_msg msg){
 					} else {
 						plpgj_utl_sendstr(pret -> name);
 					}
-					
-				break;
+			} else if (sql -> action == SQL_PEXEC_ACTION_UPDATE) {
+				int ret = SPI_execute_plan(plantable[sql -> planid], values, nulls == NULL ? "" : nulls, false, -1);
+				plpgj_utl_sendint(ret);
+			} else if (sql -> action == SQL_PEXEC_ACTION_EXECUTE) {
+				int ret = SPI_execute_plan(plantable[sql -> planid], values, nulls == NULL ? "" : nulls, false, -1);
+				plpgj_utl_sendint(ret);
+			} else {
+				elog(WARNING, "Wrong type of sql action: %d", sql -> action);
+				plpgj_utl_senderror("Wrong type of sql action");
 			}
 		PG_CATCH();
 			_SPI_plan* pln;
@@ -290,9 +299,16 @@ message handle_unprepare_message(sql_msg msg) {
 }
 
 void message_handler_init(){
+	int i;
+
+	elog(DEBUG1, "[pl-j - sql] initializing handler table");
+
 	handlertab = malloc(SQL_TYPE_MAX * sizeof(plpgj_handler_rec));
-	handlertab[0].desc = "";
-	handlertab[0].handler = handle_invalid_message;
+
+	for(i=0; i<SQL_TYPE_MAX; i++) {
+		handlertab[i].desc = "Invalid or not handled type";
+		handlertab[i].handler = handle_invalid_message;
+	}
 
 	handlertab[SQL_TYPE_STATEMENT].desc = "statement message handler";
 	handlertab[SQL_TYPE_STATEMENT].handler = handle_statement_message;
@@ -306,25 +322,30 @@ void message_handler_init(){
 	handlertab[SQL_TYPE_CURSOR_OPEN].desc = "cursor open handler";
 	handlertab[SQL_TYPE_CURSOR_OPEN].handler = handle_cursor_open;
 
-	handlertab[SQL_TYPE_PREPARE].desc = "";
+	handlertab[SQL_TYPE_PREPARE].desc = "prepare call";
 	handlertab[SQL_TYPE_PREPARE].handler = handle_prepare_message;
 
-	handlertab[SQL_TYPE_PEXECUTE].desc = "";
+	handlertab[SQL_TYPE_PEXECUTE].desc = "execute prepared statement";
 	handlertab[SQL_TYPE_PEXECUTE].handler = handle_pexecute_message;
 
-	handlertab[SQL_TYPE_UNPREPARE].desc = "";
+	handlertab[SQL_TYPE_UNPREPARE].desc = "close prepared statement";
 	handlertab[SQL_TYPE_UNPREPARE].handler = handle_unprepare_message;
 
+	elog(DEBUG1, "[pl-j - sql] init done");
+	msg_handler_init = 1;
 }
 
 message handle_message(sql_msg msg) {
-	int msg_type = msg -> msgtype;
-	if(msg_handler_init)
+	int msg_type = msg -> sqltype;
+	
+	if(!msg_handler_init)
 		message_handler_init();
 
 	if(msg_type > SQL_TYPE_MAX)
 		return handle_invalid_message(msg);
 
+	elog(DEBUG1,"calling handler: %d", msg_type);
+	elog(DEBUG1,"desc: %s", handlertab[msg_type].desc);
 	return handlertab[msg_type].handler(msg);
 }
 
