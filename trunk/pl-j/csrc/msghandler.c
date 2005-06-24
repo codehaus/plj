@@ -257,7 +257,7 @@ message handle_pexecute_message(sql_msg msg){
 			_SPI_plan* pln;
 			pln = (_SPI_plan*) plantable[sql -> planid];
 			if (sql -> action == SQL_PEXEC_ACTION_OPENCURSOR) {
-					elog(DEBUG1, "opening cursor.");
+					elog(DEBUG1, "[plj - sql] opening cursor.");
 					#if POSTGRES_VERSION >= 80
 					pret = SPI_cursor_open(NULL, 
 						plantable[sql -> planid], values, nulls == NULL ? "" : nulls, true);
@@ -271,13 +271,34 @@ message handle_pexecute_message(sql_msg msg){
 						plpgj_utl_sendstr(pret -> name);
 					}
 			} else if (sql -> action == SQL_PEXEC_ACTION_UPDATE) {
-				int ret = SPI_execute_plan(plantable[sql -> planid], values, nulls == NULL ? "" : nulls, false, -1);
+				elog(DEBUG1, "[plj - sql] runing update");
+				int ret = SPI_execute_plan(plantable[sql -> planid], values, nulls == NULL ? "" : nulls, false, sql -> nparams);
 				plpgj_utl_sendint(ret);
 			} else if (sql -> action == SQL_PEXEC_ACTION_EXECUTE) {
-				int ret = SPI_execute_plan(plantable[sql -> planid], values, nulls == NULL ? "" : nulls, false, -1);
-				plpgj_utl_sendint(ret);
+				elog(DEBUG1, "[plj - sql] runing statement");
+				int ret = SPI_execute_plan(plantable[sql -> planid], values, nulls == NULL ? "" : nulls, false, sql -> nparams);
+				elog(DEBUG1, "[plj - sql] statement result: %d", ret);
+				if(ret < 0) {
+					if(ret == SPI_ERROR_ARGUMENT)
+						plpgj_utl_senderror("Argument error");
+					else if(ret == SPI_ERROR_COPY)
+						plpgj_utl_senderror("COPY FROM/TO stdout requested");
+					else if(ret == SPI_ERROR_CURSOR)
+						plpgj_utl_senderror("DECLARE, CLOSE or FETCH requested");
+					else if(ret == SPI_ERROR_TRANSACTION)
+						plpgj_utl_senderror("Transaction operations are not available as prepared statements");
+					else if(ret == SPI_ERROR_OPUNKNOWN)
+						plpgj_utl_senderror(
+							"Command type unknown. Please report this error to http://jira.codehaus.org/browse/PLJ");
+					else if(ret == SPI_ERROR_UNCONNECTED)
+						plpgj_utl_senderror("Disconnected from database");
+					else
+						plpgj_utl_senderror("Unknown error type");
+						
+				} else
+					plpgj_utl_sendint(ret);
 			} else {
-				elog(WARNING, "Wrong type of sql action: %d", sql -> action);
+				elog(WARNING, "[plj - sql] Wrong type of sql action: %d", sql -> action);
 				plpgj_utl_senderror("Wrong type of sql action");
 			}
 		PG_CATCH();
