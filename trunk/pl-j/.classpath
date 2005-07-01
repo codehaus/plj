@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/interfaces"/>
 	<classpathentry kind="src" path="src/blocks/executors/BSF/src/java"/>
+	<classpathentry kind="src" path="src/interfaces/src/java"/>
 	<classpathentry kind="src" path="src/tests/src/java"/>
 	<classpathentry kind="src" path="src/jdbc/src/java"/>
 	<classpathentry kind="src" path="src/tools/src/java"/>
