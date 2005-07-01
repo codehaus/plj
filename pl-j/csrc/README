@@ -1,14 +1,2 @@
 
-HOW TO BUILD:
-
-requirements:
--postgresql-7.4 source code. extracted somewhere on the filesystem.
-
-copy the file Makefile.in.tmpl to Makefile.in, and replace
-the settings in the new file with your favourite editor.
-
-then type make. The generated plpgj.so file must be
-copied to the PostgreSQL installation.
-
-
-
+See build and install howto at http://docs.codehaus.org/pages/viewpage.action?pageId=12950
