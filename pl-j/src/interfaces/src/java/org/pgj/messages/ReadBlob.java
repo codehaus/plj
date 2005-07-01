@@ -5,9 +5,9 @@ package org.pgj.messages;
 
 
 /**
+ * Read blob message.
  * @author Laszlo Hornyak
  */
-//TODO: edit comments for ReadBlob
 public class ReadBlob extends SQL {
 	private long blobId = -1;
 	private int read_max;
