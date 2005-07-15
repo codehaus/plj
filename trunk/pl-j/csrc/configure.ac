@@ -53,6 +53,7 @@ nextstep*) template=nextstep ;;
 esac
 
 AC_MSG_RESULT([$template])
+AC_SUBST(PORTNAME, $template)
 
 # Checks for programs.
 AC_PROG_CC
