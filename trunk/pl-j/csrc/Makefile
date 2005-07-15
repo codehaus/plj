@@ -25,7 +25,7 @@ callmkr/$(CALLMKR_MODULE)/callmkr.a:
 plpgj.so: msghandler.o plpgj_message_fns.o plantable.o pljloging.o plpgj_hook.o plpgj_core.o modules/$(COMM_MODULE)/module.a conf/$(CONF_MODULE)/conf.a callmkr/$(CALLMKR_MODULE)/callmkr.a
 	cc -shared $^ -o plpgj.so $(LIBS) -Wall
 
-plpgj.dynlib:
+plpgj.dynlib: msghandler.o plpgj_message_fns.o plantable.o pljloging.o plpgj_hook.o plpgj_core.o modules/$(COMM_MODULE)/module.a conf/$(CONF_MODULE)/conf.a callmkr/$(CALLMKR_MODULE)/callmkr.a
 	gcc -dynamiclib $^ -flat_namespace -undefined suppress -o plpgj.dynlib
 
 clean:
