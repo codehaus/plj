@@ -89,7 +89,7 @@ void reg_error_callback() {
 	if (!callbacks_init)
 	{
 	ErrorContextCallback *mycallback;
-		mycallback = SPI_palloc(sizeof(ErrorContextCallback));
+		mycallback = palloc(sizeof(ErrorContextCallback));
 		mycallback->previous = error_context_stack;
 		mycallback->callback = plpgj_ErrorContextCallback;
 		mycallback->arg = NULL;
@@ -108,12 +108,19 @@ void reg_error_callback() {
 
 void handle_exception(void){
 	ErrorData  *edata;
+	MemoryContext oldCtx;
 	elog(DEBUG1, "exception handler.");
+
+	//oldCtx = CurrentMemoryContext;
+	//MemoryContextSwitchTo(ErrorContext);
+	
 	edata = CopyErrorData();
 	plpgj_utl_senderror(edata -> message);
 
 	elog(DEBUG1, "flushing error");
 	FlushErrorState();
+
+	//MemoryContextSwitchTo(oldCtx);
 
 //	RollbackAndReleaseCurrentSubTransaction();
 	SPI_restore_connection();
@@ -181,7 +188,14 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 	do
 	{
 		void	   *ansver = NULL;
+		MemoryContext messageContext;
+		MemoryContext oldContext;
 
+		messageContext = AllocSetContextCreate(CurrentMemoryContext, "PL-J message context", 128000, 32, 65536);
+		oldContext = CurrentMemoryContext;
+
+		MemoryContextSwitchTo(messageContext);
+		
 		pljelog(DEBUG1, "waiting ansver.");
 		ansver = plpgj_channel_receive();
 		pljelog(DEBUG1, "got %s", ansver == NULL ? "null" : "not null");
@@ -213,13 +227,18 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 
 				break;
 			default:
-				pljelog(FATAL, "received: unknown message.");
+				//lets first switch back to the old context and handle the error.
+				MemoryContextSwitchTo(oldContext);
+				MemoryContextDelete(messageContext);
+				pljelog(FATAL, "[plj core] received: unhandled message with type id %d", message_type);
 				//this wont run.
 				PG_RETURN_NULL();
 		}
-		elog(DEBUG1, "[plj core] free message");
-		free_message(ansver);
-		elog(DEBUG1, "[plj core] free message done");
+
+		//we do not try to free messages anymore, we switch context and delete the old one
+		//elog(DEBUG1, "[plj core] free message");
+		//free_message(ansver);
+		//elog(DEBUG1, "[plj core] free message done");
 
 		/*
 		 * here is how to escape from the loop
@@ -245,6 +264,8 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				MemoryContext oldctx;
 
 				if (res->data[0][0].isnull == 1){
+					MemoryContextSwitchTo(oldContext);
+					MemoryContextDelete(messageContext);
 					plpgj_return_cleanup;
 					PG_RETURN_NULL();
 				}
@@ -254,8 +275,11 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 				typeOid = typenameTypeId(typeName);
 				typetup = SearchSysCache(TYPEOID, typeOid, 0, 0, 0);
 				if (!HeapTupleIsValid(typetup)){
-					//TODO how to handle this situation the best?
-					pljelog(ERROR, "invalid heaptuple at result return");
+					MemoryContextSwitchTo(oldContext);
+					MemoryContextDelete(messageContext);
+					elog(FATAL, "[plj - core] Invalid heaptuple at result return");
+					//This won`t run
+					PG_RETURN_NULL();
 				}
 
 				type = (Form_pg_type) GETSTRUCT(typetup);
@@ -280,9 +304,9 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			}
 			else if (res->rows == 0)
 			{
-				pljelog(DEBUG1,"multirow not implemented.");
-				//error_context_stack = error_context_stack->previous;
-				plpgj_return_cleanup;
+				MemoryContextSwitchTo(oldContext);
+				MemoryContextDelete(messageContext);
+				pljelog(ERROR,"Resultset return not implemented.");
 				PG_RETURN_VOID();
 			}
 
@@ -296,6 +320,12 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			 * break;
 			 */
 		}
+
+		elog(DEBUG1, "deleting message ctx");
+		MemoryContextSwitchTo(oldContext);
+		MemoryContextDelete(messageContext);
+		elog(DEBUG1, "deleted message ctx");
+
 		if (message_type == MT_EXCEPTION) {
 			elog(ERROR, ((error_message)ansver) -> message);
 			plpgj_return_cleanup;
@@ -386,7 +416,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 			plpgj_return_cleanup;
 			return PointerGetDatum(rettup);
 		}
-		pljelog(DEBUG1, "debug");
+		elog(DEBUG1, "debug");
 		
 //		pljelog(ERROR, "no handler for message type: %d", message_type);
 
@@ -498,7 +528,7 @@ plpgj_ErrorContextCallback(void *arg)
 	/*
 	 *send the error to the java process.
 	 */
-	error_message msg = SPI_palloc(sizeof(str_error_message));
+	error_message msg = palloc(sizeof(str_error_message));
 
 	msg->msgtype = MT_EXCEPTION;
 	msg->length = sizeof(str_error_message);
@@ -532,18 +562,17 @@ plpgj_ErrorContextCallback(void *arg)
 
 void plpgj_utl_sendstr(const char* str) {
 				plpgj_result res;
-				res = SPI_palloc(sizeof(str_plpgj_result));
+				res = palloc(sizeof(str_plpgj_result));
 				res -> msgtype = MT_RESULT;
 				res -> length = sizeof(str_plpgj_result);
 				res -> rows = 1;
 				res -> cols = 1;
-				res -> types = SPI_palloc(sizeof(char*));
+				res -> types = palloc(sizeof(char*));
 				res -> types[0] = "varchar";
-				res -> data = SPI_palloc(sizeof(raw));
-				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
+				res -> data = palloc(sizeof(raw));
+				res -> data[0] = palloc(sizeof(struct str_raw));
 				res -> data[0] -> length = 4 + strlen(str);
 				res -> data[0] -> isnull = 0;
-				elog(DEBUG1, "plpgj_utl_sendstr, 1");
 				{
 					Form_pg_type int4typ;
 					HeapTuple int4htp;
@@ -555,42 +584,29 @@ void plpgj_utl_sendstr(const char* str) {
 					int4nam = makeTypeName("varchar");
 					int4oid = LookupTypeName(int4nam);
 					int4htp = SearchSysCache(TYPEOID, int4oid, 0, 0, 0);
-				elog(DEBUG1, "plpgj_utl_sendstr, 2");
 					int4typ = (Form_pg_type)GETSTRUCT(int4htp);
 					ReleaseSysCache(int4htp);
-				elog(DEBUG1, "plpgj_utl_sendstr, 2.1");
 
-					rawString = SPI_palloc(sizeof(StringInfoData));
-				elog(DEBUG1, "plpgj_utl_sendstr, 2.1.1");
+					rawString = palloc(sizeof(StringInfoData));
 					initStringInfo(rawString);
-				elog(DEBUG1, "plpgj_utl_sendstr, 2.1.2: %d, %s", strlen(str), str);
 					appendBinaryStringInfo(rawString, str, strlen(str));
-				elog(DEBUG1, "plpgj_utl_sendstr, 2.1.3");
 					d = OidFunctionCall1(int4typ -> typsend, OidFunctionCall1(int4typ -> typinput, PointerGetDatum(str)));
-				elog(DEBUG1, "plpgj_utl_sendstr, 2.2");
 					res -> data[0] -> data = DatumGetPointer(d);
-				elog(DEBUG1, "plpgj_utl_sendstr, 3");
 				}
-				pljelog(DEBUG1,"1");
-				pljloging = 0;
 				plpgj_channel_send((message)res);
-				elog(DEBUG1, "plpgj_utl_sendstr, 4");
-				pljloging = 1;
-
-
 }
 
 void plpgj_utl_sendint(int i) {
 				plpgj_result res;
-				res = SPI_palloc(sizeof(str_plpgj_result));
+				res = palloc(sizeof(str_plpgj_result));
 				res -> msgtype = MT_RESULT;
 				res -> length = sizeof(str_plpgj_result);
 				res -> rows = 1;
 				res -> cols = 1;
-				res -> types = SPI_palloc(sizeof(char*));
+				res -> types = palloc(sizeof(char*));
 				res -> types[0] = "int4";
-				res -> data = SPI_palloc(sizeof(raw));
-				res -> data[0] = SPI_palloc(sizeof(struct str_raw));
+				res -> data = palloc(sizeof(raw));
+				res -> data[0] = palloc(sizeof(struct str_raw));
 				res -> data[0] -> length = 8;
 				res -> data[0] -> isnull = 0;
 				//res -> data[0] -> data = SPI_palloc(sizeof(12));
@@ -661,4 +677,3 @@ int envstack_isempty(void) {
 void envstack_clean(void) {
 	envstack = NULL;
 }
-
