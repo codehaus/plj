@@ -1,7 +1,7 @@
 
 /**
  * file name:			plpgj_core.c
- * description:			PL/pgJ language handler module.
+ * description:			PL-J language handler module.
  * author:			Laszlo Hornyak
  */
 
@@ -37,7 +37,6 @@ plpgj_call_handler(PG_FUNCTION_ARGS)
 	datumreturn = plpgj_call_hook(fcinfo);
 
 	pljelog(DEBUG1, "[pl-j core] call done, disconnect and return");
-
 	ret = SPI_finish();
 	if (ret != SPI_OK_FINISH)
 #if (POSTGRES_VERSION == 74)
@@ -45,6 +44,6 @@ plpgj_call_handler(PG_FUNCTION_ARGS)
 #else
 		elog(ERROR, "SPI finis error: %d (%s)", ret, SPI_result_code_string(ret));
 #endif
-
+	elog(DEBUG1, "SPI_finish called");
 	return datumreturn;
 }	//plpgj_call_handler
