@@ -33,8 +33,8 @@ pq_min_connect()
 	/*
 	 * in buff
 	 */
-	conn->inBuffer = malloc(128);
-	conn->inBufSize = 128;
+	conn->inBuffer = malloc(8192);
+	conn->inBufSize = 8192;
 	conn->inCursor = 0;
 	conn->inStart = 0;
 	conn->inEnd = 0;
@@ -42,10 +42,10 @@ pq_min_connect()
 	/*
 	 * out buff
 	 */
-	conn->outBuffer = malloc(256);
+	conn->outBuffer = malloc(8192);
 	conn->outMsgStart = 0;
 	conn->outMsgEnd = 0;
-	conn->outBufSize = 256;
+	conn->outBufSize = 8192;
 	conn->outCount = 0;
 
 	conn->status = CONNECTION_NEEDED;
