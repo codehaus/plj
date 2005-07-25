@@ -97,4 +97,58 @@ typedef struct str_sql_msg_cursor_fetch
 
 } *sql_msg_cursor_fetch;
 
+typedef struct str_sql_msg_blob_create
+{
+	base_message_content;
+	sql_message_content;
+} *sql_msg_blob_create;
+
+typedef struct str_sql_msg_blob_delete 
+{
+	base_message_content;
+	sql_message_content;
+	long blobid;
+} *sql_msg_blob_delete;
+
+typedef struct str_sql_msg_blob_open 
+{
+	base_message_content;
+	sql_message_content;
+	long blobid;
+} *sql_msg_blob_open;
+
+typedef struct str_sql_msg_blob_close 
+{
+	base_message_content;
+	sql_message_content;
+	long blobid;
+} sql_msg_blob_close;
+
+typedef struct str_sql_msg_blob_read 
+{
+	base_message_content;
+	sql_message_content;
+	long blobid;
+	int max;
+	unsigned char strict;
+} *sql_msg_blob_read;
+
+typedef struct str_sql_msg_blob_write 
+{
+	base_message_content;
+	sql_message_content;
+	long blobid;
+	raw data;
+} sql_msg_blob_write;
+
+typedef struct str_sql_msg_blob_seek 
+{
+	base_message_content;
+	sql_message_content;
+	long blobid;
+	long position;
+	unsigned char relative;
+} *sql_msg_blob_seek;
+
+
 #endif
