@@ -75,12 +75,12 @@ message handle_fetch_message(sql_msg msg) {
 		return NULL;
 	}
 
-	result = SPI_palloc(sizeof(str_plpgj_result));
+	result = palloc(sizeof(str_plpgj_result));
 	result -> msgtype = MT_RESULT;
 	result -> length = sizeof(str_plpgj_result);
 	result -> cols = res_tuptable -> tupdesc -> natts;
 	result -> rows = SPI_processed;
-	result -> types = SPI_palloc(result -> cols * sizeof(char*));
+	result -> types = palloc(result -> cols * sizeof(char*));
 	for(j = 0; j < result -> cols; j++){
 		HeapTuple typtup;
 		Form_pg_type typstr;
@@ -91,13 +91,13 @@ message handle_fetch_message(sql_msg msg) {
 	}
 
 	if(result -> rows > 0){
-		result -> data = SPI_palloc(sizeof(raw) * result -> rows);
+		result -> data = palloc(sizeof(raw) * result -> rows);
 	} else {
 		result -> data = NULL;
 	}
 
 	for(i = 0; i < result -> rows; i++){
-		result -> data[i] = SPI_palloc(result -> cols * sizeof(struct str_raw));
+		result -> data[i] = palloc(result -> cols * sizeof(struct str_raw));
 		for(j = 0; j < result -> cols; j++){
 			HeapTuple typtup;
 			Form_pg_type typstr;
@@ -177,7 +177,7 @@ message handle_prepare_message(sql_msg msg) {
 	int planid;
 
 	prep = (sql_msg_prepare) msg;
-	argtypes = prep -> ntypes == 0 ? NULL : SPI_palloc(prep -> ntypes * sizeof(Oid) );
+	argtypes = prep -> ntypes == 0 ? NULL : palloc(prep -> ntypes * sizeof(Oid) );
 	for(i = 0; i < prep -> ntypes; i++) {
 		typnam = makeTypeName( prep -> types[i] );
 		argtypes[i] = LookupTypeName(typnam);
@@ -214,8 +214,8 @@ message handle_pexecute_message(sql_msg msg){
 		values = NULL;
 		nulls = NULL;
 	} else {
-		values = SPI_palloc( sql -> nparams * sizeof(Datum));
-		nulls = SPI_palloc( sql -> nparams * sizeof(char)) + 1;
+		values = palloc( (sql -> nparams+1) * sizeof(Datum) );
+		nulls = palloc( (sql -> nparams+1) * sizeof(char) );
 	}
 
 	for(i = 0; i < sql -> nparams; i++) {
@@ -235,7 +235,7 @@ message handle_pexecute_message(sql_msg msg){
 			typstr = (Form_pg_type)GETSTRUCT(typtup);
 			ReleaseSysCache(typtup);
 			
-			rawString = SPI_palloc(sizeof(StringInfoData));
+			rawString = palloc(sizeof(StringInfoData));
 			initStringInfo(rawString);
 			appendBinaryStringInfo(rawString, sql -> params[i].data.data, sql -> params[i].data.length);
 			values[i] = OidFunctionCall1(typstr -> typreceive, PointerGetDatum(rawString));
@@ -303,7 +303,7 @@ message handle_pexecute_message(sql_msg msg){
 			}
 		PG_CATCH();
 			_SPI_plan* pln;
-			elog(WARNING, "[plj core - plan exec] error at execution.");
+			elog(DEBUG1, "[plj core - plan exec] error at execution.");
 			pln = (_SPI_plan*) plantable[sql -> planid];
 			elog(DEBUG1, "%s",  pln -> query );
 			handle_exception();
