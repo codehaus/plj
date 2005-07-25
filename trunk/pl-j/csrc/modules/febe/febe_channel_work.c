@@ -29,19 +29,14 @@ febe_receive_integer_4(void)
 	unsigned char c[4];
 	int			i;
 
-	elog(DEBUG1, "cursor: %d, end: %d", min_conn -> inCursor, min_conn -> inEnd);
 	if( min_conn -> inCursor == min_conn -> inEnd ){
 		pqReadData(min_conn);
-		elog(DEBUG1, "cursor: %d, end: %d", min_conn -> inCursor, min_conn -> inEnd);
-		
 	}
 	for (i = 0; i < 4; i++) {
-		elog(DEBUG1, "chr: %d", c[i]);
 		pqGetc(c + i, min_conn);
 	}
 	i = c[3] + (c[2] * 256) + (c[1] * 256 * 256) +
 		(c[0] * 256 * 256 * 256);
-	elog(DEBUG1, "febe_receive_integer_4: %d", i);
 	return i;
 }
 
@@ -63,7 +58,8 @@ febe_receive_string(void)
 		return "";
 
 //	elog(DEBUG1,"string len: %d", (unsigned int)cnt);
-	tmp_chr = SPI_palloc(sizeof(char) * (cnt + 2));
+	tmp_chr = palloc(sizeof(char) * (cnt + 2));
+	elog(DEBUG1, "---");
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	tmp_chr[cnt] = 0;
 	return tmp_chr;
@@ -238,7 +234,7 @@ febe_receive_exception()
 	name = createPQExpBuffer();
 	mesg = createPQExpBuffer();
 
-	ret = SPI_palloc(sizeof(str_error_message));
+	ret = palloc(sizeof(str_error_message));
 
 	ret->classname = febe_receive_string();
 	ret->message = febe_receive_string();
@@ -260,7 +256,7 @@ febe_receive_result()
 	int			i,
 				j;				//iterators
 
-	ret = SPI_palloc(sizeof(str_plpgj_result));
+	ret = palloc(sizeof(str_plpgj_result));
 	ret->msgtype = MT_RESULT;
 	ret->length = sizeof(str_plpgj_result);
 
@@ -269,8 +265,8 @@ febe_receive_result()
 
 	if (ret->rows > 0)
 	{
-		ret->data = SPI_palloc((ret->rows) * sizeof(raw));
-		ret->types = SPI_palloc(ret->rows * (sizeof(char *)));
+		ret->data = palloc((ret->rows) * sizeof(raw));
+		ret->types = palloc(ret->rows * (sizeof(char *)));
 	}
 	else
 	{
@@ -285,7 +281,7 @@ febe_receive_result()
 	for (i = 0; i < ret->rows; i++)
 	{
 		if (ret->cols > 0)
-			ret->data[i] = SPI_palloc((ret->cols) * sizeof(raw));
+			ret->data[i] = palloc((ret->cols) * sizeof(raw));
 		else
 			ret->data[i] = NULL;
 		for (j = 0; j < ret->cols; j++)
@@ -306,7 +302,8 @@ febe_receive_result()
 				ret->data[i][j].isnull = 0;
 				len = febe_receive_integer_4();
 				ret->data[i][j].length = len;
-				ret->data[i][j].data = SPI_palloc(len);
+				ret->data[i][j].data = palloc(len);
+				elog(DEBUG1, "===");
 				pqGetnchar(ret->data[i][j].data, len, min_conn);
 				{
 					/*
@@ -316,11 +313,12 @@ febe_receive_result()
 					int			l;
 
 					l = febe_receive_integer_4();
+				elog(DEBUG1, "+++");
 					pqGetnchar(buff, l, min_conn);
 					buff[l] = 0;
 					if (ret->types[j] == NULL)
 					{
-						ret->types[j] = SPI_palloc(strlen(buff));
+						ret->types[j] = palloc(strlen(buff));
 						strcpy(ret->types[j], buff);
 					}
 				}
@@ -339,7 +337,7 @@ febe_receive_log()
 {
 	log_message ret;
 
-	ret = SPI_palloc(sizeof(str_log_message));
+	ret = palloc(sizeof(str_log_message));
 	ret->msgtype = MT_LOG;
 	ret->length = sizeof(str_log_message);
 
@@ -360,7 +358,7 @@ febe_receive_tupres()
 	trigger_tupleres res;
 	int			i;
 
-	res = SPI_palloc(sizeof(str_msg_trigger_tupleresult));
+	res = palloc(sizeof(str_msg_trigger_tupleresult));
 	res->length = sizeof(str_msg_trigger_tupleresult);
 	res->msgtype = MT_TUPLRES;
 
@@ -368,9 +366,9 @@ febe_receive_tupres()
 	res->colcount = febe_receive_integer_4();
 	res->colnames =
 		res->colcount >
-		0 ? SPI_palloc(res->colcount * sizeof(char *)) : NULL;
+		0 ? palloc(res->colcount * sizeof(char *)) : NULL;
 	if (res->colcount > 0)
-		res->_tuple = SPI_palloc(sizeof(pparam) * res->colcount);
+		res->_tuple = palloc(sizeof(pparam) * res->colcount);
 	else
 		res->_tuple = NULL;
 	for (i = 0; i < res->colcount; i++)
@@ -380,7 +378,7 @@ febe_receive_tupres()
 
 		name = febe_receive_string();
 		res->colnames[i] = name;
-		res->_tuple[i] = SPI_palloc(sizeof(struct fnc_param));
+		res->_tuple[i] = palloc(sizeof(struct fnc_param));
 		pqGetc(&isnull, min_conn);
 		if (isnull == 'n')
 		{
@@ -401,10 +399,11 @@ febe_receive_tupres()
 			if (res->_tuple[i]->data.length > 0)
 			{
 				res->_tuple[i]->data.data =
-					SPI_palloc(res->_tuple[i]->data.length);
+					palloc(res->_tuple[i]->data.length);
 			}
 			else
 				res->_tuple[i]->data.data = NULL;
+			elog(DEBUG1, "|||");
 			pqGetnchar(res->_tuple[i]->data.data,
 					   res->_tuple[i]->data.length, min_conn);
 		}
@@ -418,7 +417,7 @@ febe_receive_sql_fetch(void)
 {
 	sql_msg_cursor_fetch ret;
 
-	ret = SPI_palloc(sizeof(struct str_sql_msg_cursor_fetch));
+	ret = palloc(sizeof(struct str_sql_msg_cursor_fetch));
 	ret -> length = sizeof(struct str_sql_msg_cursor_fetch);
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_FETCH;
@@ -434,7 +433,7 @@ febe_receive_sql_statement(void)
 {
 	sql_msg_statement ret;
 
-	ret = (sql_msg_statement) SPI_palloc(sizeof(struct str_sql_statement));
+	ret = (sql_msg_statement) palloc(sizeof(struct str_sql_statement));
 	ret->msgtype = MT_SQL;
 	ret->length = sizeof(struct str_sql_statement);
 	ret->sqltype = SQL_TYPE_STATEMENT;
@@ -448,13 +447,13 @@ febe_receive_sql_prepare(void)
 	sql_msg_prepare ret;
 	int i;
 
-	ret = (sql_msg_prepare) SPI_palloc(sizeof(struct str_sql_prepare));
+	ret = (sql_msg_prepare) palloc(sizeof(struct str_sql_prepare));
 	ret -> length = sizeof(struct str_sql_prepare);
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_PREPARE;
 	ret -> statement = febe_receive_string();
 	ret -> ntypes = febe_receive_integer_4();
-	ret -> types = ret -> ntypes == 0 ? NULL : SPI_palloc(ret -> ntypes * sizeof(char*));
+	ret -> types = ret -> ntypes == 0 ? NULL : palloc(ret -> ntypes * sizeof(char*));
 
 //	ret -> ntypes = 0;
 //	ret -> types = NULL;
@@ -472,7 +471,7 @@ sql_pexecute febe_receive_sql_pexec(void){
 	int i;
 
 //	pljelog(DEBUG1,"febe_receive_sql_pexec");
-	ret = SPI_palloc(sizeof(struct str_sql_pexecute));
+	ret = palloc(sizeof(struct str_sql_pexecute));
 	ret -> length = sizeof(struct str_sql_pexecute);
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_PEXECUTE;
@@ -483,12 +482,13 @@ sql_pexecute febe_receive_sql_pexec(void){
 	if(ret -> nparams == 0){
 		ret -> params = NULL;
 	} else {
-		ret -> params = SPI_palloc( ret -> nparams * sizeof(struct fnc_param));
+		ret -> params = palloc( ret -> nparams * sizeof(struct fnc_param));
 	}
 	
 	for(i = 0; i < ret -> nparams; i++) {
 		char isnull;
 		isnull = 0;
+		elog(DEBUG1, ">>>");
 		pqGetc(&isnull, min_conn);
 		if(isnull == 'N') {
 			ret -> params[i].data.isnull = 1;
@@ -502,14 +502,18 @@ sql_pexecute febe_receive_sql_pexec(void){
 			ret -> params[i].data.length = febe_receive_integer_4();
 			ret -> params[i].data.data = 
 				ret -> params[i].data.length == 0 ?
-					NULL : SPI_palloc(ret -> params[i].data.length);
+					NULL : palloc(ret -> params[i].data.length + 2);
+
+			elog(DEBUG1, "pqGetnchar --> %d", ret -> params[i].data.length);
 			pqGetnchar(ret -> params[i].data.data, ret -> params[i].data.length, min_conn);
+			elog(DEBUG1, "<-- pqGetnchar");
 		}
 	}
 //	pljelog(DEBUG1,"febe_receive_sql_pexec end");
 //	for(i = 0; i < ret -> nparams; i++) {
 //		pljelog(DEBUG1, "[%d] type: %d", i, ret -> params[i].type);
 //	}
+	elog(DEBUG1, "<<<");
 	return ret;
 }
 
@@ -517,7 +521,7 @@ sql_msg_cursor_close
 febe_receive_sql_cursorclose(){
 	sql_msg_cursor_close ret;
 
-	ret = SPI_palloc(sizeof(struct str_sql_msg_cursor_close));
+	ret = palloc(sizeof(struct str_sql_msg_cursor_close));
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_CURSOR_CLOSE;
 	ret -> length = sizeof(struct str_sql_msg_cursor_close);
@@ -530,7 +534,7 @@ sql_msg_unprepare
 febe_receive_sql_unprepare(){
 	sql_msg_unprepare ret;
 
-	ret = SPI_palloc(sizeof(struct str_sql_unprepare));
+	ret = palloc(sizeof(struct str_sql_unprepare));
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_UNPREPARE;
 	ret -> length = sizeof(struct str_sql_unprepare);
@@ -543,7 +547,7 @@ sql_msg_cursor_open
 febe_receive_sql_opencursor_sql(){
 	sql_msg_cursor_open	ret;
 
-	ret = SPI_palloc(sizeof(struct str_sql_msg_cursor_open));
+	ret = palloc(sizeof(struct str_sql_msg_cursor_open));
 	ret -> msgtype = MT_SQL;
 	ret -> sqltype = SQL_TYPE_CURSOR_OPEN;
 	ret -> length = sizeof(struct str_sql_msg_cursor_open);
@@ -644,7 +648,7 @@ plpgj_channel_receive(void)
 
 	if(msgret != NULL)
 		pqMessageRecvd(min_conn);
-
+	elog(DEBUG1, "***");
 	return msgret;
 }
 
