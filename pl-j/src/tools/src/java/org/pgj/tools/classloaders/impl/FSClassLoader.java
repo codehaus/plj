@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
+import java.security.cert.Certificate;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.SecureClassLoader;
@@ -131,7 +132,7 @@ public class FSClassLoader extends SecureClassLoader
 			URL codeURL = new URL("file://" + fqn);
 			// TODO Remove this !!!
 			logger.debug(codeURL.toString());
-			cs = new CodeSource(codeURL, null);
+			cs = new CodeSource(codeURL, (Certificate [])null);
 		} catch (MalformedURLException ex) {
 			logger.fatalError("Can not happen.", ex);
 		}
@@ -189,7 +190,7 @@ public class FSClassLoader extends SecureClassLoader
 			// Creating permissionTable for classes
 
 			permissionTable = new Hashtable();
-			CodeSource cs = new CodeSource(new URL("file://jsp.files"), null);
+			CodeSource cs = new CodeSource(new URL("file://jsp.files"), (Certificate [])null);
 
 			// Class loader to load xxx.xxx.xxxxPermission class
 			ClassLoader cl = java.lang.ClassLoader.getSystemClassLoader();
