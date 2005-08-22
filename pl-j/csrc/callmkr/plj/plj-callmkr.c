@@ -29,11 +29,6 @@
 #warning MAX_NO_OPTS not defined, using default 10
 #endif
 
-#ifndef POSTGRES_VERSION
-#warning POSTGRES_VERSION is the default 74
-#define POSTGRES_VERSION 74
-#endif
-
 const char *__func_opt_regexp = "\\(\\w*\\)=\\(.*\\)$";
 regex_t		func_opt_regexp;
 int			plpgj_re_init = 0;
@@ -82,13 +77,13 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 
 	plpgj_create_call_regex_init();
 
-#if POSTGRES_VERSION == 74
+#if PG_MAJOR_VERSION == 7
 
 	func_src =
 		DatumGetCString(DirectFunctionCall1
 						(textout, PointerGetDatum(&procStruct->prosrc)));
 
-#elif POSTGRES_VERSION == 80
+#elif PG_MAJOR_VERSION == 8
 
 	{
 	bool isnull;
@@ -105,7 +100,7 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 
 #else
 
-#error UNSUPPORTED PG VERSION, MUST BE 74 OR 80
+#error UNSUPPORTED PG MAJOR VERSION, MUST BE 7 OR 8
 #endif
 
 	/*
@@ -399,14 +394,14 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 
 
 	elog(DEBUG1, "[call maker] geting function description");
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION == 7)
 
 	elog(DEBUG1, "[call maker] 7.4 spec");
 	func_src =
 		DatumGetCString(DirectFunctionCall1
 						(textout, PointerGetDatum(&procstruct->prosrc)));
 
-#elif (POSTGRES_VERSION == 80)
+#elif (PG_MAJOR_VERSION == 8)
 
 	{
 	bool isnull;
@@ -418,7 +413,7 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 	}
 #else
 
-#error NOT SUPPORTED POSTGRESQL VERSION (but i guess i told about it)
+#error NOT SUPPORTED POSTGRESQL VERSION
 #endif
 
 	elog(DEBUG1, "[call maker] function source: %s", func_src);
