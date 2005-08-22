@@ -28,6 +28,7 @@ import org.pgj.tools.classloaders.PLJClassLoader;
 import org.pgj.tools.jdbc.JDBCConfigurator;
 import org.pgj.tools.utils.ClientUtils;
 import org.pgj.typemapping.MappingException;
+import org.pgj.typemapping.TypeMapper;
 
 
 /**
@@ -65,6 +66,7 @@ public class BSFExecutor
 		Message result = null;
 		try {
 			Client cli = call.getClient();
+			TypeMapper tm = cli.getTypeMapper();
 			BSFManager manager = (BSFManager) managerMap.get(cli);
 			if(manager == null){
 				manager = new BSFManager();
@@ -74,6 +76,7 @@ public class BSFExecutor
 			Object ret = manager.eval(script.getLanguage(), script.getSource(),
 					0, 0, script.getSource());
 			cli.getTypeMapper().backMap(ret);
+			result = tm.createResult(ret);
 		} catch (ScriptNotFoundException e) {
 			result = throwableToErrorMsg(e);
 		} catch (BSFException e) {
@@ -82,7 +85,6 @@ public class BSFExecutor
 			result = throwableToErrorMsg(e);
 		} catch (ScriptStoreException e) {
 			result = throwableToErrorMsg(e);
-		} finally {
 		}
 
 		return result;
