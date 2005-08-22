@@ -4,20 +4,23 @@
 #	Autoconf configuration file for PL-J 
 #	(PostgreSQL call handler module)
 #
-#	It was rewritten from the Slony
+#	It was rewritten from the Slony-I
+#
+#	Copyright (c) 2004-2005, PL-J developers
 #
 #	Copyright (c) 2003-2004, PostgreSQL Global Development Group
 #	Author: Jan Wieck, Afilias USA INC.
 #
-# $Id: configure.ac,v 1.18 2004/03/31 13:46:09 wieck Exp $
+# $Id: configure.in,v 1.1 2005-08-22 15:10:10 kocka Exp $
 #
 # Process this file with autoconf to produce a configure script.
 # ----------
 
-AC_INIT(pl-pgj, 20040330)
+AC_INIT(pl-pgj, 0.1.1)
+AM_INIT_AUTOMAKE(plpgj,0.1.1)
 AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_SRCDIR([src])
+# AC_CONFIG_AUX_DIR(PWD)
+dnl AC_CONFIG_SRCDIR([$srcdir])
 
 AC_CANONICAL_HOST
 
@@ -58,6 +61,7 @@ AC_SUBST(PORTNAME, $template)
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LD
+AC_PROG_LIBTOOL
 AC_SUBST(LD)
 AC_SUBST(with_gnu_ld)
 ACX_PTHREAD()
@@ -65,8 +69,6 @@ ACX_PTHREAD()
 # Locate the PostgreSQL source tree
 
 AC_ARG_WITH(pgsourcetree, [  --with-pgsourcetree=<dir> Location of PostgreSQL source tree], AC_SUBST(PGSOURCETREE, $with_pgsourcetree))
-AC_ARG_WITH(pgversion, [  --with-pgversion=<version> Version number of the PG source (74 or 80)], AC_SUBST(POSTGRES_VERSION, $with_pgversion))
-
 AC_ARG_WITH(confmod, [  --with-confmod=<module> configuration module], AC_SUBST(CONFMOD, $with_confmod))
 AC_ARG_WITH(channel, [  --with-channel=<module> channel module], AC_SUBST(CHANMOD, $with_channel))
 AC_ARG_WITH(callmaker, [  --with-callmaker=<module> call maker module], AC_SUBST(CALLMKRMOD, $with_callmaker))
@@ -104,75 +106,33 @@ if test "x$with_callmaker" = "x" ; then
     CALLMKRMOD=plj
 fi
 
-if test "x$with_pgversion" = "x" ; then
-	AC_MSG_WARN([
-    assuming version 7.4
-	])
-    with_pgversion=74
-    POSTGRES_VERSION=74
-fi
 
 
+AC_MSG_CHECKING(PostgreSQL major version)
+PG_MAJOR_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\([[0-9]]*\).*/\1/" -e 's/\"//g'`
+AC_MSG_RESULT($PG_MAJOR_VERSION)
+AC_SUBST(PG_MAJOR_VERSION, $PG_MAJOR_VERSION)
 
-# ----
-# Check if our libpq contains several functions
-# ----
-save_CFLAGS="$CFLAGS"
-save_LIBS="$LIBS"
-# CFLAGS="-I${with_pgsourcetree}/src/interfaces/libpq -I${with_pgsourcetree}/src/include $CFLAGS"
-# LIBS="-L${with_pgsourcetree}/src/interfaces/libpq -lpq $LIBS"
+AC_MSG_CHECKING(PostgreSQL minor version)
+PG_MINOR_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src//include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\([[0-9]]*\).\([[0-9]]*\)\(.\|[[a-z]]*\)*/\2/" -e 's/\"//g' -e 's/\.//'`
+AC_MSG_RESULT($PG_MINOR_VERSION)
+AC_SUBST(PG_MINOR_VERSION, $PG_MINOR_VERSION)
 
-# PQfreemem()
-#AC_MSG_CHECKING([for PQfreemem() in libpq])
-#have_pqfreemem=no
-#AC_TRY_LINK([#include <libpq-fe.h>],
-#	   [PQfreemem(NULL);],
-#	   [have_pqfreemem=yes])
-#AC_MSG_RESULT($have_pqfreemem)
-#if test $have_pqfreemem = yes ; then
-#	AC_DEFINE(HAVE_PQFREEMEM,1,)
-#fi
+AC_MSG_CHECKING(PostgreSQL release number)
+PG_RELEASE_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\([[0-9]]*\).\([[0-9]]*\)\(.\|[[a-z]]*\)/\3/" -e 's/\"//g' -e 's/\.//'`
+AC_MSG_RESULT($PG_RELEASE_VERSION)
+AC_SUBST(PG_RELEASE_VERSION, $PG_RELEASE_VERSION)
 
-# PQputCopyData()
-AC_MSG_CHECKING([for PQputCopyData() in libpq])
-have_pqputcopydata=no
-AC_TRY_LINK([#include <libpq-fe.h>],
-	   [PQputCopyData(NULL,NULL,0);],
-	   [have_pqputcopydata=yes])
-AC_MSG_RESULT($have_pqputcopydata)
-if test $have_pqputcopydata = yes ; then
-	AC_DEFINE(HAVE_PQPUTCOPYDATA,1,)
-fi
+AC_SUBST(PGSOURCETREE, $with_pgsourcetree)
 
-# PQsetNoticeReceiver()
-AC_MSG_CHECKING([for PQsetNoticeReceiver() in libpq])
-have_pqsetnoticereceiver=no
-AC_TRY_LINK([#include <libpq-fe.h>],
-	   [PQsetNoticeReceiver(NULL,NULL,NULL);],
-	   [have_pqsetnoticereceiver=yes])
-AC_MSG_RESULT($have_pqsetnoticereceiver)
-if test $have_pqsetnoticereceiver = yes ; then
-	AC_DEFINE(HAVE_PQSETNOTICERECEIVER,1,)
-fi
+SRCDIR=`echo $PWD`
+AC_SUBST(SRCDIR, $SRCDIR)
 
-AC_MSG_CHECKING([for typcache.h])
-if test -f "${with_pgsourcetree}/src/include/utils/typcache.h"; then
-	have_typcache=yes
-	AC_DEFINE(HAVE_TYPCACHE,1,)
-else
-	have_typcache=no
-fi
-AC_MSG_RESULT($have_typcache)
+CFLAGS="$CFLAGS -I$with_pg_sourcetree/src/include/"
+#LIBS="$save_LIBS"
 
-CFLAGS="$save_CFLAGS"
-LIBS="$save_LIBS"
+#AC_CONFIG_FILES([
+#	Makefile.params
+#])
 
-AC_CONFIG_FILES([
-	Makefile.in 
-])
-
-AC_OUTPUT()
-
-dnl AC_OUTPUT([
-dnl    postgresql-slony1-engine.spec
-dnl ])
+AC_OUTPUT(Makefile)

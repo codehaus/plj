@@ -14,7 +14,7 @@
  * Kocka
  */
 
-#ifndef DEBUG1
+#if (PG_MAJOR_VERSION < 8)
 #define DEBUG5 DEBUG
 #define DEBUG4 DEBUG
 #define DEBUG3 DEBUG
@@ -32,7 +32,7 @@ extern sigjmp_buf* PG_exception_stack;
  * copy-paste from pg 8.0 (some kind of backport...)
  */
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION == 7)
 
 // 
 // ultra minimal exception handling imitation for version 7.4
