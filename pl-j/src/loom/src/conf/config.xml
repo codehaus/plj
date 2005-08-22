@@ -5,6 +5,7 @@
 				<type db="int4" class="org.pgj.typemapping.postgres.PGSmallInt"/>
 				<type db="int8" class="org.pgj.typemapping.postgres.PGBigInt"/>
 				<type db="varchar" class="org.pgj.typemapping.postgres.PGVarchar"/>
+				<type db="name" class="org.pgj.typemapping.postgres.PGVarchar"/>
 				<type db="bool" class="org.pgj.typemapping.postgres.PGBool"/>
 				<type db="bytea" class="org.pgj.typemapping.postgres.PGBytea"/>
 				<!--
@@ -122,9 +123,11 @@
 					-->
 				<DriverMajorVersion>0</DriverMajorVersion>
 				<DriverMinorVersion>1</DriverMinorVersion>
+				
 				<!--
 					And so on...
 					-->
+				
 		</jdbc-config>
 	</jdbc-configurator>
 	<tuplemapper>
