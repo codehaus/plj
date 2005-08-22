@@ -58,7 +58,7 @@ void		plpgj_log_do(log_message);
 
 void		plpgj_EOXactCallBack(bool isCommit, void *arg);
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 void		plpgj_ErrorContextCallback(void *arg);
 #endif
 
@@ -76,14 +76,14 @@ short		plpgj_tx_externalize_nested = 0;
 #define plpgj_tx_externalize		plj_get_configvalue_boolean("plpgj.tx.externalize")
 #define plpgj_tx_externalize_nested	plj_get_configvalue_boolean("plpgj.tx.externalize.nested")
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 #define plpgj_return_cleanup		if(envstack_isempty()) { unreg_error_callback(); UnregisterEOXactCallback(plpgj_EOXactCallBack, NULL); elog(DEBUG1, "plpgj_return_cleanup: done"); }
 #else
 #define plpgj_return_cleanup		
 #endif
 
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 
 void reg_error_callback() {
 	if (!callbacks_init)
@@ -104,7 +104,7 @@ void reg_error_callback() {
 #endif
 
 
-#if (POSTGRES_VERSION != 74)
+#if (PG_MAJOR_VERSION > 7)
 
 void handle_exception(void){
 	ErrorData  *edata;
@@ -130,7 +130,7 @@ void handle_exception(void){
 #endif
 
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 void unreg_error_callback() {
 	if (callbacks_init) {
 		elog(DEBUG1, "unreg_error_callback: 1");
@@ -151,7 +151,7 @@ Datum
 plpgj_call_hook(PG_FUNCTION_ARGS)
 {
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 	if(envstack_isempty())
 		reg_error_callback();
 #endif
@@ -165,7 +165,7 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		plpgj_channel_initialize();
 	}
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 	if(plpgj_tx_externalize && envstack_isempty())
 		RegisterEOXactCallback(plpgj_EOXactCallBack, NULL);
 #endif
@@ -473,7 +473,7 @@ plpgj_log_do(log_message log)
 
 }
 
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 
 /**
  * This may be the starting point of transaction externalisation.
@@ -498,17 +498,11 @@ plpgj_EOXactCallBack(bool isCommit, void *arg)
 	};
 }
 
-#elif (POSTGRES_VERSION == 80)
-
-
-
-#endif
-
 /**
  * ErrorContextCallback function
  */
 
-#if (POSTGRES_VERSION == 74)
+
 void
 plpgj_ErrorContextCallback(void *arg)
 {

@@ -146,7 +146,7 @@ message handle_cursor_open(sql_msg msg) {
 		elog(DEBUG1,"[plj core - cursor open] -> %s", sql_c_o -> query);
 		plan = SPI_prepare(sql_c_o -> query, 0, NULL);
 		elog(DEBUG1,"[plj core - cursor open] -> prepared");
-#if (POSTGRES_VERSION == 74)
+#if (PG_MAJOR_VERSION < 8)
 		portal = //CreatePortal(sql_c_o->cursorname, 1, 1);
 		SPI_cursor_open(cname, plan, NULL, NULL);
 #else
@@ -258,7 +258,7 @@ message handle_pexecute_message(sql_msg msg){
 			pln = (_SPI_plan*) plantable[sql -> planid];
 			if (sql -> action == SQL_PEXEC_ACTION_OPENCURSOR) {
 					elog(DEBUG1, "[plj - sql] opening cursor.");
-					#if POSTGRES_VERSION >= 80
+					#if PG_MAJOR_VERSION >= 8
 					pret = SPI_cursor_open(NULL, 
 						plantable[sql -> planid], values, nulls == NULL ? "" : nulls, true);
 					#else
