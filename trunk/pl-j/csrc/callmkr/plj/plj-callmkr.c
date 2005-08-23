@@ -65,11 +65,10 @@ glpgj_getproc(PG_FUNCTION_ARGS)
 }
 
 void
-plpgj_fill_callstruct(Form_pg_proc procStruct,
+plpgj_fill_callstruct(const char *func_src,
 					  char *classname, char *methodname)
 {
 
-	char	   *func_src;
 	int			func_src_len;
 	int			fret,
 				i;
@@ -77,31 +76,26 @@ plpgj_fill_callstruct(Form_pg_proc procStruct,
 
 	plpgj_create_call_regex_init();
 
-#if PG_MAJOR_VERSION == 7
+//#if PG_MAJOR_VERSION == 7
+//
+//	func_src =
+//		DatumGetCString(DirectFunctionCall1
+//						(textout, PointerGetDatum(&procStruct->prosrc)));
+//
+//#elif PG_MAJOR_VERSION == 8
+//
+///	{
+//	bool isnull;
+///	func_src = DatumGetCString( DirectFunctionCall1 (textout, SysCacheGetAttr(PROCOID, proctup, Anum_pg_proc_prosrc, &isnull)));
+//	if(isnull)
+//		elog(WARNING,"[plj - callmaker] Function source is NULL, this is not handled correctly");
+//	}
+//
+//#else
 
-	func_src =
-		DatumGetCString(DirectFunctionCall1
-						(textout, PointerGetDatum(&procStruct->prosrc)));
+//#error UNSUPPORTED PG MAJOR VERSION, MUST BE 7 OR 8
+//#endif
 
-#elif PG_MAJOR_VERSION == 8
-
-	{
-	bool isnull;
-	elog(DEBUG1,"[call maker] source = %s", procStruct -> prosrc.vl_dat);
-	func_src = procStruct -> prosrc.vl_dat;
-	/*
-	DatumGetCString(DirectFunctionCall1(textout,
-							   SysCacheGetAttr(PROCOID,
-								   proctup -> ,
-								   Anum_pg_proc_prosrc,
-								   &isnull)));
-	*/
-	}
-
-#else
-
-#error UNSUPPORTED PG MAJOR VERSION, MUST BE 7 OR 8
-#endif
 
 	/*
 	 * elog(DEBUG1,func_src);
@@ -358,8 +352,37 @@ plpgj_create_trigger_call(PG_FUNCTION_ARGS)
 	}
 
 
+	{
+	HeapTuple	proctup;
+	Oid		funcoid;
+	char		*func_src;
 	procStruct = glpgj_getproc(fcinfo);
-	plpgj_fill_callstruct(procStruct, ret->classname, ret->methodname);
+	funcoid = fcinfo->flinfo->fn_oid;
+	proctup = SearchSysCache(PROCOID, ObjectIdGetDatum(funcoid), 0, 0, 0);
+	elog(DEBUG1, "[call maker] geting function description");
+#if (PG_MAJOR_VERSION == 7)
+
+	elog(DEBUG1, "[call maker] 7.4 spec");
+	func_src =
+		DatumGetCString(DirectFunctionCall1
+						(textout, PointerGetDatum(&procstruct->prosrc)));
+
+#elif (PG_MAJOR_VERSION == 8)
+
+	{
+	bool isnull;
+	elog(DEBUG1, "[call maker] 8.0 spec");
+	Datum d = DirectFunctionCall1 (textout, SysCacheGetAttr(PROCOID, proctup, Anum_pg_proc_prosrc, &isnull));
+	elog(DEBUG1, "[call maker] making c string");
+	func_src =
+		DatumGetCString(d);
+	}
+#endif
+
+	plpgj_fill_callstruct(func_src, ret->classname, ret->methodname);
+	ReleaseSysCache(proctup);
+	}
+
 	return ret;
 }
 
@@ -390,8 +413,6 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 	funcoid = fcinfo->flinfo->fn_oid;
 	proctup = SearchSysCache(PROCOID, ObjectIdGetDatum(funcoid), 0, 0, 0);
 	procstruct = (Form_pg_proc) GETSTRUCT(proctup);
-	ReleaseSysCache(proctup);
-
 
 	elog(DEBUG1, "[call maker] geting function description");
 #if (PG_MAJOR_VERSION == 7)
@@ -412,6 +433,7 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 		DatumGetCString(d);
 	}
 #else
+	ReleaseSysCache(proctup);
 
 #error NOT SUPPORTED POSTGRESQL VERSION
 #endif
@@ -419,7 +441,7 @@ plpgj_create_call(PG_FUNCTION_ARGS)
 	elog(DEBUG1, "[call maker] function source: %s", func_src);
 	func_src_len = strlen(func_src);
 
-	plpgj_fill_callstruct(procstruct, ret->classname, ret->methodname);
+	plpgj_fill_callstruct(func_src, ret->classname, ret->methodname);
 
 	
 	elog(DEBUG1, "[call maker] class name: %s", ret->classname);
