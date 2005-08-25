@@ -31,6 +31,8 @@
 
 #include "plpgj_hook.h"
 
+#include "memdebug.h"
+
 /*	*/
 
 /* proto */
@@ -198,24 +200,20 @@ plpgj_call_hook(PG_FUNCTION_ARGS)
 		
 		pljelog(DEBUG1, "waiting ansver.");
 		ansver = plpgj_channel_receive();
-		pljelog(DEBUG1, "got %s", ansver == NULL ? "null" : "not null");
 		message_type = plpgj_message_type(ansver);
 		pljelog(DEBUG1, "ansver of type: %d", message_type);
 		switch (message_type)
 		{
 			case MT_RESULT:
-				pljelog(DEBUG1, "received: result");
-
+				//handle elsewhere
 				break;
 			case MT_EXCEPTION:
-				pljelog(DEBUG1, "received: exception");
 				plpgj_exception_do((error_message) ansver);
 				plpgj_return_cleanup;
 				PG_RETURN_NULL();
 				break;
 			case MT_SQL:
 				{
-					pljelog(DEBUG1, "received: sql");
 					plpgj_sql_do(ansver);
 				}
 				break;
