@@ -21,6 +21,8 @@
 #include "libpq-mini-misc.h"
 #include "libpq-mini.h"
 
+#include "memdebug.h"
+
 extern PGconn_min *min_conn;
 
 int
@@ -59,7 +61,6 @@ febe_receive_string(void)
 
 //	elog(DEBUG1,"string len: %d", (unsigned int)cnt);
 	tmp_chr = palloc(sizeof(char) * (cnt + 2));
-	elog(DEBUG1, "---");
 	pqGetnchar(tmp_chr, cnt, min_conn);
 	tmp_chr[cnt] = 0;
 	return tmp_chr;
@@ -198,7 +199,6 @@ int
 plpgj_channel_send(message msg)
 {
 	int			ret;
-
 	switch (msg->msgtype)
 	{
 		case MT_TRIGREQ:
@@ -227,12 +227,12 @@ plpgj_channel_send(message msg)
 void *
 febe_receive_exception()
 {
-	PQExpBuffer name,
-				mesg;
+	//PQExpBuffer name,
+	//			mesg;
 	error_message ret;
 
-	name = createPQExpBuffer();
-	mesg = createPQExpBuffer();
+	//name = createPQExpBuffer();
+	//mesg = createPQExpBuffer();
 
 	ret = palloc(sizeof(str_error_message));
 
@@ -255,7 +255,6 @@ febe_receive_result()
 	plpgj_result ret;
 	int			i,
 				j;				//iterators
-
 	ret = palloc(sizeof(str_plpgj_result));
 	ret->msgtype = MT_RESULT;
 	ret->length = sizeof(str_plpgj_result);
@@ -277,11 +276,10 @@ febe_receive_result()
 	for (i = 0; i < ret->rows; i++)
 		ret->types[i] = NULL;
 
-
 	for (i = 0; i < ret->rows; i++)
 	{
 		if (ret->cols > 0)
-			ret->data[i] = palloc((ret->cols) * sizeof(raw));
+			ret->data[i] = palloc((ret->cols) * sizeof(struct str_raw));
 		else
 			ret->data[i] = NULL;
 		for (j = 0; j < ret->cols; j++)
@@ -302,27 +300,23 @@ febe_receive_result()
 				ret->data[i][j].isnull = 0;
 				len = febe_receive_integer_4();
 				ret->data[i][j].length = len;
-				ret->data[i][j].data = palloc(len);
+				ret->data[i][j].data = palloc(len + 2);
 				elog(DEBUG1, "===");
 				pqGetnchar(ret->data[i][j].data, len, min_conn);
 				{
 					/*
 					 * evil!
 					 */
-					char		buff[100];
+					char		*buff;
 					int			l;
 
-					l = febe_receive_integer_4();
-				elog(DEBUG1, "+++");
-					pqGetnchar(buff, l, min_conn);
-					buff[l] = 0;
+					buff = febe_receive_string();
 					if (ret->types[j] == NULL)
 					{
-						ret->types[j] = palloc(strlen(buff));
+						ret->types[j] = palloc((strlen(buff) +1) * sizeof(char));
 						strcpy(ret->types[j], buff);
 					}
 				}
-
 			}
 		}
 	}
@@ -648,7 +642,6 @@ plpgj_channel_receive(void)
 
 	if(msgret != NULL)
 		pqMessageRecvd(min_conn);
-	elog(DEBUG1, "***");
 	return msgret;
 }
 

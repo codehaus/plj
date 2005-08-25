@@ -16,6 +16,8 @@
 #include "lib/stringinfo.h"
 #include "executor/spi_priv.h"
 
+#include "memdebug.h"
+
 plpgj_handler handlertab = NULL;
 int msg_handler_init = 0;
 
@@ -208,14 +210,14 @@ message handle_pexecute_message(sql_msg msg){
 	int i;
 	sql_pexecute sql = (sql_pexecute)msg;
 
-	elog(DEBUG1, "handle_pexecute_message");
 
 	if(sql -> nparams == 0){
 		values = NULL;
 		nulls = NULL;
 	} else {
-		values = palloc( (sql -> nparams+1) * sizeof(Datum) );
-		nulls = palloc( (sql -> nparams+1) * sizeof(char) );
+		values = palloc( (sql -> nparams) * sizeof(Datum) );
+		nulls = palloc( (sql -> nparams +1 ) * sizeof(char) );
+		memset(nulls, 0, (sql -> nparams +1 ) * sizeof(char) );
 	}
 
 	for(i = 0; i < sql -> nparams; i++) {
@@ -248,9 +250,6 @@ message handle_pexecute_message(sql_msg msg){
 		return NULL;
 	}
 
-	if(nulls != NULL)
-		nulls[sql -> nparams + 1] = 0;
-
 	{
 		Portal pret;
 		PG_TRY();
@@ -259,6 +258,7 @@ message handle_pexecute_message(sql_msg msg){
 			if (sql -> action == SQL_PEXEC_ACTION_OPENCURSOR) {
 					elog(DEBUG1, "[plj - sql] opening cursor.");
 					#if PG_MAJOR_VERSION >= 8
+
 					pret = SPI_cursor_open(NULL, 
 						plantable[sql -> planid], values, nulls == NULL ? "" : nulls, true);
 					#else
@@ -309,6 +309,7 @@ message handle_pexecute_message(sql_msg msg){
 			handle_exception();
 		PG_END_TRY();
 	}
+
 	return NULL;
 }
 
@@ -358,7 +359,7 @@ void message_handler_init(){
 
 message handle_message(sql_msg msg) {
 	int msg_type = msg -> sqltype;
-	
+
 	if(!msg_handler_init)
 		message_handler_init();
 
