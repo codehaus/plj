@@ -11,7 +11,7 @@
 #	Copyright (c) 2003-2004, PostgreSQL Global Development Group
 #	Author: Jan Wieck, Afilias USA INC.
 #
-# $Id: configure.in,v 1.1 2005-08-22 15:10:10 kocka Exp $
+# $Id: configure.in,v 1.2 2005-08-27 13:04:51 kocka Exp $
 #
 # Process this file with autoconf to produce a configure script.
 # ----------
@@ -109,17 +109,17 @@ fi
 
 
 AC_MSG_CHECKING(PostgreSQL major version)
-PG_MAJOR_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\([[0-9]]*\).*/\1/" -e 's/\"//g'`
+PG_MAJOR_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\"//g"  -e "s/\([[0-9]]*\).\([0-9]*\)\(.*\)/\1/" -e "s/\.//g"`
 AC_MSG_RESULT($PG_MAJOR_VERSION)
 AC_SUBST(PG_MAJOR_VERSION, $PG_MAJOR_VERSION)
 
 AC_MSG_CHECKING(PostgreSQL minor version)
-PG_MINOR_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src//include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\([[0-9]]*\).\([[0-9]]*\)\(.\|[[a-z]]*\)*/\2/" -e 's/\"//g' -e 's/\.//'`
+PG_MINOR_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\"//g"  -e "s/\([[0-9]]*\).\([0-9]*\)\(.*\)/\2/" -e "s/\.//g"`
 AC_MSG_RESULT($PG_MINOR_VERSION)
 AC_SUBST(PG_MINOR_VERSION, $PG_MINOR_VERSION)
 
 AC_MSG_CHECKING(PostgreSQL release number)
-PG_RELEASE_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\([[0-9]]*\).\([[0-9]]*\)\(.\|[[a-z]]*\)/\3/" -e 's/\"//g' -e 's/\.//'`
+PG_RELEASE_VERSION=`grep "#define PACKAGE_VERSION" $with_pgsourcetree/src/include/pg_config.h | sed -e "s/#define PACKAGE_VERSION //" -e "s/\"//g"  -e "s/\([[0-9]]*\).\([0-9]*\)\(.*\)/\3/" -e "s/\.//g"`
 AC_MSG_RESULT($PG_RELEASE_VERSION)
 AC_SUBST(PG_RELEASE_VERSION, $PG_RELEASE_VERSION)
 
