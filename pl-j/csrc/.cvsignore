@@ -1,8 +1,0 @@
-*.o
-*.swp
-Makefile.in
-autom4te.cache
-config.status
-config.log
-config.h
-autoscan.log
