@@ -1,0 +1,47 @@
+
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>plj</groupId>
+	<artifactId>plj</artifactId>
+	<version>0.2.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>PLJ - top level project</name>
+  <ciManagement>
+  <notifiers>
+  <notifier>
+  <type>mail</type>
+  <sendOnFailure>true</sendOnFailure>
+  <sendOnError>true</sendOnError>
+  <sendOnSuccess>true</sendOnSuccess>
+  <sendOnWarning>true</sendOnWarning>
+  <configuration>
+  <address>kocka.dev.null@gmail.com</address>
+  </configuration>
+  </notifier>
+  </notifiers>
+  </ciManagement>
+  
+	<repositories>
+		<repository>
+			<id>Ibiblio</id>
+			<name>Ibiblio</name>
+			<url>http://www.ibiblio.org/maven2</url>
+		</repository>
+		<repository>
+			<id>codehaus</id>
+			<name>codehaus</name>
+			<url>http://dist.codehaus.org/</url>
+		</repository>
+	</repositories>
+	<scm>
+		<connection>scm:cvs:pserver:anonymous@cvs.plj.codehaus.org:/cvs/plj/</connection>
+		<url>http://cvs.plj.codehaus.org/</url>
+	</scm>
+	<modules>
+		<module>plj-interfaces</module>
+		<module>plj-java</module>
+		<module>plj-febe</module>
+		<module>plj-postgresql</module>
+	</modules>
+</project>
+
