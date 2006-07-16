@@ -12,7 +12,7 @@ import org.codehaus.plg.messages.Message;
  * @version planing
  */
 
-public interface Executor{
+public interface Runner{
 	
 	/**
 	 * Perform a call.
