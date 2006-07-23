@@ -40,7 +40,10 @@
 	<modules>
 		<module>plj-interfaces</module>
 		<module>plj-java</module>
+		<module>plj-utils</module>
+		<module>plj-jdbc</module>
 		<module>plj-febe</module>
+		<module>plj-core</module>
 		<module>plj-postgresql</module>
 	</modules>
 </project>
