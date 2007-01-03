@@ -36,7 +36,7 @@ public class PostgresTypeMapper
 	private HashMap typeBackMap = new HashMap();
 
 	/** Avalon logger */
-	private Logger logger = null;
+	private final static Logger logger = Logger.getLogger(PostgresTypeMapper.class);
 
 	public PostgresTypeMapper() {
 		super();
@@ -73,13 +73,6 @@ public class PostgresTypeMapper
 	 */
 	public void initialize() throws java.lang.Exception {
 		logger.debug("initialized");
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.avalon.framework.logger.LogEnabled#enableLogging(org.apache.avalon.framework.logger.Logger)
-	 */
-	public void enableLogging(Logger logger) {
-		this.logger = logger;
 	}
 
 	/**
