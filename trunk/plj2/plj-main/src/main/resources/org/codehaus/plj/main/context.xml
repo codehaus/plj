@@ -2,6 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-	<bean name="glue">
+
+	<bean name="executor" class="org.codehaus.plj.java.JavaExecutor">
+
+	</bean>
+
+	<bean name="channel" class="org.codehaus.plj.febe.FEBEChannel" init-method="init" destroy-method="shutdown">
+	</bean>
+
+	<bean name="glue" class="org.codehaus.plj.core.Glue" init-method="start">
+		<property name="channel" ref="channel"/>
+		<property name="executor" ref="executor"/>
 	</bean>
 </beans>

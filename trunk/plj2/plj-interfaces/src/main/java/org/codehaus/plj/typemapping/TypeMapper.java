@@ -3,7 +3,7 @@ package org.codehaus.plj.typemapping;
 
 import java.util.Map;
 
-import org.codehaus.plg.messages.Result;
+import org.codehaus.plj.messages.Result;
 
 /**
  * Interface for type mapper blocks.

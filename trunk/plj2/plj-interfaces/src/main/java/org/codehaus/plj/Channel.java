@@ -1,6 +1,6 @@
 package org.codehaus.plj;
 
-import org.codehaus.plg.messages.Message;
+import org.codehaus.plj.messages.Message;
 import org.codehaus.plj.typemapping.MappingException;
 
 /**

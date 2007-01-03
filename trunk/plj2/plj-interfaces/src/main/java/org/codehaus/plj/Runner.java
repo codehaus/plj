@@ -1,7 +1,7 @@
 package org.codehaus.plj;
 
-import org.codehaus.plg.messages.CallRequest;
-import org.codehaus.plg.messages.Message;
+import org.codehaus.plj.messages.CallRequest;
+import org.codehaus.plj.messages.Message;
 
 /**
  * An interface for call executors.
