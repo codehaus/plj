@@ -42,7 +42,7 @@ public class GlueWorker
 	}
 
 	/** Logger */
-	private Logger logger = null;
+	private final static Logger logger = Logger.getLogger(GlueWorker.class);
 
 	private GlueConfiguration gConf = null;
 
@@ -104,13 +104,6 @@ public class GlueWorker
 	}
 
 	/**
-	 * @see LogEnabled#enableLogging(Logger)
-	 */
-	public void enableLogging(Logger arg0) {
-		logger = arg0;
-	}
-
-	/**
 	 * @see Startable#start()
 	 */
 	public void start() throws java.lang.Exception {
@@ -130,6 +123,7 @@ public class GlueWorker
 			execute();
 		} catch (java.lang.Exception e) {
 			logger.error("GlueWorker: something error in execution.", e);
+			throw new RuntimeException(e);
 		}
 	}
 

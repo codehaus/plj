@@ -6,9 +6,6 @@ import org.codehaus.plj.Client;
 import org.codehaus.plj.Runner;
 import org.codehaus.plj.TriggerExecutor;
 
-import com.sun.corba.se.internal.orbutil.ThreadPool;
-import com.sun.jndi.ldap.pool.Pool;
-
 /**
  * The logic that wakes up glue workers.
  * This logic runs as in a separate thread and listens the chanell for inclmming connections.
@@ -21,14 +18,10 @@ public class GlueBoss implements Runnable {
 	/** Reference ot the chanell we are dealing with. */
 	private Channel chanell = null;
 	/** Logger for the Glue component. */
-	private Logger logger = null;
+	private final static Logger logger = Logger.getLogger(GlueBoss.class);
 	/** flag to show if we are terminating */
 	private boolean terminating = false;
 	/** the thread pool to use for workers */
-	private ThreadPool threadPool = null;
-	/** Worker pool */
-	private Pool workerPool = null;
-	/** Reference to the executor component. */
 	private Runner executor;
 	/** Reference to the executor component. */
 	private TriggerExecutor triggerExecutor;
@@ -47,7 +40,8 @@ public class GlueBoss implements Runnable {
 		try {
 			execute();
 		} catch (Exception e) {
-			logger.fatal("execution", e);
+			logger.error("Glue run error, shuting down", e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -102,55 +96,10 @@ public class GlueBoss implements Runnable {
 	}
 
 	/**
-	 * @see LogEnabled#enableLogging(Logger)
-	 */
-	public void enableLogging(Logger arg0) {
-		logger = arg0;
-	}
-
-	/**
-	 * @see Startable#start()
-	 */
-	public void start() throws Exception {
-	}
-
-	/**
 	 * @see Startable#stop()
 	 */
 	public void stop() throws Exception {
 		terminating = true;
-	}
-
-	/**
-	 * Gets the threadPool.
-	 * @return Returns a ThreadPool
-	 */
-	protected ThreadPool getThreadPool() {
-		return threadPool;
-	}
-
-	/**
-	 * Sets the threadPool.
-	 * @param threadPool The threadPool to set
-	 */
-	protected void setThreadPool(ThreadPool threadPool) {
-		this.threadPool = threadPool;
-	}
-
-	/**
-	 * Gets the workerPool.
-	 * @return Returns a Pool
-	 */
-	protected Pool getWorkerPool() {
-		return workerPool;
-	}
-
-	/**
-	 * Sets the workerPool.
-	 * @param workerPool The workerPool to set
-	 */
-	protected void setWorkerPool(Pool workerPool) {
-		this.workerPool = workerPool;
 	}
 
 	/**

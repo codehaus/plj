@@ -1,15 +1,11 @@
 package org.codehaus.plj.core;
 
-import javax.naming.ConfigurationException;
-import javax.security.auth.login.Configuration;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plj.Channel;
 import org.codehaus.plj.JTAAdapter;
 import org.codehaus.plj.Runner;
 import org.codehaus.plj.TriggerExecutor;
-
-import com.sun.jndi.ldap.pool.Pool;
 
 
 /**
@@ -22,13 +18,13 @@ import com.sun.jndi.ldap.pool.Pool;
  */
 public class Glue {
 
+	private final static Logger logger = Logger.getLogger(Glue.class);
+
+	
 	/**
 	 * Glue configuration object.
 	 */
 	private GlueConfiguration gConf = null;
-
-	/** Workers are pooled here. */
-	private Pool workerPool = null;
 
 //	/** Factory that creates workers */
 //	private GlueWorkerFactory gwfactory = null;
@@ -43,22 +39,13 @@ public class Glue {
 	private GlueBoss gb;
 
 	/** The chanell we are dealing with */
-	private Channel chanell = null;
+	private Channel channel = null;
 
 	/** The executor we are dealing with */
 	private Runner executor = null;
 
 	/** The trigger executor, if it differs from the call executor */
 	private TriggerExecutor trigexecutor = null;
-
-	//
-	//from Configurable
-	//
-	public void configure(Configuration conf) throws ConfigurationException {
-		gConf = new GlueConfiguration();
-//		gConf.setErrorRecoverable(conf.getChild("errorRecoverable").getValueAsBoolean());
-		logger.debug("configured");
-	}
 
 	public void initialize() throws Exception {
 		logger.debug("initializing");
@@ -72,20 +59,14 @@ public class Glue {
 	}
 
 	public void start() throws Exception {
-		try {
 			gb = new GlueBoss();
-			gb.enableLogging(logger);
-			gb.setChanell(chanell);
-			gb.setWorkerPool(workerPool);
+			gb.setChanell(channel);
 			gb.setExecutor(executor);
 			gb.setTriggerExecutor(trigexecutor);
 
 			new Thread(gb).run();
 
 			logger.debug("started");
-		} catch (Throwable t) {
-			logger.fatal("glue threads cannot start", t);
-		}
 	}
 
 	public void stop() throws Exception {
@@ -97,21 +78,13 @@ public class Glue {
 		}
 	}
 
-	//
-	//from LogEnabled
-	//
-	Logger logger = null;
-
-	public void enableLogging(Logger logger) {
-		this.logger = logger;
-	}
 
 	public Channel getChanell() {
-		return chanell;
+		return channel;
 	}
 
-	public void setChanell(Channel chanell) {
-		this.chanell = chanell;
+	public void setChannel(Channel channel) {
+		this.channel = channel;
 	}
 
 	public Runner getExecutor() {
