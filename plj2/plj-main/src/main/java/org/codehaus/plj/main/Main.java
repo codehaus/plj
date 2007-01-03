@@ -12,7 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class Main {
 
-	private final static String[] CTX_DESCRIPTORS = {""};
+	private final static String[] CTX_DESCRIPTORS = {"classpath:org/codehaus/plj/main/context.xml"};
 
 	/**
 	 * @param args

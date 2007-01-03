@@ -4,8 +4,8 @@
 
 package org.codehaus.plj;
 
-import org.codehaus.plg.messages.Message;
-import org.codehaus.plg.messages.TriggerCallRequest;
+import org.codehaus.plj.messages.Message;
+import org.codehaus.plj.messages.TriggerCallRequest;
 
 /**
  * Trigger execution interface.
